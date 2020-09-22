@@ -27,8 +27,6 @@ public class UpdateRealTimeTask  implements Runnable {
 					RealTimeDo model=new RealTimeDo();
 					BeanUtils.copyProperties(date, model);
 					guPiaoService.realTimeInsert(model);
-				}else {
-					logger.info(threadName+"：请求结果为空！！！！！！！！！！！！！！："+number);
 				}
 			} catch (Exception e) {
 			}

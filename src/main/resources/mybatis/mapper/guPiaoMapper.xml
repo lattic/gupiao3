@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+						"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.example.mapper.GuPiaoMapper">
+
+	<resultMap id="guPiaoDo" type="com.example.model.GuPiaoDo">
+		<result column="id" property="id" jdbcType="BIGINT" />
+
+		<result column="number" property="number" jdbcType="VARCHAR" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="kaipanjia" property="kaipanjia" jdbcType="DOUBLE" />
+		<result column="zuorishoupanjia" property="zuorishoupanjia" jdbcType="DOUBLE" />
+		<result column="dangqianjiage" property="dangqianjiage" jdbcType="DOUBLE" />
+		<result column="top" property="top" jdbcType="DOUBLE" />
+		<result column="low" property="low" jdbcType="DOUBLE" />
+		<result column="jbuy1" property="jbuy1" jdbcType="DOUBLE" />
+		<result column="jsell1" property="jsell1" jdbcType="DOUBLE" />
+		<result column="chengjiaogupiao" property="chengjiaogupiao" jdbcType="DECIMAL" />
+		<result column="chengjiaojine" property="chengjiaojine" jdbcType="DECIMAL" />
+		<result column="buy1number" property="buy1number" jdbcType="DOUBLE" />
+		<result column="buy1" property="buy1" jdbcType="DOUBLE" />
+		<result column="buy2number" property="buy2number" jdbcType="DOUBLE" />
+		<result column="buy2" property="buy2" jdbcType="DOUBLE" />
+		<result column="buy3number" property="buy3number" jdbcType="DOUBLE" />
+		<result column="buy3" property="buy3" jdbcType="DOUBLE" />
+		<result column="buy4number" property="buy4number" jdbcType="DOUBLE" />
+		<result column="buy4" property="buy4" jdbcType="DOUBLE" />
+		<result column="buy5number" property="buy5number" jdbcType="DOUBLE" />
+		<result column="buy5" property="buy5" jdbcType="DOUBLE" />
+		<result column="sell1number" property="sell1number" jdbcType="DOUBLE" />
+		<result column="sell1" property="sell1" jdbcType="DOUBLE" />
+		<result column="sell2number" property="sell2number" jdbcType="DOUBLE" />
+		<result column="sell2" property="sell2" jdbcType="DOUBLE" />
+		<result column="sell3number" property="sell3number" jdbcType="DOUBLE" />
+		<result column="sell3" property="sell3" jdbcType="DOUBLE" />
+		<result column="sell4number" property="sell4number" jdbcType="DOUBLE" />
+		<result column="sell4" property="sell4" jdbcType="DOUBLE" />
+		<result column="sell5number" property="sell5number" jdbcType="DOUBLE" />
+		<result column="sell5" property="sell5" jdbcType="DOUBLE" />
+		<result column="date" property="date" jdbcType="VARCHAR" />
+		<result column="time" property="time" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<sql id="All_Column">
+		id,
+		number,name,kaipanjia,zuorishoupanjia,dangqianjiage,top,
+		low,jbuy1,jsell1,chengjiaogupiao,chengjiaojine,buy1number,buy1,
+		buy2number,buy2,buy3number,buy3,buy4number,buy4,buy5number,buy5,
+		sell1number,sell1,sell2number,sell2,sell3number,sell3,sell4number,sell4,
+		sell5number,sell5,date,time
+	</sql>
+
+	<select id="getAll" resultMap="guPiaoDo">
+		SELECT
+		<include refid="All_Column" />
+		FROM gupiao
+	</select>
+
+	<select id="getNumber" parameterType="string" resultMap="guPiaoDo">
+		SELECT
+		<include refid="All_Column" />
+		FROM gupiao
+		WHERE number = #{number}
+		limit 1
+	</select>
+
+	<insert id="insert" parameterType="guPiaoDo">
+		INSERT INTO
+		gupiao
+		(number,name,kaipanjia,zuorishoupanjia,dangqianjiage,top,
+		low,jbuy1,jsell1,chengjiaogupiao,chengjiaojine,buy1number,buy1,
+		buy2number,buy2,buy3number,buy3,buy4number,buy4,buy5number,buy5,
+		sell1number,sell1,sell2number,sell2,sell3number,sell3,sell4number,sell4,
+		sell5number,sell5,date,time)
+		VALUES
+		(#{number},#{name},#{kaipanjia},#{zuorishoupanjia},#{dangqianjiage},#{top},
+		#{low},#{jbuy1},#{jsell1},#{chengjiaogupiao},#{chengjiaojine},#{buy1number},#{buy1},#{buy2number},#{buy2},#{buy3number},#{buy3},#{buy4number},#{buy4},#{buy5number},#{buy5},#{sell1number},#{sell1},#{sell2number},#{sell2},#{sell3number},#{sell3},#{sell4number},#{sell4},#{
+		sell5number},#{sell5},#{date},#{time})
+	</insert>
+
+	<delete id="delete" parameterType="guPiaoDo">
+		DELETE FROM
+		gupiao
+		WHERE
+		id =#{id}
+	</delete>
+
+</mapper>

@@ -35,13 +35,13 @@ public class MonitorTask implements InitializingBean {
 	@Autowired
 	private GuPiaoService guPiaoService;
 	
-//	@Scheduled(cron = "0 0/5 * * * *")
+	@Scheduled(cron = "0 0 0/2 * * *")
 	private void init() {
 		pool.execute(new Runnable() {
 			@Override
 			public void run() {
 				if(!updateAll) {
-					System.out.println("已经有程序在执行！！！");
+					logger.info("已经有程序在执行！！！");
 					return;
 				}
 				updateAll=false;
@@ -75,23 +75,10 @@ public class MonitorTask implements InitializingBean {
 		updateAll=true;
 	}
 	
-	
-	
-//	@Scheduled(cron = "0/3 * * * * *")
-	private void  monitor() {
-		GuPiao date=ReadUrl.readUrl(2117, "sz0",true);
-		if(date !=null) {
-			logger.info(date.toString());
-			RealTimeDo model=new RealTimeDo();
-			BeanUtils.copyProperties(date, model);
-			guPiaoService.realTimeInsert(model);
-		}
-	}
-
-	@Scheduled(cron = "0/5 * * * * *")
+	@Scheduled(cron = "0/3 * * * * *")
 	private void  monitorAll() {
 		if(!updateReal) {
-			System.out.println("monitorAll 已经有程序在执行！！！");
+			logger.info("monitorAll 已经有程序在执行！！！");
 			return;
 		}
 		updateReal=false;
@@ -116,7 +103,7 @@ public class MonitorTask implements InitializingBean {
 	
 	@Scheduled(cron = "0/5 * * * * *")
 	private void status() {
-		System.out.println(pool.isTerminated()+"_"+pool.getActiveCount()+"_"+pool.getCompletedTaskCount()+"_"+pool.getPoolSize());
+		logger.info("检查线程完成状态："+pool.getActiveCount());
 		if(pool.getActiveCount()<1) {
 			updateReal=true;
 		}

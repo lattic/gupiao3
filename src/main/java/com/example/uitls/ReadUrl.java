@@ -10,7 +10,7 @@ import com.example.demo.GuPiao;
 
 public class ReadUrl {
 	private static Map<String, String> map = new ConcurrentHashMap<>();
-	private static Logger logger = LoggerFactory.getLogger(ReadUrl.class);
+	private static Logger logger = LoggerFactory.getLogger("real_time_monitor");
 
 	public static GuPiao readUrl(String title, boolean isTemp) {
 		String url = "http://hq.sinajs.cn/list=" + title;

@@ -15,20 +15,20 @@ public class UpdateRealTimeTask  implements Runnable {
 
 	private String number;
 	private GuPiaoService guPiaoService;
-	private String threadName;
-	private static Logger logger = LoggerFactory.getLogger(UpdateRealTimeTask.class);
+	private static Logger logger = LoggerFactory.getLogger("real_time_monitor");
 	
 	@Override
 	public void run() {
 			try {
 				GuPiao date=ReadUrl.readUrl(number,true);
 				if(date !=null && guPiaoService!=null) {
-					logger.info(threadName+"：写入数据库"+number);
+					logger.info("写入数据库"+number);
 					RealTimeDo model=new RealTimeDo();
 					BeanUtils.copyProperties(date, model);
 					guPiaoService.realTimeInsert(model);
 				}
 			} catch (Exception e) {
+				logger.warn(e.getMessage(),e);
 			}
 	}
 
@@ -48,13 +48,6 @@ public class UpdateRealTimeTask  implements Runnable {
 		this.guPiaoService = guPiaoService;
 	}
 
-	public String getThreadName() {
-		return threadName;
-	}
-
-	public void setThreadName(String threadName) {
-		this.threadName = threadName;
-	}
 
 	
 }

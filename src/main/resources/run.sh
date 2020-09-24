@@ -1,6 +1,7 @@
 docker stop gupiao
 docker rm gupiao
-docker run --name gupiao \
+docker run -d  --name gupiao \
+	-v  /home/admin/docker/gupiao:/root/logs \
 	-v  /home/admin/docker/jenkins/jenkins_data/workspace/gupiao/target:/usr/src/ \
 	-w /usr/src \
 	java:8 \

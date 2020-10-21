@@ -94,6 +94,7 @@ public class MonitorTask implements InitializingBean {
 			pool.execute(new Runnable() {
 				@Override
 				public void run() {
+					ReadUrl.readUrl(gupiao.getNumber(),60);
 					UpdateRealTimeTask task=new UpdateRealTimeTask();
 					task.setNumber(gupiao.getNumber());
 					task.setGuPiaoService(guPiaoService);

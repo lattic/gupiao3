@@ -1,67 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration>
-    <!-- https://github.com/spring-projects/spring-boot/blob/v1.5.13.RELEASE/spring-boot/src/main/resources/org/springframework/boot/logging/logback/defaults.xml -->
-    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+<configuration debug="false">
+	<!-- https://github.com/spring-projects/spring-boot/blob/v1.5.13.RELEASE/spring-boot/src/main/resources/org/springframework/boot/logging/logback/defaults.xml -->
+	<include
+		resource="org/springframework/boot/logging/logback/defaults.xml" />
 
-    <property name="APP_NAME" value="gupiao" />
-    <property name="LOG_PATH" value="${user.home}/logs/app" />
-    <property name="LOG_FILE" value="${LOG_PATH}/application.log" />
+	<property name="APP_NAME" value="gupiao" />
+	<property name="LOG_PATH" value="${user.home}/logs/app" />
+	<property name="LOG_FILE" value="${LOG_PATH}/application.log" />
+	
+	<logger name="org.apache" level="INFO" />
+    <logger name="org.apache.http.wire" level="INFO" />
+    <logger name="org.apache.http.headers" level="INFO" />
 
-    <appender name="APPLICATION"
-        class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_FILE}</file>
-        <encoder>
-            <pattern>${FILE_LOG_PATTERN}</pattern>
-        </encoder>
-        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-            <maxHistory>7</maxHistory>
-            <maxFileSize>50MB</maxFileSize>
-            <totalSizeCap>20GB</totalSizeCap>
-        </rollingPolicy>
-    </appender>
-    
-    <appender name="REAL_TIME_MONITOR"
-        class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_PATH}/RealTimeMonitor.log</file>
-        <encoder>
-            <pattern>${FILE_LOG_PATTERN}</pattern>
-        </encoder>
-        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_PATH}/RemoteMonitor.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-            <maxHistory>7</maxHistory>
-            <maxFileSize>50MB</maxFileSize>
-            <totalSizeCap>20GB</totalSizeCap>
-        </rollingPolicy>
-    </appender>
-    <appender name="DINGTALK_LOG"
-        class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_PATH}/dingtalk.log</file>
-        <encoder>
-            <pattern>${FILE_LOG_PATTERN}</pattern>
-        </encoder>
-        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_PATH}/dingtalk.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-            <maxHistory>7</maxHistory>
-            <maxFileSize>50MB</maxFileSize>
-            <totalSizeCap>20GB</totalSizeCap>
-        </rollingPolicy>
-    </appender>
-    
 
-    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
-            <charset>utf8</charset>
-        </encoder>
-    </appender>
-    
-   <logger name="dingtalk_log" level="INFO"  additivity="false" >
-        <appender-ref ref="DINGTALK_LOG" />
-    </logger>
+	<appender name="APPLICATION"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_FILE}</file>
+		<encoder>
+			<pattern>${FILE_LOG_PATTERN}</pattern>
+		</encoder>
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+			<maxHistory>7</maxHistory>
+			<maxFileSize>50MB</maxFileSize>
+			<totalSizeCap>20GB</totalSizeCap>
+		</rollingPolicy>
+	</appender>
 
-    <root level="INFO">
-        <appender-ref ref="CONSOLE" />
-        <appender-ref ref="APPLICATION" />
-    </root>
+	<appender name="REAL_TIME_MONITOR"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_PATH}/RealTimeMonitor.log</file>
+		<encoder>
+			<pattern>${FILE_LOG_PATTERN}</pattern>
+		</encoder>
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_PATH}/RemoteMonitor.%d{yyyy-MM-dd}.%i.log
+			</fileNamePattern>
+			<maxHistory>7</maxHistory>
+			<maxFileSize>50MB</maxFileSize>
+			<totalSizeCap>20GB</totalSizeCap>
+		</rollingPolicy>
+	</appender>
+	<appender name="DINGTALK_LOG"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_PATH}/dingtalk.log</file>
+		<encoder>
+			<pattern>${FILE_LOG_PATTERN}</pattern>
+		</encoder>
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_PATH}/dingtalk.%d{yyyy-MM-dd}.%i.log
+			</fileNamePattern>
+			<maxHistory>7</maxHistory>
+			<maxFileSize>50MB</maxFileSize>
+			<totalSizeCap>20GB</totalSizeCap>
+		</rollingPolicy>
+	</appender>
+
+
+	<appender name="CONSOLE"
+		class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>${CONSOLE_LOG_PATTERN}</pattern>
+			<charset>utf8</charset>
+		</encoder>
+	</appender>
+
+	<logger name="dingtalk_log" level="INFO" additivity="false">
+		<appender-ref ref="DINGTALK_LOG" />
+	</logger>
+	
+	
+	<root level="INFO">
+		<appender-ref ref="CONSOLE" />
+		<appender-ref ref="APPLICATION" />
+	</root>
 </configuration>

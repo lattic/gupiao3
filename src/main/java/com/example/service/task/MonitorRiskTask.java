@@ -42,6 +42,9 @@ public class MonitorRiskTask {
 		listenRealTime("sz300073");
 		listenRealTime("sz002201");
 		listenRealTime("sh600438");
+		listenRealTime("sz300232");
+		listenRealTime("sz300092");
+		listenRealTime("sz300014");
 	}
 
 	private void listenRealTime(String key) throws Exception {

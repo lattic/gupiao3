@@ -5,6 +5,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -27,8 +28,12 @@ public class ReadUrl {
 	private static ConcurrentHashMap<String, BigDecimal> minPriceMap=new ConcurrentHashMap<String, BigDecimal>();
 	
 	public static void main(String[] args) {
-		List<HistoryPriceDo> list=ReadUrl.readUrl("sz300073",60);
-		logger.info(JSON.toJSONString(list));
+		for(int i=1;i<3000;i++) {
+			String number = String.format("%05d", i);
+			List<HistoryPriceDo> list=ReadUrl.readUrl("sz3"+number,60);
+		}
+		
+		//logger.info(JSON.toJSONString(list));
 	}
 	
 	
@@ -49,19 +54,28 @@ public class ReadUrl {
 			return null;
 		}
 		List<HistoryPriceDo> list=new ArrayList<HistoryPriceDo>();
+		if(JSON.parseObject(code)==null) {
+			return null;
+		}
 		JSONArray  priceList=(JSONArray)JSON.parseObject(code).get("record");
-		int chuangeValue=0;
 		int powerValue=0;
 		int buyCount=0;
 		int sellCount=0;
 		int num=0;
-		double total=10000;
-		for(int i=0;i<priceList.size();i++) {
+		int init=100000;
+		double allwin=0;
+		double total=init;
+		Calendar calendar=Calendar.getInstance();
+		calendar.set(Calendar.HOUR_OF_DAY,-24);
+		Date now=calendar.getTime();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd");
+		for(int i=210;i<priceList.size();i++) {
 			 List<Object> priceObjList=(List<Object>)priceList.get(i);
 			 HistoryPriceDo price=new HistoryPriceDo();
 			 try {
 				 	price.setNumber(title);
-				    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				    
 		            Date date = sdf.parse((String)priceObjList.get(0));
 		            price.setDateime(date);
 		            price.setKaipanjia(getBigDecimal(priceObjList.get(1)));
@@ -96,10 +110,14 @@ public class ReadUrl {
 		            if(price.getShoupanjia().compareTo(price.getMa20()) > -1) {
 		            	buyCount++;
 		            	sellCount=0;
-		            	if(buyCount == 1) {
+		            	if(buyCount == 1 && powerValue>-3) {
 		            		num=(int) Math.floor(total/(price.getShoupanjia().doubleValue()*100));
 		            		total=total-price.getShoupanjia().doubleValue()*100*num;
-		            		logger.info("编号："+price.getNumber()+" 买入点!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"+sdf.format(price.getDateime())+" 价格："+price.getShoupanjia()+" 数量："+(num*100) +" 余额:"+df.format(total));
+		            		
+		            		logger.info("编号："+price.getNumber()+" 买入点!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"+sdf.format(price.getDateime())+"当前能量值："+powerValue+" 价格："+price.getShoupanjia()+" 数量："+(num*100) +" 余额:"+df.format(total));
+		            		if(sdf.format(price.getDateime()).contains(sdf1.format(now))) {
+		            			logger.info("|||||||||||||||||||||||||||||||||||||||||||||||||");
+		            		}
 		            	}
 		            	powerValue++;
 		            	//logger.info(sdf.format(price.getDateime())+":"+price.getNumber()+" "+price.getShoupanjia()+">="+price.getMa20()+"=趋势上升   "+"当前能量值："+powerValue+" 偏移量："+price.getPianlizhi());
@@ -107,19 +125,22 @@ public class ReadUrl {
 		            }else {
 		            	sellCount++;
 		            	buyCount=0;
-		            	if(sellCount == 1) {
+		            	if(sellCount == 1 && num>0) {
 		            		total=total+price.getShoupanjia().doubleValue()*100*num;
-		            		double win=total-10000;
+		            		double win=total-init;
+		            		allwin=allwin+win;
 		            		num=0;
-		            		logger.info("编号："+price.getNumber()+" 卖出点!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"+sdf.format(price.getDateime())+" 价格："+df.format(price.getShoupanjia())+" 余额:"+df.format(total)+" 盈利："+df.format(win)+" 盈利率："+df.format(win/100)+"%");
-		            		total=10000;
+		            		logger.info("编号："+price.getNumber()+" 卖出点!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"+sdf.format(price.getDateime())+"当前能量值："+powerValue+" 价格："+df.format(price.getShoupanjia())+" 余额:"+df.format(total)+" 盈利："+df.format(win)+" 盈利率："+df.format((win/init)*100)+"% 累计:"+df.format(allwin)+" 累计盈利率:"+df.format((allwin/init)*100)+"%");
+		            		if(sdf.format(price.getDateime()).contains(sdf1.format(now))) {
+		            			logger.info("|||||||||||||||||||||||||||||||||||||||||||||||||");
+		            		}
+		            		total=init;
 		            		
 		            	}
 		            	powerValue--;
 		            	//logger.info(sdf.format(price.getDateime())+":"+price.getNumber()+" "+price.getShoupanjia()+"<"+price.getMa20()+"=趋势下降  "+"当前能量值："+powerValue+" 偏移量："+price.getPianlizhi());
 		            }
 		            price.setPowerValue(powerValue);
-		            chuangeValue=powerValue;
 		            list.add(price);
 		        } catch (ParseException e) {
 		        	logger.error(e.getMessage(),e);

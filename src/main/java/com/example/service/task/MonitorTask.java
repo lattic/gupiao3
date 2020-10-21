@@ -1,5 +1,7 @@
 package com.example.service.task;
 
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -20,6 +22,7 @@ import com.example.demo.GuPiao;
 import com.example.model.GuPiaoDo;
 import com.example.model.RealTimeDo;
 import com.example.service.GuPiaoService;
+import com.example.uitls.DingTalkRobotHTTPUtil;
 import com.example.uitls.ReadUrl;
 
 @Service
@@ -112,6 +115,10 @@ public class MonitorTask implements InitializingBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		monitorAll();
+		Date now=new Date();
+    	SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String robotbuy = MessageFormat.format("GS【实时监听启动】"+dateformat.format(now),new Object[] {});
+        DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_SECRET, robotbuy, null, false);
 	}
 	
 	

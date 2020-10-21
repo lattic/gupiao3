@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.uitls;
 
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -23,8 +23,8 @@ import org.apache.http.util.EntityUtils;
 
 import com.alibaba.fastjson.JSONObject;
 public class DingTalkRobotHTTPUtil {
-		final static String APP_SECRET="477b77570a86de89c4c3a43a662e498d4262e7382ea0b0332563d88c93adc3fc";
-		static boolean isTest=false;
+		public final static String APP_SECRET="477b77570a86de89c4c3a43a662e498d4262e7382ea0b0332563d88c93adc3fc";
+		public static boolean isTest=false;
 		    
 		    
 		    public static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(10, 30, 60, TimeUnit.SECONDS , new ArrayBlockingQueue<Runnable>(10), new DingTalkThreadFactory());

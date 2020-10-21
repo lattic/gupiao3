@@ -118,7 +118,7 @@ public class MonitorTask implements InitializingBean {
 		Date now=new Date();
     	SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String robotbuy = MessageFormat.format("GS【实时监听启动】"+dateformat.format(now),new Object[] {});
-        DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_SECRET, robotbuy, null, false);
+        //DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_SECRET, robotbuy, null, false);
 	}
 	
 	

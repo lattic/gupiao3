@@ -34,13 +34,30 @@ public class DingTalkRobotHTTPUtil {
 		    public static void main(String[] args) throws Exception {
 		    	Date now=new Date();
 		    	SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		        String content = MessageFormat.format("GS【买入提示】"+dateformat.format(now)+"\n------------------------------------ \n股票代码：{0}\n预警价位：{1}\n建议仓位：{2}\n当前金额：{3}\n策略规则", 
-		        		                                                                  new Object[] {"SH600305", "21.39", "10%","22.51", "突破策略趋势"});
+		        String content = MessageFormat.format("GS【止损预警提示】"+dateformat.format(now)
+		        +"\n------------------------------------ \n股票代码：{0}\n股票名称：{1}\n条件价格：{2}\n当前价格：{3}\n策略规则", 
+		        		         new Object[] {"603881", "数据港", "68.66","68.00", "触发boll下轨赋值"});
 		        
 		        String robotbuy = MessageFormat.format("GS【自动买入】"+dateformat.format(now)+"\n------------------------------------ \n股票代码：{0}\n买入价位：{1}\n数量：{2}\n当前余额：{3}", 
                         new Object[] {"SH600305", "22.51", "1000",(100000-(22.51*1000))});
 		        
-		        DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_SECRET, robotbuy, null, false);
+		        String order = MessageFormat.format("GS【订阅通知】"+dateformat.format(now)
+		        +"\n------------------------------------ \n"
+		        + "股票代码：{0}\n股票名称：{1}\n策略规则:{2}\n", 
+		         new Object[] {"002201", "九鼎新材", "趋势判断策略"});
+		        DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_SECRET, order, null, false);
+		        
+		        String order1 = MessageFormat.format("GS【订阅通知】"+dateformat.format(now)
+		        +"\n------------------------------------ \n"
+		        + "股票代码：{0}\n股票名称：{1}\n策略规则:{2}\n", 
+		         new Object[] {"600438", "通威股份", "趋势判断策略"});
+		        DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_SECRET, order1, null, false);
+		        
+		        String order2 = MessageFormat.format("GS【订阅通知】"+dateformat.format(now)
+		        +"\n------------------------------------ \n"
+		        + "股票代码：{0}\n股票名称：{1}\n策略规则:{2}\n", 
+		         new Object[] {"300073", "当升科技", "趋势判断策略"});
+		        DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_SECRET, order2, null, false);
 		       
 		    }
 		    
@@ -58,8 +75,7 @@ public class DingTalkRobotHTTPUtil {
 		            String errorText = MessageFormat.format("parameter accessToken:{0} or content:{1} is null", accessToken, content);
 		            throw new RuntimeException(errorText);
 		        }
-		        isTest=true;
-		        run(accessToken, content, notifyList, isAtAll);
+		       // run(accessToken, content, notifyList, isAtAll);
 		    };
 
 		    public static void run(final String accessToken, final String content, final List<String> notifyList, final Boolean isAtAll) throws Exception {

@@ -34,6 +34,19 @@
             <totalSizeCap>20GB</totalSizeCap>
         </rollingPolicy>
     </appender>
+    <appender name="DINGTALK_LOG"
+        class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/dingtalk.log</file>
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/dingtalk.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+            <maxFileSize>50MB</maxFileSize>
+            <totalSizeCap>20GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
     
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
@@ -43,8 +56,8 @@
         </encoder>
     </appender>
     
-   <logger name="real_time_monitor" level="INFO"  additivity="false" >
-        <appender-ref ref="REAL_TIME_MONITOR" />
+   <logger name="dingtalk_log" level="INFO"  additivity="false" >
+        <appender-ref ref="DINGTALK_LOG" />
     </logger>
 
     <root level="INFO">

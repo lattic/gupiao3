@@ -83,6 +83,8 @@ public class ReadUrl {
 		            BigDecimal tempMax=maxPriceMap.get(title);
 		            BigDecimal min=price.getZuidijia();
 		            BigDecimal tempMin=minPriceMap.get(title);
+		            
+		            
 		            if(null == tempMax || tempMax.compareTo(max)< 1) {
 		            	maxPriceMap.put(title, max);
 		            }

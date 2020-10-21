@@ -20,12 +20,14 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.alibaba.fastjson.JSONObject;
 public class DingTalkRobotHTTPUtil {
 		public final static String APP_SECRET="477b77570a86de89c4c3a43a662e498d4262e7382ea0b0332563d88c93adc3fc";
 		public static boolean isTest=false;
-		    
+		private static Logger logger = LoggerFactory.getLogger("dingtalk_log");    
 		    
 		    public static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(10, 30, 60, TimeUnit.SECONDS , new ArrayBlockingQueue<Runnable>(10), new DingTalkThreadFactory());
 
@@ -75,7 +77,7 @@ public class DingTalkRobotHTTPUtil {
 		            String errorText = MessageFormat.format("parameter accessToken:{0} or content:{1} is null", accessToken, content);
 		            throw new RuntimeException(errorText);
 		        }
-		       // run(accessToken, content, notifyList, isAtAll);
+		        run(accessToken, content, notifyList, isAtAll);
 		    };
 
 		    public static void run(final String accessToken, final String content, final List<String> notifyList, final Boolean isAtAll) throws Exception {
@@ -111,6 +113,7 @@ public class DingTalkRobotHTTPUtil {
 		                } catch (IOException e) {
 		                    e.printStackTrace();
 		                }finally {
+		                	logger.info("sendMsg:"+content);
 							if(isTest) {
 								 System.exit(0);
 							}

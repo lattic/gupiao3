@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import com.alibaba.fastjson.JSONObject;
 public class DingTalkRobotHTTPUtil {
 		public final static String APP_SECRET="477b77570a86de89c4c3a43a662e498d4262e7382ea0b0332563d88c93adc3fc";
+		public final static String APP_TEST_SECRET="bb888ac7199ba68c327c8a0e44fbf0ee6b65b5b0f490beb39a209a295e132a4f";
 		public static boolean isTest=false;
 		private static Logger logger = LoggerFactory.getLogger("dingtalk_log");    
 		    

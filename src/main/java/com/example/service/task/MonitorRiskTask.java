@@ -44,7 +44,9 @@ public class MonitorRiskTask {
 		listenRealTime("sh600438");
 		listenRealTime("sz300232");
 		listenRealTime("sz300092");
+		listenRealTime("sz300005");
 		listenRealTime("sz300014");
+		listenRealTime("sz300026");
 	}
 
 	private void listenRealTime(String key) throws Exception {
@@ -92,7 +94,7 @@ public class MonitorRiskTask {
 			        		        		 riskPrice.getZhichengwei().doubleValue(),
 			        		        		 "目前属于下滑趋势"});
 					logger.info(content);
-					DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_SECRET, content, null, false);
+					//DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_SECRET, content, null, false);
 					lossMap.put(key,true);
 					return ;
 				}
@@ -106,11 +108,12 @@ public class MonitorRiskTask {
 			        		        		 df.format(model.getDangqianjiage()), 
 			        		        		 "当前股票从强转弱趋势，请及时止盈或止损"});
 					logger.info(content);
-					DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_SECRET, content, null, false);
+					if(isNotify) {
+						DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_SECRET, content, null, false);
+						notifyMap.put(key,false);
+					}
 					lossMap.put(key,true);
-					notifyMap.put(key,true);
 				}
-				
 			}
 			
 			//强势 当前价格大于20天线
@@ -126,7 +129,7 @@ public class MonitorRiskTask {
 			        		        		 riskPrice.getMa20().doubleValue(),
 			        		        		 "目前属于上升趋势"});
 					logger.info(content);
-					DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_SECRET, content, null, false);
+					//DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_SECRET, content, null, false);
 					lossMap.put(key,false);
 					return ;
 				}
@@ -139,11 +142,12 @@ public class MonitorRiskTask {
 			        		        		 df.format(model.getDangqianjiage()), 
 			        		        		 "当前股价从弱转强，请配合趋势买入股票"});
 					logger.info(content);
-					DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_SECRET, content, null, false);
+					if(isNotify) {
+						DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_SECRET, content, null, false);
+						notifyMap.put(key,false);
+					}
 					lossMap.put(key,false);
-					notifyMap.put(key,true);
 				}
-				
 			}
 		}
 	}

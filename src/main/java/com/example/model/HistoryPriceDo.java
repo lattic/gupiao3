@@ -6,6 +6,7 @@ import java.util.Date;
 public class HistoryPriceDo {
 	private Date dateime;
 	private String number;
+	private String name;
 	private BigDecimal kaipanjia;
 	private BigDecimal zuigaojia;
 	private BigDecimal shoupanjia;
@@ -25,6 +26,12 @@ public class HistoryPriceDo {
 	private BigDecimal yaliwei;
 	private BigDecimal zhichengwei;
 	
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
 	public BigDecimal getYaliwei() {
 		return yaliwei;
 	}

@@ -95,10 +95,10 @@ public class MonitorTask implements InitializingBean {
 				@Override
 				public void run() {
 					ReadUrl.readUrl(gupiao.getNumber(),60);
-					UpdateRealTimeTask task=new UpdateRealTimeTask();
-					task.setNumber(gupiao.getNumber());
-					task.setGuPiaoService(guPiaoService);
-					task.run();
+//					UpdateRealTimeTask task=new UpdateRealTimeTask();
+//					task.setNumber(gupiao.getNumber());
+//					task.setGuPiaoService(guPiaoService);
+//					task.run();
 				}
 			});
 		}

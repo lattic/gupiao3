@@ -28,14 +28,15 @@ public class DingTalkRobotHTTPUtil {
 		public final static String APP_SECRET="477b77570a86de89c4c3a43a662e498d4262e7382ea0b0332563d88c93adc3fc";
 		public final static String APP_TEST_SECRET="bb888ac7199ba68c327c8a0e44fbf0ee6b65b5b0f490beb39a209a295e132a4f";
 		public final static String yelin="4ce1db92d93c1c533045d3c52104bc378a76f19e9e82af29727450a004e34ffa";
+		public final static String zhubin="1ca13615f48b24101a052fc8fb966c7f9f647a4383e9a8ca57fe408200a0f5a7";
 		
 		
+		private static boolean isClose=false;
+		private static boolean isTest=false;
 		
 		private static Logger logger = LoggerFactory.getLogger("dingtalk_log");    
-		    
-		    public static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(10, 30, 60, TimeUnit.SECONDS , new ArrayBlockingQueue<Runnable>(10), new DingTalkThreadFactory());
-
-		    public static String WEBHOOK_TOKEN = "https://oapi.dingtalk.com/robot/send?access_token=";
+		public static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(10, 30, 60, TimeUnit.SECONDS , new ArrayBlockingQueue<Runnable>(10), new DingTalkThreadFactory());
+		public static String WEBHOOK_TOKEN = "https://oapi.dingtalk.com/robot/send?access_token=";
 
 		    public static void main(String[] args) throws Exception {
 		    	Date now=new Date();
@@ -77,10 +78,20 @@ public class DingTalkRobotHTTPUtil {
 		     * @return
 		     */
 		    public static void sendMsg(String accessToken, String content, List<String> notifyList, Boolean isAtAll) throws Exception {
+		    	if(isClose) {
+		    		return ;
+		    	}
+		    	
 		        if (StringUtils.isBlank(accessToken) || StringUtils.isBlank(content)) {
 		            String errorText = MessageFormat.format("parameter accessToken:{0} or content:{1} is null", accessToken, content);
 		            throw new RuntimeException(errorText);
 		        }
+		        if(isTest) {
+		        	content="测试"+content;
+		        	run(DingTalkRobotHTTPUtil.APP_TEST_SECRET, content, notifyList, isAtAll);
+		        	return ;
+		        }
+		        
 		        if(accessToken.equalsIgnoreCase(DingTalkRobotHTTPUtil.APP_TEST_SECRET)) {
 		        	 content="测试"+content;
 		        	 run(DingTalkRobotHTTPUtil.APP_TEST_SECRET, content, notifyList, isAtAll);

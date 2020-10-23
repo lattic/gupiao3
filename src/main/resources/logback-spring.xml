@@ -58,6 +58,22 @@
 			<totalSizeCap>20GB</totalSizeCap>
 		</rollingPolicy>
 	</appender>
+	
+	<appender name="MOCK_LOG"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_PATH}/mock.log</file>
+		<encoder>
+			<pattern>${FILE_LOG_PATTERN}</pattern>
+		</encoder>
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_PATH}/mock.%d{yyyy-MM-dd}.%i.log
+			</fileNamePattern>
+			<maxHistory>7</maxHistory>
+			<maxFileSize>50MB</maxFileSize>
+			<totalSizeCap>20GB</totalSizeCap>
+		</rollingPolicy>
+	</appender>
 
 
 	<appender name="CONSOLE"
@@ -67,6 +83,10 @@
 			<charset>utf8</charset>
 		</encoder>
 	</appender>
+
+	<logger name="mock_log" level="INFO" additivity="false">
+		<appender-ref ref="MOCK_LOG" />
+	</logger>
 
 	<logger name="dingtalk_log" level="INFO" additivity="false">
 		<appender-ref ref="DINGTALK_LOG" />

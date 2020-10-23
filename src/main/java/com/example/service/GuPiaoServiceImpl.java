@@ -83,4 +83,9 @@ public class GuPiaoServiceImpl implements GuPiaoService,InitializingBean {
 		}
 	}
 
+	@Override
+	public List<StockDo> getAllStock() {
+		return stockMapper.getAll();
+	}
+
 }

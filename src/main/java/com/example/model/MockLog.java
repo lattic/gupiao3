@@ -15,6 +15,26 @@ public class MockLog {
 	private Double win;
 	private Double winRate; 
 	private HistoryPriceDo price;
+	private Boolean isBuyin=false;
+	private Date lastBuyin;
+	
+	
+
+	public Date getLastBuyin() {
+		return lastBuyin;
+	}
+
+	public void setLastBuyin(Date lastBuyin) {
+		this.lastBuyin = lastBuyin;
+	}
+
+	public Boolean getIsBuyin() {
+		return isBuyin;
+	}
+
+	public void setIsBuyin(Boolean isBuyin) {
+		this.isBuyin = isBuyin;
+	}
 
 	public HistoryPriceDo getPrice() {
 		return price;

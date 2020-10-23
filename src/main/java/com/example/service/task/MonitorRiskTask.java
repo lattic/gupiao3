@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,11 +40,19 @@ public class MonitorRiskTask {
 	private static ConcurrentHashMap<String, Boolean> lossMap=new ConcurrentHashMap<String, Boolean>();
 	//目前是否通知
 	private static ConcurrentHashMap<String, Boolean> notifyMap=new ConcurrentHashMap<String, Boolean>();
+	//AI操盘通知   key—— yyyymmdd_number
+	private static ConcurrentHashMap<String, Boolean> mockAiMap=new ConcurrentHashMap<String, Boolean>();
 	
 	
-	@Scheduled(cron = "0/30 * * * * *")
+//	@Scheduled(cron = "0/30 * * * * *")
 	private void  monitorAll() throws Exception {
+		//叶琳
 		excuteRunListen("sz300026",DingTalkRobotHTTPUtil.yelin);
+		
+		//朱斌
+		excuteRunListen("sh603986",DingTalkRobotHTTPUtil.zhubin);
+		excuteRunListen("sz002594",DingTalkRobotHTTPUtil.zhubin);
+		excuteRunListen("sz002241",DingTalkRobotHTTPUtil.zhubin);
 		
 		
 		List<String>numberList= new ArrayList<>();
@@ -53,7 +62,6 @@ public class MonitorRiskTask {
 		numberList.add("sh600438");
 		numberList.add("sz300232");
 		numberList.add("sz300092");
-		numberList.add("sz300005");
 		numberList.add("sz300014");
 		numberList.forEach(number->{
             System.out.println(number);
@@ -69,6 +77,21 @@ public class MonitorRiskTask {
 			public void run() {
 				try {
 					listenRealTime(number,appSecret);
+					SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd");
+					String key=dateformat.format(new Date())+"_"+number;
+					Boolean isNotifyByMock=mockAiMap.get(key);
+					//通知开关
+					if(isNotifyByMock == null || isNotifyByMock) {
+						isNotifyByMock=true;
+					}
+					
+					if(isNotifyByMock) {
+						Calendar calendar = Calendar.getInstance();  
+						calendar.add(Calendar.MONTH, -1);
+						MockDeal.mockDeal(number, dateformat.format(calendar.getTime()),appSecret,true);
+						isNotifyByMock=false;
+					}
+					mockAiMap.put(number,isNotifyByMock);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -128,7 +151,6 @@ public class MonitorRiskTask {
 			        		        		 "目前属于下滑趋势"});
 					logger.info(content);
 					DingTalkRobotHTTPUtil.sendMsg(appSecret, content, null, false);
-					MockDeal.sendMsg(nowPrice.getNumber(), null);
 					lossMap.put(key,true);
 					return;
 				}
@@ -144,7 +166,6 @@ public class MonitorRiskTask {
 					logger.info(content);
 					if(isNotify) {
 						DingTalkRobotHTTPUtil.sendMsg(appSecret, content, null, false);
-						MockDeal.sendMsg(nowPrice.getNumber(), null);
 						notifyMap.put(key,false);
 					}
 					lossMap.put(key,true);
@@ -165,7 +186,6 @@ public class MonitorRiskTask {
 			        		        		 "目前属于上升趋势"});
 					logger.info(content);
 					DingTalkRobotHTTPUtil.sendMsg(appSecret, content, null, false);
-					MockDeal.sendMsg(nowPrice.getNumber(), null);
 					lossMap.put(key,false);
 					return;
 				}
@@ -180,7 +200,6 @@ public class MonitorRiskTask {
 					logger.info(content);
 					if(isNotify) {
 						DingTalkRobotHTTPUtil.sendMsg(appSecret, content, null, false);
-						MockDeal.sendMsg(nowPrice.getNumber(), null);
 						notifyMap.put(key,false);
 					}
 					lossMap.put(key,false);

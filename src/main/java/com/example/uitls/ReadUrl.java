@@ -1,7 +1,6 @@
 package com.example.uitls;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -14,14 +13,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.example.demo.GuPiao;
 import com.example.model.HistoryPriceDo;
-import com.example.model.StockDo;
-import com.example.service.GuPiaoService;
 import com.example.service.task.MonitorTask;
 
 public class ReadUrl {
@@ -33,7 +29,6 @@ public class ReadUrl {
 	private static ConcurrentHashMap<String, BigDecimal> minPriceMap=new ConcurrentHashMap<String, BigDecimal>();
 	
 	public static void main(String[] args) {
-			List<HistoryPriceDo> list=ReadUrl.readUrl("sh600438",60);
 		
 	}
 	
@@ -92,7 +87,6 @@ public class ReadUrl {
 		            price.setMa20number(getBigDecimal(priceObjList.get(13)));
 		            price.setHuanshoulv(getBigDecimal(priceObjList.get(14)));
 		            price.setPianlizhi(price.getMa20().divide(price.getShoupanjia(),BigDecimal.ROUND_HALF_UP));
-		            	           
 		            BigDecimal max=price.getZuigaojia();
 		            BigDecimal tempMax=maxPriceMap.get(number);
 		            BigDecimal min=price.getZuidijia();
@@ -113,15 +107,12 @@ public class ReadUrl {
 		            		price.setUp(true);
 			            	logger.info("编号："+price.getNumber()+" 上升趋势 "+sdf.format(price.getDateime())+"价格："+price.getShoupanjia()+" 差值："+(price.getMa20().doubleValue() - ma20_5));
 	            		}
-		            	powerValue++;
 		            	logger.info(sdf.format(price.getDateime())+":"+price.getNumber()+" "+price.getShoupanjia()+">="+price.getMa20()+"=趋势上升   "+"当前能量值："+powerValue+" 偏移量："+price.getPianlizhi());
 		            	
 		            }else {
-		            	
 		            	powerValue--;
 		            	logger.info(sdf.format(price.getDateime())+":"+price.getNumber()+" "+price.getShoupanjia()+"<"+price.getMa20()+"=趋势下降  "+"当前能量值："+powerValue+" 偏移量："+price.getPianlizhi());
 		            }
-		            price.setPowerValue(powerValue);
 		            list.add(price);
 		        } catch (ParseException e) {
 		        	logger.error(e.getMessage(),e);

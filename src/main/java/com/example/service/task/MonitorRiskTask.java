@@ -35,25 +35,109 @@ public class MonitorRiskTask {
 	private static ConcurrentHashMap<String, Boolean> lossMap=new ConcurrentHashMap<String, Boolean>();
 	//目前是否通知
 	private static ConcurrentHashMap<String, Boolean> notifyMap=new ConcurrentHashMap<String, Boolean>();
+	//
 	
 	@Scheduled(cron = "0/5 * * * * *")
 	private void  monitorAll() throws Exception {
-		listenRealTime("sh603881");
-		listenRealTime("sz300073");
-		listenRealTime("sz002201");
-		listenRealTime("sh600438");
-		listenRealTime("sz300232");
-		listenRealTime("sz300092");
-		listenRealTime("sz300005");
-		listenRealTime("sz300014");
-		listenRealTime("sz300026");
+		pool.execute(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					listenRealTime("sh603881");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		
+		pool.execute(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					listenRealTime("sz300073");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		pool.execute(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					listenRealTime("sz002201");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		pool.execute(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					listenRealTime("sh600438");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		pool.execute(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					listenRealTime("sz300232");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		pool.execute(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					listenRealTime("sz300092");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		pool.execute(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					listenRealTime("sz300005");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		pool.execute(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					listenRealTime("sz300014");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		pool.execute(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					listenRealTime("sz300026");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
+	
 
-	private void listenRealTime(String key) throws Exception {
+	private void listenRealTime(final String key) throws Exception {
 		DecimalFormat    df   = new DecimalFormat("######0.00");  
 		Date now=new Date();
     	SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		GuPiao date=ReadUrl.readUrl(key,false);
+		GuPiao date=ReadUrl.readUrl(key,true);
 		if(date !=null) {
 			GuPiaoDo model=new GuPiaoDo();
 			BeanUtils.copyProperties(date, model);
@@ -77,8 +161,10 @@ public class MonitorRiskTask {
 		        		        		 df.format(model.getDangqianjiage()), 
 		        		        		 "股价已经破位，请及时止损！！"});
 				logger.info(content);
-				DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_SECRET, content, null, false);
-				notifyMap.put(key,false);
+				if(isNotify) {
+					DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_SECRET, content, null, false);
+					notifyMap.put(key,false);
+				}
 			}
 			
 			//弱势 当前价格小于20天线

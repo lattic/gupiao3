@@ -94,7 +94,7 @@ public class MonitorRiskTask {
 			        		        		 riskPrice.getZhichengwei().doubleValue(),
 			        		        		 "目前属于下滑趋势"});
 					logger.info(content);
-					//DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_SECRET, content, null, false);
+					DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_SECRET, content, null, false);
 					lossMap.put(key,true);
 					return ;
 				}
@@ -129,7 +129,7 @@ public class MonitorRiskTask {
 			        		        		 riskPrice.getMa20().doubleValue(),
 			        		        		 "目前属于上升趋势"});
 					logger.info(content);
-					//DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_SECRET, content, null, false);
+					DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_SECRET, content, null, false);
 					lossMap.put(key,false);
 					return ;
 				}

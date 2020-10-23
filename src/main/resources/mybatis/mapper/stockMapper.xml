@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+						"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.example.mapper.StockMapper">
+
+	<resultMap id="stockDo" type="com.example.model.StockDo">
+		<result column="id" 			property="id" 			jdbcType="BIGINT" />
+		<result column="number" 		property="number" 		jdbcType="VARCHAR" />
+		<result column="name" 			property="name" 		jdbcType="VARCHAR" />
+		<result column="create_Date" 	property="createDate" 	jdbcType="TIMESTAMP" />
+		<result column="type" 			property="type" 		jdbcType="INTEGER" />
+		<result column="status" 		property="status" 		jdbcType="INTEGER" />
+	</resultMap>
+
+	<sql id="All_Column">
+		id, number,name,create_date,type,status
+	</sql>
+
+	<select id="getAll" resultMap="stockDo">
+		SELECT
+		<include refid="All_Column" />
+		FROM stock
+	</select>
+
+	<select id="getNumber" parameterType="string" resultMap="stockDo">
+		SELECT
+		<include refid="All_Column" />
+		FROM stock
+		WHERE number = #{number}
+		limit 1
+	</select>
+
+	<insert id="insert" parameterType="stockDo">
+		INSERT INTO
+		stock
+		(number,name,create_date,type,status)
+		VALUES
+		(#{number},#{name},#{createDate},#{type},#{status})
+	</insert>
+
+	<delete id="delete" parameterType="stockDo">
+		DELETE FROM
+		stock
+		WHERE
+		id =#{id}
+	</delete>
+
+</mapper>

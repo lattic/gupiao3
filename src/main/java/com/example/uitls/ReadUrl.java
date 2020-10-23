@@ -14,15 +14,20 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.example.demo.GuPiao;
 import com.example.model.HistoryPriceDo;
+import com.example.model.StockDo;
+import com.example.service.GuPiaoService;
+import com.example.service.task.MonitorTask;
 
 public class ReadUrl {
 	private static Map<String, String> map = new ConcurrentHashMap<>();
 	private static Logger logger = LoggerFactory.getLogger("real_time_monitor");
+	
 	
 	private static ConcurrentHashMap<String, BigDecimal> maxPriceMap=new ConcurrentHashMap<String, BigDecimal>();
 	private static ConcurrentHashMap<String, BigDecimal> minPriceMap=new ConcurrentHashMap<String, BigDecimal>();
@@ -42,8 +47,8 @@ public class ReadUrl {
 	}
 	
 	//http://api.finance.ifeng.com/akmin?scode=sz300073&type=60
-	public static List<HistoryPriceDo> readUrl(String title,int type) {
-		String url = "http://api.finance.ifeng.com/akmin?scode=" + title+"&type="+type;
+	public static List<HistoryPriceDo> readUrl(String number,int type) {
+		String url = "http://api.finance.ifeng.com/akmin?scode=" + number+"&type="+type;
 		String code = HttpClientUtil.doGet(url);
 		if (code == null) {
 			logger.warn("http请求数据为空");
@@ -59,25 +64,16 @@ public class ReadUrl {
 		Calendar calendar=Calendar.getInstance();
 		calendar.set(Calendar.HOUR_OF_DAY,-24);
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		String name=null;
-		while(StringUtils.isBlank(name)) {
-			GuPiao gupiao=readUrl(title,true);
-			if(gupiao == null) {
-				try {
-					Thread.sleep(2000L);
-					logger.info("重试获取名称");
-					continue;
-				}catch(Exception ex) {
-					
-				}
-			}
-			name=gupiao.getName();
+		String name="";
+		if(MonitorTask.stockMap.containsKey(number)) {
+			name=MonitorTask.stockMap.get(number).getName();
 		}
+		
 		for(int i=0;i<priceList.size();i++) {
 			 List<Object> priceObjList=(List<Object>)priceList.get(i);
 			 HistoryPriceDo price=new HistoryPriceDo();
 			 try {
-				 	price.setNumber(title);
+				 	price.setNumber(number);
 				 	price.setName(name);
 		            Date date = sdf.parse((String)priceObjList.get(0));
 		            price.setDateime(date);
@@ -98,14 +94,14 @@ public class ReadUrl {
 		            price.setPianlizhi(price.getMa20().divide(price.getShoupanjia(),BigDecimal.ROUND_HALF_UP));
 		            	           
 		            BigDecimal max=price.getZuigaojia();
-		            BigDecimal tempMax=maxPriceMap.get(title);
+		            BigDecimal tempMax=maxPriceMap.get(number);
 		            BigDecimal min=price.getZuidijia();
-		            BigDecimal tempMin=minPriceMap.get(title);
+		            BigDecimal tempMin=minPriceMap.get(number);
 		            if(null == tempMax || tempMax.compareTo(max)< 1) {
-		            	maxPriceMap.put(title, max);
+		            	maxPriceMap.put(number, max);
 		            }
 		            if(null == tempMin || tempMin.compareTo(min)> -1) {
-		            	minPriceMap.put(title, min);
+		            	minPriceMap.put(number, min);
 		            }
 		            if(ma20_5 <=0) {
 		            	ma20_5=price.getMa20().doubleValue();
@@ -132,11 +128,11 @@ public class ReadUrl {
 		        }
 		}
 		for(HistoryPriceDo price:list) {
-			BigDecimal tempMax=maxPriceMap.get(title);
+			BigDecimal tempMax=maxPriceMap.get(number);
 			if(tempMax!=null) {
 				price.setYaliwei(tempMax);
 			}
-			BigDecimal tempMin=minPriceMap.get(title);
+			BigDecimal tempMin=minPriceMap.get(number);
 			if(tempMin!=null) {
 				price.setZhichengwei(tempMin);
 			}
@@ -151,9 +147,14 @@ public class ReadUrl {
 		return new BigDecimal(temp);
 	}
 	
-	
-	public static GuPiao readUrl(String title, boolean isTemp) {
-		String url = "http://hq.sinajs.cn/list=" + title;
+	/**
+	 * 
+	 * @param number
+	 * @param isTemp   false 获取实时数据
+	 * @return
+	 */
+	public static GuPiao readUrl(String number, boolean isTemp) {
+		String url = "http://hq.sinajs.cn/list=" + number;
 		String code = HttpClientUtil.doGet(url);
 		if (code == null) {
 			logger.warn("http请求数据为空");
@@ -161,20 +162,20 @@ public class ReadUrl {
 		}
 
 		if (!isTemp) {
-			return hanldeData(title, code);
+			return hanldeData(number, code);
 		}
 
 		String temp = "";
-		if (map.containsKey(title)) {
-			temp = map.get(title);
+		if (map.containsKey(number)) {
+			temp = map.get(number);
 		}
 
 		if (StringUtils.equalsIgnoreCase(temp, code)) {
-			logger.info("数据相同：" + title);
+			logger.info("数据相同：" + number);
 			return null;
 		}
-		map.put(title, code);
-		return hanldeData(title, code);
+		map.put(number, code);
+		return hanldeData(number, code);
 	}
 
 	public static GuPiao readUrl(final int i, String title, boolean isTemp) {

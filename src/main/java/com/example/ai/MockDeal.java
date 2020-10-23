@@ -25,9 +25,10 @@ public class MockDeal {
 	private static ConcurrentHashMap<String, BigDecimal> maxPriceMap = new ConcurrentHashMap<String, BigDecimal>();
 	private static ConcurrentHashMap<String, BigDecimal> minPriceMap = new ConcurrentHashMap<String, BigDecimal>();
 	private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+	
 	public static void main(String[] args) {
 		List<String>list=new ArrayList<String>();
-		list.add("sh601318");
+		list.add("sz002030");
 
 		sendMsg(list,"2020-10-01");
 	}

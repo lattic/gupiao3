@@ -27,7 +27,10 @@ import com.alibaba.fastjson.JSONObject;
 public class DingTalkRobotHTTPUtil {
 		public final static String APP_SECRET="477b77570a86de89c4c3a43a662e498d4262e7382ea0b0332563d88c93adc3fc";
 		public final static String APP_TEST_SECRET="bb888ac7199ba68c327c8a0e44fbf0ee6b65b5b0f490beb39a209a295e132a4f";
-		public static boolean isTest=false;
+		public final static String yelin="4ce1db92d93c1c533045d3c52104bc378a76f19e9e82af29727450a004e34ffa";
+		
+		
+		
 		private static Logger logger = LoggerFactory.getLogger("dingtalk_log");    
 		    
 		    public static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(10, 30, 60, TimeUnit.SECONDS , new ArrayBlockingQueue<Runnable>(10), new DingTalkThreadFactory());
@@ -78,7 +81,13 @@ public class DingTalkRobotHTTPUtil {
 		            String errorText = MessageFormat.format("parameter accessToken:{0} or content:{1} is null", accessToken, content);
 		            throw new RuntimeException(errorText);
 		        }
-		        run(accessToken, content, notifyList, isAtAll);
+		        if(accessToken.equalsIgnoreCase(DingTalkRobotHTTPUtil.APP_TEST_SECRET)) {
+		        	 content="测试"+content;
+		        	 run(DingTalkRobotHTTPUtil.APP_TEST_SECRET, content, notifyList, isAtAll);
+		        }else {
+		        	 run(accessToken, content, notifyList, isAtAll);
+		        }
+		       
 		    };
 
 		    public static void run(final String accessToken, final String content, final List<String> notifyList, final Boolean isAtAll) throws Exception {
@@ -115,9 +124,6 @@ public class DingTalkRobotHTTPUtil {
 		                    e.printStackTrace();
 		                }finally {
 		                	logger.info("sendMsg:"+content);
-							if(isTest) {
-								 System.exit(0);
-							}
 						}
 		            }
 		        });

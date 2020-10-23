@@ -84,7 +84,7 @@ public class MonitorRiskTask {
 			//弱势 当前价格小于20天线
 			if(model.getDangqianjiage()<riskPrice.getMa20().doubleValue()) {
 				if(status == null) {
-					String content = MessageFormat.format("GS【初始化状态--2】"+dateformat.format(now)
+					String content = MessageFormat.format("GS【开始监听】"+dateformat.format(now)
 			        +"\n------------------------------------ \n股票代码：{0}\n股票名称：{1}\n当前能量值:{2}\n压力位置:{3}\n当前价格:{4}\n支撑位置:{5}\n当前趋势:{6}", 
 			        		                 new Object[] {date.getNumber(), 
 			        		        		 date.getName(), 
@@ -96,7 +96,6 @@ public class MonitorRiskTask {
 					logger.info(content);
 					DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_SECRET, content, null, false);
 					lossMap.put(key,true);
-					return ;
 				}
 				
 				if(!status) {
@@ -119,7 +118,7 @@ public class MonitorRiskTask {
 			//强势 当前价格大于20天线
 			if(model.getDangqianjiage()>=riskPrice.getMa20().doubleValue()){
 				if(status == null) {
-					String content = MessageFormat.format("GS【初始化状态--2】"+dateformat.format(now)
+					String content = MessageFormat.format("GS【开始监听】"+dateformat.format(now)
 					  +"\n------------------------------------ \n股票代码：{0}\n股票名称：{1}\n当前能量值:{2}\n压力位置:{3}\n当前价格:{4}\n支撑位置:{5}\n当前趋势:{6}", 
 			        		                 new Object[] {date.getNumber(), 
 			        		        		 date.getName(), 
@@ -131,7 +130,6 @@ public class MonitorRiskTask {
 					logger.info(content);
 					DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_SECRET, content, null, false);
 					lossMap.put(key,false);
-					return ;
 				}
 				if(status) {
 					String content = MessageFormat.format("GS【买入信号提示】"+dateformat.format(now)

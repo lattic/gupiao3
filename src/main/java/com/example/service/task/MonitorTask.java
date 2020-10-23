@@ -78,7 +78,7 @@ public class MonitorTask implements InitializingBean {
 		updateAll=true;
 	}
 	
-	@Scheduled(cron = "0/3 * * * * *")
+//	@Scheduled(cron = "0/3 * * * * *")
 	private void  monitorAll() {
 		if(!updateReal) {
 			logger.info("monitorAll 已经有程序在执行！！！");
@@ -94,7 +94,7 @@ public class MonitorTask implements InitializingBean {
 			pool.execute(new Runnable() {
 				@Override
 				public void run() {
-					ReadUrl.readUrl(gupiao.getNumber(),60);
+//					ReadUrl.readUrl(gupiao.getNumber(),60);
 //					UpdateRealTimeTask task=new UpdateRealTimeTask();
 //					task.setNumber(gupiao.getNumber());
 //					task.setGuPiaoService(guPiaoService);
@@ -105,7 +105,7 @@ public class MonitorTask implements InitializingBean {
 		
 	}
 	
-	@Scheduled(cron = "0/5 * * * * *")
+//	@Scheduled(cron = "0/5 * * * * *")
 	private void status() {
 		logger.info("检查线程完成状态："+pool.getActiveCount());
 		if(pool.getActiveCount()<1) {
@@ -119,7 +119,7 @@ public class MonitorTask implements InitializingBean {
 		Date now=new Date();
     	SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String robotbuy = MessageFormat.format("GS【实时监听启动】"+dateformat.format(now),new Object[] {});
-        //DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_SECRET, robotbuy, null, false);
+        DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_SECRET, robotbuy, null, false);
 	}
 	
 	

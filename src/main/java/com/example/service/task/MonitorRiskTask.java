@@ -17,6 +17,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import com.example.ai.MockDeal;
 import com.example.demo.GuPiao;
 import com.example.model.GuPiaoDo;
 import com.example.model.HistoryPriceDo;
@@ -180,7 +181,7 @@ public class MonitorRiskTask {
 			        		        		 riskPrice.getZhichengwei().doubleValue(),
 			        		        		 "目前属于下滑趋势"});
 					logger.info(content);
-					DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_SECRET, content, null, false);
+					DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_TEST_SECRET, content, null, false);
 					lossMap.put(key,true);
 				}
 				
@@ -214,7 +215,7 @@ public class MonitorRiskTask {
 			        		        		 riskPrice.getMa20().doubleValue(),
 			        		        		 "目前属于上升趋势"});
 					logger.info(content);
-					DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_SECRET, content, null, false);
+					DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_TEST_SECRET, content, null, false);
 					lossMap.put(key,false);
 				}
 				if(status) {
@@ -228,6 +229,7 @@ public class MonitorRiskTask {
 					logger.info(content);
 					if(isNotify) {
 						DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_SECRET, content, null, false);
+						MockDeal.sendMsg(model.getNumber(), null);
 						notifyMap.put(key,false);
 					}
 					lossMap.put(key,false);

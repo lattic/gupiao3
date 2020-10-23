@@ -27,22 +27,14 @@ public class MockDeal {
 	private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 	public static void main(String[] args) {
 		List<String>list=new ArrayList<String>();
-		list.add("sh603881");
-		list.add("sz300073");
-		list.add("sz002201");
-		list.add("sh600438");
-		list.add("sz300232");
-		list.add("sz300092");
-		list.add("sz300005");
-		list.add("sz300014");
-		list.add("sz300026");
-		sendMsg(list);
+		list.add("sh601318");
+
+		sendMsg(list,"2020-10-01");
 	}
 
-	private static void sendMsg(List<String>listTest) {
-		for(String number:listTest) {
+	public static void sendMsg(String number,String beginDate) {
 			List<HistoryPriceDo> list = ReadUrl.readUrl(number, 60);
-			MockLog mockLog=mockDeal(list, "2020-09-01");
+			MockLog mockLog=mockDeal(list, beginDate);
 			DecimalFormat df = new DecimalFormat("0.00");
 			System.out.println(JSON.toJSONString(mockLog));
 			String context=mockLog.getLogs();
@@ -62,11 +54,37 @@ public class MockDeal {
 						 +"\n"+context;
 				DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_SECRET, context, null, false);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		
+	}
+	
+	private static void sendMsg(List<String>listTest,String beginDate) {
+		for(String number:listTest) {
+			List<HistoryPriceDo> list = ReadUrl.readUrl(number, 60);
+			MockLog mockLog=mockDeal(list, beginDate);
+			DecimalFormat df = new DecimalFormat("0.00");
+			System.out.println(JSON.toJSONString(mockLog));
+			String context=mockLog.getLogs();
+			if(StringUtils.isBlank(context)) {
+				context="该走势还没找到买入点，请回溯更长的时间。";
+			}
+			 try {
+				context = "GS=========测试AI操盘=================="
+						 +"\n 股票编码："+ mockLog.getNumber()
+						 +"\n 股票名称："+mockLog.getName()
+						 +"\n 回测数据："+sdf.format(mockLog.getBeginTime())+"~"+sdf.format(mockLog.getEndTime())
+						 +"\n 成功次数："+mockLog.getSuccess()
+						 +"\n 失败次数："+mockLog.getFail()
+						 +"\n 总盈利："+df.format(mockLog.getWin())
+						 +"\n 总盈利率："+df.format(mockLog.getWinRate())+"%"
+						 +"\n ======操作记录===================="
+						 +"\n"+context;
+				DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_SECRET, context, null, false);
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-		
 	}
 
 	public static MockLog mockDeal(List<HistoryPriceDo> stortList, String beginDate) {
@@ -98,6 +116,9 @@ public class MockDeal {
 			
 			try {
 				Date date = price.getDateime();
+				if(StringUtils.isBlank(beginDate) && mockLog.getBeginTime()==null) {
+					mockLog.setBeginTime(date);
+				}
 				if (!StringUtils.isBlank(beginDate)) {
 					Date bgtime = sdf1.parse(beginDate);
 					if (bgtime.compareTo(date) >= 1) {

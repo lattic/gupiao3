@@ -46,20 +46,20 @@ public class MonitorRiskTask {
 		excuteRunListen("sz300026",DingTalkRobotHTTPUtil.yelin);
 		
 		
-//		List<String>numberList= new ArrayList<>();
-//		numberList.add("sh603881");
-//		numberList.add("sz300073");
-//		numberList.add("sz002201");
-//		numberList.add("sh600438");
-//		numberList.add("sz300232");
-//		numberList.add("sz300092");
-//		numberList.add("sz300005");
-//		numberList.add("sz300014");
-//		numberList.forEach(number->{
-//            System.out.println(number);
-//            excuteRunListen(number,DingTalkRobotHTTPUtil.APP_TEST_SECRET);
-//        });
-//		
+		List<String>numberList= new ArrayList<>();
+		numberList.add("sh603881");
+		numberList.add("sz300073");
+		numberList.add("sz002201");
+		numberList.add("sh600438");
+		numberList.add("sz300232");
+		numberList.add("sz300092");
+		numberList.add("sz300005");
+		numberList.add("sz300014");
+		numberList.forEach(number->{
+            System.out.println(number);
+            excuteRunListen(number,DingTalkRobotHTTPUtil.APP_SECRET);
+        });
+		
 	}
 
 

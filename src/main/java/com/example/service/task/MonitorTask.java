@@ -2,6 +2,7 @@ package com.example.service.task;
 
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -45,7 +46,29 @@ public class MonitorTask implements InitializingBean {
 	//股票名称
 	public static ConcurrentHashMap<String, StockDo> stockMap=new ConcurrentHashMap<String, StockDo>();
 	
-	
+	 
+	@Scheduled(cron = "0 30 11 * * *")
+	private void followTask() {
+		List<String>list=new ArrayList<String>();
+		list.add("sh605003");
+		list.add("sz300692");
+		list.add("sz300647");
+		list.add("sz300707");
+		list.add("sz300882");
+		list.add("sz002372");
+		list.add("sz002042");
+		list.add("sh603650");
+		list.add("sh600601");
+		list.add("sz300588");
+		list.add("sh600438");
+		list.add("sz300865");
+		pool.execute(new Runnable() {
+			@Override
+			public void run() {
+				MockDeal.sendMsgByList(list,"2020-09-24",DingTalkRobotHTTPUtil.APP_TEST_SECRET);
+			}
+		});
+	}
 	
 	@Scheduled(cron = "0 0 0/1 * * *")
 	private void updateAllGuPiao() {
@@ -61,10 +84,11 @@ public class MonitorTask implements InitializingBean {
 		private int init() {
 		List<StockDo> stockList = guPiaoService.getAllStock();
 		stockList.forEach(stock->{
-			if(!StringUtils.containsIgnoreCase(stock.getName(), "ST")) {
-				stockMap.put(stock.getNumber(), stock);
-			}else {
+			if(StringUtils.containsIgnoreCase(stock.getName(), "ST") || StringUtils.containsIgnoreCase(stock.getName(), "债") ) {
 				System.out.println(stock.getName());
+			}else {
+				stockMap.put(stock.getNumber(), stock);
+				
 			}
             
         });
@@ -82,31 +106,51 @@ public class MonitorTask implements InitializingBean {
 		String winLog="";
 		String lossLog="";
 		for(StockDo stock : stockMap.values()){
-            Calendar calendar = Calendar.getInstance();  
-			calendar.add(Calendar.MONTH, -4);
-			calendar.add(Calendar.DATE, -15);
+            // Calendar calendar = Calendar.getInstance();  
+			//calendar.add(Calendar.MONTH, -1);
+			//calendar.add(Calendar.DATE, -15);
 			SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd");
-			MockLog log=MockDeal.mockDeal(stock.getNumber(), dateformat.format(calendar.getTime()),DingTalkRobotHTTPUtil.APP_TEST_SECRET,false);
-			if(log != null  && log.getIsBuyin()) {
-				// Calendar before = Calendar.getInstance();  
-				// before.add(Calendar.DATE, -4);
-				//if(log.getLastBuyin().after(before.getTime()) ) {
-					if(maxprice.getWin() == null || log.getWin()> maxprice.getWin()) {
+			MockLog log=MockDeal.mockDeal(stock.getNumber(), "2020-09-24",DingTalkRobotHTTPUtil.APP_TEST_SECRET,false);
+			if(log != null && log.getIsBuyin() ) {
+				//近4天出现买入点
+				Calendar before = Calendar.getInstance();  
+				before.add(Calendar.DATE, -4);
+				if(log.getLastBuyin().after(before.getTime()) ) {
+					if(maxprice.getWin() == null ) {
 						maxprice=log;
 					}
-					if(minprice.getWin() == null || log.getWin()< minprice.getWin()) {
+					
+					if(log.getWin()!=null && log.getWin()> maxprice.getWin()) {
+						if(log.getWinRate().doubleValue()>=3 && log.getWinRate().doubleValue()<=60) {
+							DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_TEST_SECRET, log.getLogs(), null, false);
+						}
+						maxprice=log;
+					}
+					if(minprice.getWin() == null ) {
 						minprice=log;
 					}
-					if(log.getWinRate()>0) {
+					
+					if(log.getWin()!=null && log.getWin()< minprice.getWin()) {
+						minprice=log;
+						if(log.getWinRate().doubleValue()<=-3) {
+							DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_TEST_SECRET, log.getLogs(), null, false);
+						}
+					}
+					
+					
+					
+					if(log.getWinRate() != null && log.getWinRate()>0) {
 						winLog+=log.getNumber()+"  "+log.getName()+" "+log.getWinRate()+"\n";
 						max++;
 					}
-					if(log.getWinRate()<0) { 
+					if(log.getWinRate() != null &&  log.getWinRate()<0) { 
 						min++;
 						lossLog+=log.getNumber()+"  "+log.getName()+" "+log.getWinRate()+"\n";
 					}
-					total+=log.getWin();
-				//}
+					if(log.getWin() != null) {
+						total+=log.getWin();
+					}
+				}
 			}
         }
 		try {
@@ -116,10 +160,10 @@ public class MonitorTask implements InitializingBean {
 					+"\n 亏钱的机器人:"+min
 					+"\n 亏钱股票："+lossLog
 					+"\n 单个机器人最大盈利："
-					+maxprice.getLogs()
+					+ maxprice.getLogs()
 					+"\n 单个机器人最大亏损："
 					+minprice.getLogs();
-			DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_TEST_SECRET, context, null, false);
+			logger.info(context);
 		} catch (Exception e) {
 		}
 		
@@ -177,7 +221,8 @@ public class MonitorTask implements InitializingBean {
 		String robotbuy = MessageFormat.format("【实时监听启动】"+dateformat.format(now)
 											   +"\n 初始化股票池数量："+init(),new Object[] {});
         DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_TEST_SECRET, robotbuy, null, false);
-        AiBuyIn();
+      //  AiBuyIn();
+        followTask();
 	}
 	
 	

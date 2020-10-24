@@ -77,7 +77,7 @@ public class DingTalkRobotHTTPUtil {
 		     * @param isAtAll 是否@所有人
 		     * @return
 		     */
-		    public static void sendMsg(String accessToken, String content, List<String> notifyList, Boolean isAtAll) throws Exception {
+		    public static void sendMsg(String accessToken, String content, List<String> notifyList, Boolean isAtAll){
 		    	if(isClose) {
 		    		return ;
 		    	}
@@ -86,19 +86,22 @@ public class DingTalkRobotHTTPUtil {
 		            String errorText = MessageFormat.format("parameter accessToken:{0} or content:{1} is null", accessToken, content);
 		            throw new RuntimeException(errorText);
 		        }
-		        if(isTest) {
-		        	content="测试"+content;
-		        	run(DingTalkRobotHTTPUtil.APP_TEST_SECRET, content, notifyList, isAtAll);
-		        	return ;
-		        }
-		        
-		        if(accessToken.equalsIgnoreCase(DingTalkRobotHTTPUtil.APP_TEST_SECRET)) {
-		        	 content="测试"+content;
-		        	 run(DingTalkRobotHTTPUtil.APP_TEST_SECRET, content, notifyList, isAtAll);
-		        }else {
-		        	 run(accessToken, content, notifyList, isAtAll);
-		        }
-		       
+		        try {
+			        if(isTest) {
+			        	content="测试"+content;
+						 run(DingTalkRobotHTTPUtil.APP_TEST_SECRET, content, notifyList, isAtAll);
+			        	return ;
+			        }
+			        if(accessToken.equalsIgnoreCase(DingTalkRobotHTTPUtil.APP_TEST_SECRET)) {
+			        	 content="测试"+content;
+			        	 run(DingTalkRobotHTTPUtil.APP_TEST_SECRET, content, notifyList, isAtAll);
+			        }else {
+			        	 run(accessToken, content, notifyList, isAtAll);
+			        }
+		        } catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 		    };
 
 		    public static void run(final String accessToken, final String content, final List<String> notifyList, final Boolean isAtAll) throws Exception {

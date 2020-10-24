@@ -25,16 +25,26 @@ public class MockDeal {
 	private static ConcurrentHashMap<String, BigDecimal> minPriceMap = new ConcurrentHashMap<String, BigDecimal>();
 	
 	public static void main(String[] args) {
-//		List<String>list=new ArrayList<String>();
-//		list.add("sz002594");
-
-		mockDeal("sz300588","2020-09-24",DingTalkRobotHTTPUtil.APP_TEST_SECRET,true);
-//		sendMsgByList(list,null,DingTalkRobotHTTPUtil.APP_TEST_SECRET);
+		List<String>list=new ArrayList<String>();
+//		list.add("sh605003");
+//		list.add("sz300692");
+//		list.add("sz300647");
+//		list.add("sz300707");
+//		list.add("sz300882");
+//		list.add("sz002372");
+//		list.add("sz002042");
+//		list.add("sh603650");
+//		list.add("sh600601");
+//		list.add("sz300588");
+		list.add("sh600438");
+//		list.add("sz300865");
+		//mockDeal("sz300588","2020-09-24",DingTalkRobotHTTPUtil.APP_TEST_SECRET,true);
+		sendMsgByList(list,"2020-09-24",DingTalkRobotHTTPUtil.APP_TEST_SECRET);
 	}
 
 	
 	
-	private static void sendMsgByList(List<String>listTest,String beginDate,String appSecret) {
+	public static void sendMsgByList(List<String>listTest,String beginDate,String appSecret) {
 		for(String number:listTest) {
 			try {
 				mockDeal( number, beginDate, appSecret,true);
@@ -76,19 +86,20 @@ public class MockDeal {
 			mockLog.setLogs("数据量不满100个60分钟线");
 			return mockLog;
 		}
-		
+		int maxPower=0;
 		int powerValue = 0;
-		int buyCount = 0;
 		int sellCount = 0;
 		int num = 0;
 		double init = 100000;
-		double keepPrice=0;
+		BigDecimal keepPrice=new BigDecimal(0.0);
+		BigDecimal zuotianPrice=new BigDecimal(0.0);
 		int ma20_count=0;
 		double ma20 = 0;
 		double allwin = 0;
 		double total = init;
 		double boxMax=0.0;
 		double boxMin=0.0;
+		int keepDown=0;
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd");
 		for (HistoryPriceDo price : stortList) {
@@ -143,8 +154,12 @@ public class MockDeal {
 				if(boxMin<=0) {
 					boxMin=price.getShoupanjia().doubleValue();
 				}
-				
-
+				if(keepPrice.compareTo(new BigDecimal(0.0)) < 1) {
+					keepPrice=price.getShoupanjia();
+				}
+				if(zuotianPrice.compareTo(new BigDecimal(0.0)) < 1) {
+					zuotianPrice=price.getShoupanjia();
+				}
 				if (null == tempMax || tempMax.compareTo(max) < 1) {
 					maxPriceMap.put(price.getNumber(), max);
 				}
@@ -155,19 +170,58 @@ public class MockDeal {
 				
 				// 收盘价比MA20高
 				if (price.getShoupanjia().compareTo(price.getMa20()) > -1) {
-					//重置
-					if(powerValue<0) {
-						powerValue=0;
-						price.setUp(true);
+					//强势重置
+					if(powerValue<=-20) {
+						powerValue=-4;
+						price.setUp(false);
+						ma20=price.getMa20().doubleValue();
+						String log= " 强势反弹 建议买入==> "
+								+ sdf.format(price.getDateime()) 
+								+ " MA20:" + price.getMa20().doubleValue()
+								+ " 偏移量:" + price.getPianlizhi()
+								+ " 当前能量值：" + powerValue 
+								+ " 当前价格：" + price.getShoupanjia();
+								logger.info(log);
+								mockLog.setLogs(mockLog.getLogs()+log+"\n");
+					}else if(powerValue<0) {
+						//重置
+						powerValue=-1;
 						ma20=price.getMa20().doubleValue();
 					}
 					if(price.getShoupanjia().doubleValue()>=boxMax) {
 						boxMax=price.getShoupanjia().doubleValue();
+						String log= "创新箱体新高 ==> "
+								+ sdf.format(price.getDateime()) 
+								+ " MA20:" + price.getMa20().doubleValue()
+								+ " 偏移量:" + price.getPianlizhi()
+								+ " 当前能量值：" + powerValue 
+								+ " 箱体min：" + boxMin
+								+ " 箱体max：" + boxMax
+								+ " 当前价格：" + price.getShoupanjia();
+								logger.info(log);
+								//mockLog.setLogs(mockLog.getLogs()+log+"\n");
 					}
 					if(powerValue ==0) {
+						price.setUp(true);
 						boxMin=price.getMa20().doubleValue();
+						String log= "强势变盘，重置箱体下限 ==> "
+								+ sdf.format(price.getDateime()) 
+								+ " MA20:" + price.getMa20().doubleValue()
+								+ " 偏移量:" + price.getPianlizhi()
+								+ " 当前能量值：" + powerValue 
+								+ " 箱体min：" + boxMin
+								+ " 箱体max：" + boxMax
+								+ " 当前价格：" + price.getShoupanjia();
+								logger.info(log);
+								//mockLog.setLogs(mockLog.getLogs()+log+"\n");
 					}
-					buyCount++;
+					//现在的收盘价少于上个一个收盘价，
+					if(price.getShoupanjia().compareTo(zuotianPrice) == -1) {
+						keepDown++;
+						powerValue = powerValue -(keepDown * 1);
+					}else {
+						keepDown=0;
+					}
 					sellCount = 0;
 					if (num > 0) {
 						String log= " 持有==> "
@@ -176,15 +230,31 @@ public class MockDeal {
 						+ " 偏移量:" + price.getPianlizhi()
 						+ " 当前能量值：" + powerValue 
 						+ " 当前价格：" + price.getShoupanjia() 
-						+ " 净利价：" + df.format(price.getShoupanjia().doubleValue()-keepPrice);
+						+ " 净利价：" + df.format(price.getShoupanjia().subtract(keepPrice));
 						//logger.info(log);
 						//mockLog.setLogs(mockLog.getLogs()+log+"\n");
 					}
-					
-					if (buyCount == 1 && num <= 0 && powerValue > 0 && powerValue <20  && buyPorintMap.get(buyKey) && price.isUp()) {
+					if(StringUtils.containsIgnoreCase(price.getNumber(), "sh600438") && StringUtils.containsIgnoreCase(sdf.format(price.getDateime()), "2020-10-23 11:30:00")) {
+						num = (int) Math.floor(total / (28.17 * 100));
+						total = total - price.getShoupanjia().doubleValue() * 100 * num;
+						String log=" 买入点==> "
+								+ sdf.format(price.getDateime()) 
+								+ " 能量值：" + powerValue 
+								+ " 偏离值："+ (price.getMa20().longValue()/price.getShoupanjia().doubleValue())
+								+ " 20价格：" + price.getMa20()
+								+ " 价格：" + price.getShoupanjia() 
+								+ " 数量：" + (num * 100)
+								+ " 余额：" + df.format(total);
+						logger.info(log);
+						mockLog.setLastBuyin(date);
+						mockLog.setLogs(mockLog.getLogs()+log+"\n");
+						buyPorintMap.put(buyKey, false);
+					}
+					BigDecimal maybePrice=price.getMa20().multiply(new BigDecimal("1.02"));
+					if (num <= 0 && price.getShoupanjia().compareTo(maybePrice) == -1 && powerValue >= 0 && powerValue <20  && buyPorintMap.get(buyKey) && price.isUp()) {
 						
 						buyPorintMap.put(buyKey, false);
-						keepPrice = price.getShoupanjia().doubleValue();
+						keepPrice = price.getShoupanjia();
 						String log="";
 						if((allwin / init) * 100<=-3) {
 							num =  1;
@@ -201,6 +271,8 @@ public class MockDeal {
 							log=" 买入点==> "
 									+ sdf.format(price.getDateime()) 
 									+ " 能量值：" + powerValue 
+									+ " 偏离值："+ (price.getMa20().longValue()/price.getShoupanjia().doubleValue())
+									+ " 20价格：" + price.getMa20()
 									+ " 价格：" + price.getShoupanjia() 
 									+ " 数量：" + (num * 100)
 									+ " 余额：" + df.format(total);
@@ -213,21 +285,39 @@ public class MockDeal {
 				} else {
 					if(price.getShoupanjia().doubleValue()<=boxMin) {
 						boxMin=price.getShoupanjia().doubleValue();
+						String log= "创箱体新低，主要风险 ==> "
+								+ sdf.format(price.getDateime()) 
+								+ " MA20:" + price.getMa20().doubleValue()
+								+ " 偏移量:" + price.getPianlizhi()
+								+ " 当前能量值：" + powerValue 
+								+ " 箱体min：" + boxMin
+								+ " 箱体max：" + boxMax
+								+ " 当前价格：" + price.getShoupanjia();
+								logger.info(log);
+								//mockLog.setLogs(mockLog.getLogs()+log+"\n");
 					}
 					if(powerValue ==0) {
 						boxMax=price.getMa20().doubleValue();
+						String log= "强势变弱盘，重置箱体上限 ==> "
+								+ sdf.format(price.getDateime()) 
+								+ " MA20:" + price.getMa20().doubleValue()
+								+ " 偏移量:" + price.getPianlizhi()
+								+ " 当前能量值：" + powerValue 
+								+ " 箱体min：" + boxMin
+								+ " 箱体max：" + boxMax
+								+ " 当前价格：" + price.getShoupanjia();
+								logger.info(log);
+								//mockLog.setLogs(mockLog.getLogs()+log+"\n");
 					}
 					sellCount++;
-					buyCount = 0;
 					// 止损逻辑
 					double totaltemp = total + price.getShoupanjia().doubleValue() * 100 * num;
-
-					if (totaltemp < init && buyPorintMap.get(buyKey)) {
+					double temp11 = (totaltemp-init)/init*100;
+					if (temp11 < -3 && buyPorintMap.get(buyKey)) {
 						total = total + price.getShoupanjia().doubleValue() * 100 * num;
 						double win = total - init;
 						allwin = allwin + win;
 						num = 0;
-						keepPrice=-10;
 						String log=" 止损卖出==> "
 								+ sdf.format(price.getDateime()) 
 								+ " 能量值：" + powerValue 
@@ -240,6 +330,7 @@ public class MockDeal {
 						mockLog.setFail(mockLog.getFail()+1);
 						mockLog.setLogs(mockLog.getLogs()+log+"\n");
 						total = init;
+						maxPower=0;
 					}
 
 					if (sellCount == 1 && num > 0 && buyPorintMap.get(buyKey)) {
@@ -252,7 +343,7 @@ public class MockDeal {
 						+ sdf.format(price.getDateime()) 
 						+ " 能量值：" + powerValue 
 						+ " 价格：" + df.format(price.getShoupanjia()) 
-						+ " 净利价：" + df.format(price.getShoupanjia().doubleValue()-keepPrice)
+						+ " 净利价：" + df.format(price.getShoupanjia().subtract(keepPrice))
 						+ " 盈利：" + df.format(win)
 						+ " 盈利率：" + df.format((win / init) * 100) 
 						+ "% 累计:" + df.format(allwin) 
@@ -261,15 +352,20 @@ public class MockDeal {
 						mockLog.setSuccess(mockLog.getSuccess()+1);
 						mockLog.setLogs(mockLog.getLogs()+log+"\n");
 						total = init;
-						keepPrice=0;
+						maxPower=0;
 					}
 					powerValue--;
 				}
+				zuotianPrice=price.getShoupanjia();
 				String log=" 箱体==> "
 						+ sdf.format(price.getDateime()) 
 						+ " 能量值：" + powerValue 
-						+ " min：" + boxMin
-						+ " max：" + boxMax;
+						+ " 当前价格:" + price.getShoupanjia().doubleValue()
+						+ " 边界上:" + price.getMa20().doubleValue()*1.03
+						+ " 边界下:" + price.getMa20().doubleValue()
+						+ " 箱体min：" + boxMin
+						+ " 箱体max：" + boxMax
+						+ " keepDown:"+keepDown;
 						logger.info(log);
 				mockLog.setLogs(mockLog.getLogs()+log+"\n");
 				

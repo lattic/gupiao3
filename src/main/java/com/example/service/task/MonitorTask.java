@@ -88,15 +88,14 @@ public class MonitorTask implements InitializingBean {
 				System.out.println(stock.getName());
 			}else {
 				stockMap.put(stock.getNumber(), stock);
-				
 			}
-            
         });
 		return stockList.size();
 	}
 		
 	
 	//初始化map
+	@Scheduled(cron = "0 0 12 * * *")
 	private void AiBuyIn() {
 		int max=0;
 		int min=0;
@@ -222,7 +221,7 @@ public class MonitorTask implements InitializingBean {
 											   +"\n 初始化股票池数量："+init(),new Object[] {});
         DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_TEST_SECRET, robotbuy, null, false);
       //  AiBuyIn();
-        followTask();
+      //  followTask();
 	}
 	
 	

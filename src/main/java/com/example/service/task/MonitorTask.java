@@ -219,7 +219,7 @@ public class MonitorTask implements InitializingBean {
     	SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String robotbuy = MessageFormat.format("【同步股票池】"+dateformat.format(now)
 											   +"\n 初始化股票池数量："+init(),new Object[] {});
-        DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_SECRET, robotbuy, null, false);
+        DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_TEST_SECRET, robotbuy, null, false);
       //  AiBuyIn();
       //  followTask();
 	}

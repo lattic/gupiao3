@@ -91,7 +91,7 @@ public class MonitorRiskTask {
 						MockDeal.mockDeal(number, dateformat.format(calendar.getTime()),appSecret,true);
 						isNotifyByMock=false;
 					}
-					mockAiMap.put(number,isNotifyByMock);
+					mockAiMap.put(key,isNotifyByMock);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -118,7 +118,8 @@ public class MonitorRiskTask {
 			Boolean isNotify=notifyMap.get(key);
 			//通知开关
 			if(isNotify == null) {
-				 notifyMap.put(key,true);
+				isNotify=true;
+				notifyMap.put(key,isNotify);
 			}
 			
 			//止损 当前价格低于历史支撑位
@@ -140,7 +141,7 @@ public class MonitorRiskTask {
 			//弱势 当前价格小于20天线
 			if(nowPrice.getDangqianjiage()<riskPrice.getMa20().doubleValue()) {
 				if(status == null) {
-					String content = MessageFormat.format("GS【开始监听】"+dateformat.format(now)
+					String content = MessageFormat.format("GS【诊断股票走势】"+dateformat.format(now)
 			        +"\n------------------------------------ \n股票代码：{0}\n股票名称：{1}\n当前能量值:{2}\n压力位置:{3}\n当前价格:{4}\n支撑位置:{5}\n当前趋势:{6}", 
 			        		                 new Object[] {date.getNumber(), 
 			        		        		 date.getName(), 
@@ -150,7 +151,9 @@ public class MonitorRiskTask {
 			        		        		 riskPrice.getZhichengwei().doubleValue(),
 			        		        		 "目前属于下滑趋势"});
 					logger.info(content);
-					DingTalkRobotHTTPUtil.sendMsg(appSecret, content, null, false);
+					if(isNotify) {
+						DingTalkRobotHTTPUtil.sendMsg(appSecret, content, null, false);
+					}
 					lossMap.put(key,true);
 					return;
 				}
@@ -175,7 +178,7 @@ public class MonitorRiskTask {
 			//强势 当前价格大于20天线
 			if(nowPrice.getDangqianjiage()>=riskPrice.getMa20().doubleValue()){
 				if(status == null) {
-					String content = MessageFormat.format("GS【开始监听】"+dateformat.format(now)
+					String content = MessageFormat.format("GS【诊断股票走势】"+dateformat.format(now)
 					  +"\n------------------------------------ \n股票代码：{0}\n股票名称：{1}\n当前能量值:{2}\n压力位置:{3}\n当前价格:{4}\n支撑位置:{5}\n当前趋势:{6}", 
 			        		                 new Object[] {date.getNumber(), 
 			        		        		 date.getName(), 

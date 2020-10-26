@@ -44,7 +44,7 @@ public class MonitorRiskTask {
 	private static ConcurrentHashMap<String, Boolean> mockAiMap=new ConcurrentHashMap<String, Boolean>();
 	
 	
-//	@Scheduled(cron = "0/30 * * * * *")
+	@Scheduled(cron = "0/30 * * * * *")
 	private void  monitorAll() throws Exception {
 		//叶琳
 		excuteRunListen("sz300026",DingTalkRobotHTTPUtil.yelin);

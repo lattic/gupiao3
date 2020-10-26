@@ -65,7 +65,7 @@ public class MonitorTask implements InitializingBean {
 		pool.execute(new Runnable() {
 			@Override
 			public void run() {
-				MockDeal.sendMsgByList(list,"2020-09-24",DingTalkRobotHTTPUtil.APP_TEST_SECRET);
+				MockDeal.sendMsgByList(list,"2020-09-24",DingTalkRobotHTTPUtil.APP_SECRET);
 			}
 		});
 	}
@@ -217,9 +217,9 @@ public class MonitorTask implements InitializingBean {
 	public void afterPropertiesSet() throws Exception {
 		Date now=new Date();
     	SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		String robotbuy = MessageFormat.format("【实时监听启动】"+dateformat.format(now)
+		String robotbuy = MessageFormat.format("【同步股票池】"+dateformat.format(now)
 											   +"\n 初始化股票池数量："+init(),new Object[] {});
-        DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_TEST_SECRET, robotbuy, null, false);
+        DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_SECRET, robotbuy, null, false);
       //  AiBuyIn();
       //  followTask();
 	}

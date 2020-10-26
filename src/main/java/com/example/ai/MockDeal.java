@@ -367,7 +367,7 @@ public class MockDeal {
 						+ " 箱体max：" + boxMax
 						+ " keepDown:"+keepDown;
 						logger.info(log);
-				mockLog.setLogs(mockLog.getLogs()+log+"\n");
+				//mockLog.setLogs(mockLog.getLogs()+log+"\n");
 				
 				price.setPowerValue(powerValue);
 				mockLog.setPowerValue(powerValue);

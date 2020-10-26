@@ -65,7 +65,7 @@ public class MonitorTask implements InitializingBean {
 		pool.execute(new Runnable() {
 			@Override
 			public void run() {
-				MockDeal.sendMsgByList(list,"2020-09-24",DingTalkRobotHTTPUtil.APP_SECRET);
+				MockDeal.sendMsgByList(list,"2020-09-24",DingTalkRobotHTTPUtil.APP_TEST_SECRET);
 			}
 		});
 	}
@@ -95,7 +95,7 @@ public class MonitorTask implements InitializingBean {
 		
 	
 	//初始化map
-	@Scheduled(cron = "0 0 12 * * *")
+	@Scheduled(cron = "0 12 15 * * *")
 	private void AiBuyIn() {
 		int max=0;
 		int min=0;
@@ -120,8 +120,10 @@ public class MonitorTask implements InitializingBean {
 					}
 					
 					if(log.getWin()!=null && log.getWin()> maxprice.getWin()) {
-						if(log.getWinRate().doubleValue()>=3 && log.getWinRate().doubleValue()<=60) {
-							DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_TEST_SECRET, log.getLogs(), null, false);
+						if(log.getWinRate().doubleValue()>=3 && log.getWinRate().doubleValue()<=40) {
+							log.setLogs(log.getLogs().replace("测试AI操盘", "AI个股推荐"));
+							DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_SECRET, log.getLogs(), null, false);
+							DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.wangyongquan, log.getLogs(), null, false);
 						}
 						maxprice=log;
 					}
@@ -135,8 +137,6 @@ public class MonitorTask implements InitializingBean {
 							DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_TEST_SECRET, log.getLogs(), null, false);
 						}
 					}
-					
-					
 					
 					if(log.getWinRate() != null && log.getWinRate()>0) {
 						winLog+=log.getNumber()+"  "+log.getName()+" "+log.getWinRate()+"\n";

@@ -13,6 +13,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -47,12 +48,12 @@ public class MonitorRiskTask {
 	@Scheduled(cron = "0/30 * * * * *")
 	private void  monitorAll() throws Exception {
 		//叶琳
-		excuteRunListen("sz300026",DingTalkRobotHTTPUtil.yelin);
+		excuteRunListen("sz300026",DingTalkRobotHTTPUtil.yelin,"2020-09-23");
 		
 		//朱斌
-		excuteRunListen("sh603986",DingTalkRobotHTTPUtil.zhubin);
-		excuteRunListen("sz002594",DingTalkRobotHTTPUtil.zhubin);
-		excuteRunListen("sz002241",DingTalkRobotHTTPUtil.zhubin);
+		excuteRunListen("sh603986",DingTalkRobotHTTPUtil.zhubin,"2020-09-23");
+		excuteRunListen("sz002594",DingTalkRobotHTTPUtil.zhubin,"2020-09-23");
+		excuteRunListen("sz002241",DingTalkRobotHTTPUtil.zhubin,"2020-09-23");
 		
 		
 		List<String>numberList= new ArrayList<>();
@@ -65,13 +66,13 @@ public class MonitorRiskTask {
 		numberList.add("sz300014");
 		numberList.forEach(number->{
             System.out.println(number);
-            excuteRunListen(number,DingTalkRobotHTTPUtil.APP_SECRET);
+            excuteRunListen(number,DingTalkRobotHTTPUtil.APP_SECRET,"2020-09-23");
         });
 		
 	}
 
 
-	private void excuteRunListen(final String number,final String appSecret) {
+	private void excuteRunListen(final String number,final String appSecret,final String beginTime) {
 		pool.execute(new Runnable() {
 			@Override
 			public void run() {
@@ -88,7 +89,11 @@ public class MonitorRiskTask {
 					if(isNotifyByMock) {
 						Calendar calendar = Calendar.getInstance();  
 						calendar.add(Calendar.MONTH, -1);
-						MockDeal.mockDeal(number, dateformat.format(calendar.getTime()),appSecret,true);
+						if(StringUtils.isBlank(beginTime)) {
+							MockDeal.mockDeal(number, dateformat.format(calendar.getTime()),appSecret,true);
+						}else {
+							MockDeal.mockDeal(number, beginTime,appSecret,true);
+						}
 						isNotifyByMock=false;
 					}
 					mockAiMap.put(key,isNotifyByMock);

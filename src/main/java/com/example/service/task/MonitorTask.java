@@ -45,9 +45,27 @@ public class MonitorTask implements InitializingBean {
 	
 	//股票名称
 	public static ConcurrentHashMap<String, StockDo> stockMap=new ConcurrentHashMap<String, StockDo>();
-	
-	 
+	@Scheduled(cron = "0 30 9 * * *")
+	private void followTask1() {
+		followTask();
+	}
+	@Scheduled(cron = "0 30 10 * * *")
+	private void followTask2() {
+		followTask();
+	}
 	@Scheduled(cron = "0 30 11 * * *")
+	private void followTask3() {
+		followTask();
+	}
+	@Scheduled(cron = "0 0 14 * * *")
+	private void followTask4() {
+		followTask();
+	}
+	 
+	@Scheduled(cron = "0 0 15 * * *")
+	private void followTask5() {
+		 followTask();
+	}
 	private void followTask() {
 		List<String>list=new ArrayList<String>();
 		list.add("sh605003");
@@ -59,9 +77,7 @@ public class MonitorTask implements InitializingBean {
 		list.add("sz002042");
 		list.add("sh603650");
 		list.add("sh600601");
-		list.add("sz300588");
 		list.add("sh600438");
-		list.add("sz300865");
 		pool.execute(new Runnable() {
 			@Override
 			public void run() {
@@ -94,8 +110,11 @@ public class MonitorTask implements InitializingBean {
 	}
 		
 	
+	
+	
+	
 	//初始化map
-	@Scheduled(cron = "0 12 15 * * *")
+	@Scheduled(cron = "0 30 13 * * *")
 	private void AiBuyIn() {
 		int max=0;
 		int min=0;

@@ -57,13 +57,13 @@ public class MonitorRiskTask {
 		
 		
 		List<String>numberList= new ArrayList<>();
-		numberList.add("sh603881");
-		numberList.add("sz300073");
-		numberList.add("sz002201");
-		numberList.add("sh600438");
-		numberList.add("sz300232");
-		numberList.add("sz300092");
-		numberList.add("sz300014");
+		numberList.add("sz300092");//科新机电
+		numberList.add("sz300014");//亿纬锂能
+		numberList.add("sh603985");//恒润股份
+		numberList.add("sz300073");//当升科技
+		numberList.add("sz002201");//九鼎新材
+		numberList.add("sh600438");//通威股份
+		
 		numberList.forEach(number->{
             System.out.println(number);
             excuteRunListen(number,DingTalkRobotHTTPUtil.APP_SECRET,"2020-09-23");

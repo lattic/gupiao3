@@ -114,7 +114,7 @@ public class MonitorTask implements InitializingBean {
 	
 	
 	//初始化map
-	@Scheduled(cron = "0 30 13 * * *")
+	@Scheduled(cron = "0 40 11 * * *")
 	private void AiBuyIn() {
 		int max=0;
 		int min=0;

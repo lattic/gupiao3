@@ -143,6 +143,7 @@ public class MonitorTask implements InitializingBean {
 							log.setLogs(log.getLogs().replace("测试AI操盘", "AI个股推荐"));
 							DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_SECRET, log.getLogs(), null, false);
 							DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.wangyongquan, log.getLogs(), null, false);
+							DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.dongxu, log.getLogs(), null, false);
 							if(!StringUtils.containsIgnoreCase(log.getNumber(), "sz3")) {
 								DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.erhuo, log.getLogs(), null, false);
 							}

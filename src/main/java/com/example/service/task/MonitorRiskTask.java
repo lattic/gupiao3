@@ -66,8 +66,13 @@ public class MonitorRiskTask {
 		excuteRunListen("sh600004",DingTalkRobotHTTPUtil.erhuo,"2020-10-20");
 		excuteRunListen("sh600685",DingTalkRobotHTTPUtil.erhuo,"2020-10-20");
 
+		//王永全 wangyongquan
+		excuteRunListen("sz300092",DingTalkRobotHTTPUtil.wangyongquan,"2020-10-20");
 		
-		
+		//冬旭
+		excuteRunListen("sh601360",DingTalkRobotHTTPUtil.dongxu,"2020-10-20");
+		excuteRunListen("sz002024",DingTalkRobotHTTPUtil.dongxu,"2020-10-20");
+		excuteRunListen("sz002468",DingTalkRobotHTTPUtil.dongxu,"2020-10-20");
 		
 		List<String>numberList= new ArrayList<>();
 		numberList.add("sz300092");//科新机电

@@ -38,7 +38,7 @@ public class MockDeal {
 //		list.add("sz300588");
 		list.add("sh600438");
 //		list.add("sz300865");
-		mockDeal("sz002417","2020-09-24",DingTalkRobotHTTPUtil.APP_TEST_SECRET,true);
+		mockDeal("sz002468","2020-09-24",DingTalkRobotHTTPUtil.APP_TEST_SECRET,true);
 		sendMsgByList(list,"2020-09-24",DingTalkRobotHTTPUtil.APP_TEST_SECRET);
 	}
 

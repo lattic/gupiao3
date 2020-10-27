@@ -30,6 +30,7 @@ public class DingTalkRobotHTTPUtil {
 		public final static String yelin="4ce1db92d93c1c533045d3c52104bc378a76f19e9e82af29727450a004e34ffa";
 		public final static String zhubin="1ca13615f48b24101a052fc8fb966c7f9f647a4383e9a8ca57fe408200a0f5a7";
 		public final static String wangyongquan="61e94635ad0af3228043a9bf63ea4db70955dc381898ea170bc8981501e94907";
+		public final static String erhuo="49042570dc9011dacfd58b9f8ec44ced8f0e1f8979ca8ab5968f8441f30c8078";
 		
 		
 		

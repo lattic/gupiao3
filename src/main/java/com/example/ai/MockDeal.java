@@ -38,7 +38,7 @@ public class MockDeal {
 //		list.add("sz300588");
 //		list.add("sh600438");
 //		list.add("sz300865");
-		mockDeal("sz512880","2020-09-24",DingTalkRobotHTTPUtil.APP_TEST_SECRET,true);
+		mockDeal("sz399001","2020-09-24",DingTalkRobotHTTPUtil.APP_TEST_SECRET,true);
 //		sendMsgByList(list,"2020-09-24",DingTalkRobotHTTPUtil.APP_TEST_SECRET);
 	}
 
@@ -177,9 +177,9 @@ public class MockDeal {
 						ma20=price.getMa20().doubleValue();
 						String log= " 强势反弹 建议买入==> "
 								+ sdf.format(price.getDateime()) 
-								+ " MA20:" + price.getMa20().doubleValue()
-								+ " 偏移量:" + price.getPianlizhi()
-								+ " 当前能量值：" + powerValue 
+								//+ " MA20:" + price.getMa20().doubleValue()
+								//+ " 偏移量:" + price.getPianlizhi()
+								//+ " 当前能量值：" + powerValue 
 								+ " 当前价格：" + price.getShoupanjia();
 								logger.info(log);
 								mockLog.setLogs(mockLog.getLogs()+log+"\n");
@@ -237,11 +237,11 @@ public class MockDeal {
 					if(StringUtils.containsIgnoreCase(price.getNumber(), "sh600438") && StringUtils.containsIgnoreCase(sdf.format(price.getDateime()), "2020-10-23 11:30:00")) {
 						num = (int) Math.floor(total / (28.17 * 100));
 						total = total - price.getShoupanjia().doubleValue() * 100 * num;
-						String log=" 买入点==> "
+						String log=" 买入信号点--上升波段启动==> "
 								+ sdf.format(price.getDateime()) 
-								+ " 能量值：" + powerValue 
-								+ " 偏离值："+ (price.getMa20().longValue()/price.getShoupanjia().doubleValue())
-								+ " 20价格：" + price.getMa20()
+								//+ " 能量值：" + powerValue 
+								//+ " 偏离值："+ (price.getMa20().longValue()/price.getShoupanjia().doubleValue())
+								//+ " 20价格：" + price.getMa20()
 								+ " 价格：" + price.getShoupanjia() 
 								+ " 数量：" + (num * 100)
 								+ " 余额：" + df.format(total);
@@ -261,18 +261,18 @@ public class MockDeal {
 							total = total - price.getShoupanjia().doubleValue() * 100 * num;
 							log=" 小量买入观察 当前买入点==> "
 									+ sdf.format(price.getDateime()) 
-									+ " 能量值：" + powerValue 
+									//+ " 能量值：" + powerValue 
 									+ " 价格：" + price.getShoupanjia() 
 									+ " 数量：" + (num * 100)
 									+ " 余额：" + df.format(total);
 						}else {
 							num = (int) Math.floor(total / (price.getShoupanjia().doubleValue() * 100));
 							total = total - price.getShoupanjia().doubleValue() * 100 * num;
-							log=" 买入点==> "
+							log=" 买入信号点--上升波段启动==> "
 									+ sdf.format(price.getDateime()) 
-									+ " 能量值：" + powerValue 
-									+ " 偏离值："+ (price.getMa20().longValue()/price.getShoupanjia().doubleValue())
-									+ " 20价格：" + price.getMa20()
+									//+ " 能量值：" + powerValue 
+									//+ " 偏离值："+ (price.getMa20().longValue()/price.getShoupanjia().doubleValue())
+									//+ " 20价格：" + price.getMa20()
 									+ " 价格：" + price.getShoupanjia() 
 									+ " 数量：" + (num * 100)
 									+ " 余额：" + df.format(total);
@@ -318,9 +318,9 @@ public class MockDeal {
 						double win = total - init;
 						allwin = allwin + win;
 						num = 0;
-						String log=" 止损卖出==> "
+						String log=" 止损卖出--下跌波段加速==> "
 								+ sdf.format(price.getDateime()) 
-								+ " 能量值：" + powerValue 
+							//	+ " 能量值：" + powerValue 
 								+ " 价格：" + df.format(price.getShoupanjia()) 
 								+ " 盈利：" + df.format(win)
 								+ " 盈利率：" + df.format((win / init) * 100) 
@@ -339,9 +339,9 @@ public class MockDeal {
 						double win = total - init;
 						allwin = allwin + win;
 						num = 0;
-						String log=" 卖出点==> "
+						String log=" 卖出信号点--下跌波段启动==> "
 						+ sdf.format(price.getDateime()) 
-						+ " 能量值：" + powerValue 
+					//	+ " 能量值：" + powerValue 
 						+ " 价格：" + df.format(price.getShoupanjia()) 
 						+ " 净利价：" + df.format(price.getShoupanjia().subtract(keepPrice))
 						+ " 盈利：" + df.format(win)

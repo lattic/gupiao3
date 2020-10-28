@@ -49,7 +49,11 @@ public class MonitorRiskTask {
 	private void  monitorAll() throws Exception {
 		//文斌
 		excuteRunListen("sz002030",DingTalkRobotHTTPUtil.wenbin,"2020-10-20");
-				
+		
+		//晴峰
+		excuteRunListen("sz000016",DingTalkRobotHTTPUtil.qingfeng,"2020-10-07");//上证
+		excuteRunListen("sz399001",DingTalkRobotHTTPUtil.qingfeng,"2020-10-07");//深指
+		
 		
 		//叶琳
 		excuteRunListen("sz300026",DingTalkRobotHTTPUtil.yelin,"2020-09-23");

@@ -145,6 +145,7 @@ public class MonitorTask implements InitializingBean {
 							DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.wangyongquan, log.getLogs(), null, false);
 							DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.dongxu, log.getLogs(), null, false);
 							DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.keyi, log.getLogs(), null, false);
+							DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.qingfeng, log.getLogs(), null, false);
 							if(!StringUtils.containsIgnoreCase(log.getNumber(), "sz3")) {
 								DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.erhuo, log.getLogs(), null, false);
 							}

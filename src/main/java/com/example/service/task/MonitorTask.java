@@ -186,6 +186,7 @@ public class MonitorTask implements InitializingBean {
 					+ maxprice.getLogs()
 					+"\n 单个机器人最大亏损："
 					+minprice.getLogs();
+			DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_TEST_SECRET, context, null, false);
 			logger.info(context);
 		} catch (Exception e) {
 		}

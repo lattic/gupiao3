@@ -32,6 +32,8 @@ public class DingTalkRobotHTTPUtil {
 		public final static String wangyongquan="61e94635ad0af3228043a9bf63ea4db70955dc381898ea170bc8981501e94907";
 		public final static String erhuo="49042570dc9011dacfd58b9f8ec44ced8f0e1f8979ca8ab5968f8441f30c8078";
 		public final static String dongxu="17a07b1c73c305763e5da8562b8ac704b96ce9853153d36a6e6e7923891d7037";
+		public final static String wenbin="90a3787b0cfdbb11eceffb33059824de7200c5664f82be046ec6b410e6a57271";
+		public final static String keyi="1580061e071428e8b6f0825ccfdb3777498eaab4b36c0d28b2db0551725fc516";
 		
 		
 		

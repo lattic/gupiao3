@@ -97,7 +97,7 @@ public class MonitorTask implements InitializingBean {
 	}
 	
 	//初始化map
-		private int init() {
+	private int init() {
 		List<StockDo> stockList = guPiaoService.getAllStock();
 		stockList.forEach(stock->{
 			if(StringUtils.containsIgnoreCase(stock.getName(), "ST") || StringUtils.containsIgnoreCase(stock.getName(), "债") ) {
@@ -144,6 +144,7 @@ public class MonitorTask implements InitializingBean {
 							DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_SECRET, log.getLogs(), null, false);
 							DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.wangyongquan, log.getLogs(), null, false);
 							DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.dongxu, log.getLogs(), null, false);
+							DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.keyi, log.getLogs(), null, false);
 							if(!StringUtils.containsIgnoreCase(log.getNumber(), "sz3")) {
 								DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.erhuo, log.getLogs(), null, false);
 							}

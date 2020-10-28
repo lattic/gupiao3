@@ -47,6 +47,10 @@ public class MonitorRiskTask {
 	
 	@Scheduled(cron = "0/30 * * * * *")
 	private void  monitorAll() throws Exception {
+		//文斌
+		excuteRunListen("sz002030",DingTalkRobotHTTPUtil.wenbin,"2020-10-20");
+				
+		
 		//叶琳
 		excuteRunListen("sz300026",DingTalkRobotHTTPUtil.yelin,"2020-09-23");
 		
@@ -66,6 +70,7 @@ public class MonitorRiskTask {
 		excuteRunListen("sh600004",DingTalkRobotHTTPUtil.erhuo,"2020-10-20");
 		excuteRunListen("sh600685",DingTalkRobotHTTPUtil.erhuo,"2020-10-20");
 
+		
 		//王永全 wangyongquan
 		excuteRunListen("sz300092",DingTalkRobotHTTPUtil.wangyongquan,"2020-10-20");
 		

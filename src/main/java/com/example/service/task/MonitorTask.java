@@ -26,6 +26,7 @@ import com.example.demo.GuPiao;
 import com.example.model.GuPiaoDo;
 import com.example.model.MockLog;
 import com.example.model.StockDo;
+import com.example.model.SubscriptionDo;
 import com.example.service.GuPiaoService;
 import com.example.uitls.DingTalkRobotHTTPUtil;
 import com.example.uitls.ReadUrl;
@@ -68,16 +69,12 @@ public class MonitorTask implements InitializingBean {
 	}
 	private void followTask() {
 		List<String>list=new ArrayList<String>();
-		list.add("sh605003");
-		list.add("sz300692");
-		list.add("sz300647");
-		list.add("sz300707");
-		list.add("sz300882");
-		list.add("sz002372");
-		list.add("sz002042");
-		list.add("sh603650");
-		list.add("sh600601");
-		list.add("sh600438");
+		List<SubscriptionDo> subscriptionList=guPiaoService.listMemberAll();
+		for(SubscriptionDo realTime:subscriptionList) {
+			if(!StringUtils.equals(realTime.getNumber(), "0")) {
+				list.add(realTime.getNumber());
+			}
+		}
 		pool.execute(new Runnable() {
 			@Override
 			public void run() {
@@ -116,6 +113,7 @@ public class MonitorTask implements InitializingBean {
 	//初始化map
 	@Scheduled(cron = "0 31 9 * * *")
 	private void AiBuyIn() {
+		List<SubscriptionDo> subscriptionList=guPiaoService.listMemberAll();
 		int max=0;
 		int min=0;
 		double total=0;
@@ -141,13 +139,10 @@ public class MonitorTask implements InitializingBean {
 					if(log.getWin()!=null && log.getWin()> maxprice.getWin()) {
 						if(log.getWinRate().doubleValue()>=3 && log.getWinRate().doubleValue()<=40) {
 							log.setLogs(log.getLogs().replace("测试AI操盘", "AI个股推荐"));
-							DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_SECRET, log.getLogs(), null, false);
-							DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.wangyongquan, log.getLogs(), null, false);
-							DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.dongxu, log.getLogs(), null, false);
-							DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.keyi, log.getLogs(), null, false);
-							DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.qingfeng, log.getLogs(), null, false);
-							if(!StringUtils.containsIgnoreCase(log.getNumber(), "sz3")) {
-								DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.erhuo, log.getLogs(), null, false);
+							for(SubscriptionDo realTime:subscriptionList) {
+								if(StringUtils.equals(realTime.getNumber(), "0")) {
+									DingTalkRobotHTTPUtil.sendMsg(realTime.getDingtalkId(), log.getLogs(), null, false);
+								}
 							}
 						}
 						maxprice=log;

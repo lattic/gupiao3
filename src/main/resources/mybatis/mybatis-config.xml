@@ -11,6 +11,6 @@
 		<typeAlias alias="guPiaoDo" type="com.example.model.GuPiaoDo" />
 		<typeAlias alias="realTime" type="com.example.model.RealTimeDo" />
 		<typeAlias alias="stockDo" type="com.example.model.StockDo" />
-		
+		<typeAlias alias="subscriptionDo" type="com.example.model.SubscriptionDo" />
 	</typeAliases>
 </configuration>

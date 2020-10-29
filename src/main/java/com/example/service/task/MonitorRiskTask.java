@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,8 @@ import com.example.ai.MockDeal;
 import com.example.demo.GuPiao;
 import com.example.model.GuPiaoDo;
 import com.example.model.HistoryPriceDo;
+import com.example.model.SubscriptionDo;
+import com.example.service.GuPiaoService;
 import com.example.uitls.DingTalkRobotHTTPUtil;
 import com.example.uitls.ReadUrl;
 
@@ -35,7 +38,8 @@ public class MonitorRiskTask {
 			Executors.defaultThreadFactory(), 
 			new ThreadPoolExecutor.CallerRunsPolicy());
 
-	
+	@Autowired
+	private GuPiaoService guPiaoService;
 	
 	//目前是否弱势
 	private static ConcurrentHashMap<String, Boolean> lossMap=new ConcurrentHashMap<String, Boolean>();
@@ -44,58 +48,60 @@ public class MonitorRiskTask {
 	//AI操盘通知   key—— yyyymmdd_number
 	private static ConcurrentHashMap<String, Boolean> mockAiMap=new ConcurrentHashMap<String, Boolean>();
 	
+	private static boolean belongCalendar(Date nowTime, Date beginTime, Date endTime) {
+		Calendar date = Calendar.getInstance();
+		date.setTime(nowTime);
+ 
+		Calendar begin = Calendar.getInstance();
+		begin.setTime(beginTime);
+ 
+		Calendar end = Calendar.getInstance();
+		end.setTime(endTime);
+ 
+		if (date.after(begin) && date.before(end)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	private static boolean traceTime() {
+		SimpleDateFormat df = new SimpleDateFormat("HH:mm");// 设置日期格式
+		Date now = null;
+		Date beginTime1 = null;
+		Date endTime1 = null;
+		Date beginTime2 = null;
+		Date endTime2 = null;
+		try {
+			now = df.parse(df.format(new Date()));
+			beginTime1 = df.parse("09:15");
+			endTime1 = df.parse("11:31");
+			
+			beginTime2 = df.parse("13:00");
+			endTime2 = df.parse("15:01");
+			
+			if(belongCalendar(now, beginTime1, endTime1)||belongCalendar(now, beginTime2, endTime2)) {
+				return true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
 	
 	@Scheduled(cron = "0/30 * * * * *")
 	private void  monitorAll() throws Exception {
-		//文斌
-		excuteRunListen("sz002030",DingTalkRobotHTTPUtil.wenbin,"2020-10-20");
-		
-		//晴峰
-		excuteRunListen("sz000016",DingTalkRobotHTTPUtil.qingfeng,"2020-10-07");//上证
-		excuteRunListen("sz399001",DingTalkRobotHTTPUtil.qingfeng,"2020-10-07");//深指
-		
-		
-		//叶琳
-		excuteRunListen("sz300026",DingTalkRobotHTTPUtil.yelin,"2020-09-23");
-		
-		//朱斌
-		excuteRunListen("sh603986",DingTalkRobotHTTPUtil.zhubin,"2020-09-23");
-		excuteRunListen("sz002594",DingTalkRobotHTTPUtil.zhubin,"2020-09-23");
-		excuteRunListen("sz002241",DingTalkRobotHTTPUtil.zhubin,"2020-09-23");
-		
-		//二火
-		excuteRunListen("sh600251",DingTalkRobotHTTPUtil.erhuo,"2020-10-20");
-		excuteRunListen("sz002202",DingTalkRobotHTTPUtil.erhuo,"2020-10-20");
-		excuteRunListen("sz002030",DingTalkRobotHTTPUtil.erhuo,"2020-10-20");
-		
-		excuteRunListen("sz002117",DingTalkRobotHTTPUtil.erhuo,"2020-10-20");
-		excuteRunListen("sz000156",DingTalkRobotHTTPUtil.erhuo,"2020-10-20");
-		excuteRunListen("sz002530",DingTalkRobotHTTPUtil.erhuo,"2020-10-20");
-		excuteRunListen("sh600004",DingTalkRobotHTTPUtil.erhuo,"2020-10-20");
-		excuteRunListen("sh600685",DingTalkRobotHTTPUtil.erhuo,"2020-10-20");
+		if(!traceTime()) {
+			System.out.println("还没开盘");
+			return ;
+		}
 
-		
-		//王永全 wangyongquan
-		excuteRunListen("sz300092",DingTalkRobotHTTPUtil.wangyongquan,"2020-10-20");
-		
-		//冬旭
-		excuteRunListen("sh601360",DingTalkRobotHTTPUtil.dongxu,"2020-10-20");
-		excuteRunListen("sz002024",DingTalkRobotHTTPUtil.dongxu,"2020-10-20");
-		excuteRunListen("sz002468",DingTalkRobotHTTPUtil.dongxu,"2020-10-20");
-		
-		List<String>numberList= new ArrayList<>();
-		numberList.add("sz300092");//科新机电
-		numberList.add("sz300014");//亿纬锂能
-		numberList.add("sh603985");//恒润股份
-		numberList.add("sz300073");//当升科技
-		numberList.add("sz002201");//九鼎新材
-		numberList.add("sh600438");//通威股份
-		
-		numberList.forEach(number->{
-            System.out.println(number);
-            excuteRunListen(number,DingTalkRobotHTTPUtil.APP_SECRET,"2020-09-23");
-        });
-		
+		List<SubscriptionDo> list=guPiaoService.listMemberAll();
+		for(SubscriptionDo realTime:list) {
+			if(!StringUtils.equals(realTime.getNumber(), "0")) {
+				excuteRunListen(realTime.getNumber(),realTime.getDingtalkId(),realTime.getBegintime());
+			}
+		}
 	}
 
 

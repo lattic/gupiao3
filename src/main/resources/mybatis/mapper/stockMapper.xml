@@ -8,7 +8,7 @@
 		<result column="id" 			property="id" 			jdbcType="BIGINT" />
 		<result column="number" 		property="number" 		jdbcType="VARCHAR" />
 		<result column="name" 			property="name" 		jdbcType="VARCHAR" />
-		<result column="create_Date" 	property="createDate" 	jdbcType="TIMESTAMP" />
+		<result column="create_date" 	property="createDate" 	jdbcType="TIMESTAMP" />
 		<result column="type" 			property="type" 		jdbcType="INTEGER" />
 		<result column="status" 		property="status" 		jdbcType="INTEGER" />
 	</resultMap>

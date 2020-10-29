@@ -5,6 +5,7 @@ import java.util.List;
 import com.example.model.GuPiaoDo;
 import com.example.model.RealTimeDo;
 import com.example.model.StockDo;
+import com.example.model.SubscriptionDo;
 
 public interface GuPiaoService {
 	boolean realTimeInsert(RealTimeDo model);
@@ -18,4 +19,6 @@ public interface GuPiaoService {
 	StockDo getNumber(String number);
 
 	List<StockDo> getAllStock();
+	
+	List<SubscriptionDo> listMemberAll();
 }

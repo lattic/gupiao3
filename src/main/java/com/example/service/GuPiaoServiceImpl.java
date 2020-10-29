@@ -1,8 +1,11 @@
 package com.example.service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,13 +14,17 @@ import com.alibaba.fastjson.JSON;
 import com.example.mapper.GuPiaoMapper;
 import com.example.mapper.RealTimeMapper;
 import com.example.mapper.StockMapper;
+import com.example.mapper.SubscriptionMapper;
 import com.example.model.GuPiaoDo;
 import com.example.model.RealTimeDo;
 import com.example.model.StockDo;
+import com.example.model.SubscriptionDo;
 
 @Service
 public class GuPiaoServiceImpl implements GuPiaoService,InitializingBean {
 
+	private static Logger logger = LoggerFactory.getLogger(GuPiaoServiceImpl.class);
+	
 	@Autowired
 	private GuPiaoMapper guPiaoMapper;
 	
@@ -26,6 +33,9 @@ public class GuPiaoServiceImpl implements GuPiaoService,InitializingBean {
 	
 	@Autowired
 	private StockMapper stockMapper;
+	
+	@Autowired
+	private SubscriptionMapper subscriptionMapper;
 	
 
 	@Override
@@ -86,6 +96,16 @@ public class GuPiaoServiceImpl implements GuPiaoService,InitializingBean {
 	@Override
 	public List<StockDo> getAllStock() {
 		return stockMapper.getAll();
+	}
+
+	@Override
+	public List<SubscriptionDo> listMemberAll() {
+		try {
+			return subscriptionMapper.getAll();
+		}catch(Exception ex) {
+			logger.error(ex.getMessage());
+		}
+		return null; 
 	}
 
 }

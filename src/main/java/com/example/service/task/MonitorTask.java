@@ -28,6 +28,7 @@ import com.example.model.MockLog;
 import com.example.model.StockDo;
 import com.example.model.SubscriptionDo;
 import com.example.service.GuPiaoService;
+import com.example.uitls.DateUtils;
 import com.example.uitls.DingTalkRobotHTTPUtil;
 import com.example.uitls.ReadUrl;
 
@@ -68,6 +69,11 @@ public class MonitorTask implements InitializingBean {
 		 followTask();
 	}
 	private void followTask() {
+		if(!DateUtils.traceTime()) {
+			System.out.println("还没开盘");
+			return ;
+		}
+		
 		List<String>list=new ArrayList<String>();
 		List<SubscriptionDo> subscriptionList=guPiaoService.listMemberAll();
 		for(SubscriptionDo realTime:subscriptionList) {

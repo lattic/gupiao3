@@ -27,6 +27,7 @@ import com.example.model.GuPiaoDo;
 import com.example.model.HistoryPriceDo;
 import com.example.model.SubscriptionDo;
 import com.example.service.GuPiaoService;
+import com.example.uitls.DateUtils;
 import com.example.uitls.DingTalkRobotHTTPUtil;
 import com.example.uitls.ReadUrl;
 
@@ -48,50 +49,10 @@ public class MonitorRiskTask {
 	//AI操盘通知   key—— yyyymmdd_number
 	private static ConcurrentHashMap<String, Boolean> mockAiMap=new ConcurrentHashMap<String, Boolean>();
 	
-	private static boolean belongCalendar(Date nowTime, Date beginTime, Date endTime) {
-		Calendar date = Calendar.getInstance();
-		date.setTime(nowTime);
- 
-		Calendar begin = Calendar.getInstance();
-		begin.setTime(beginTime);
- 
-		Calendar end = Calendar.getInstance();
-		end.setTime(endTime);
- 
-		if (date.after(begin) && date.before(end)) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
-	private static boolean traceTime() {
-		SimpleDateFormat df = new SimpleDateFormat("HH:mm");// 设置日期格式
-		Date now = null;
-		Date beginTime1 = null;
-		Date endTime1 = null;
-		Date beginTime2 = null;
-		Date endTime2 = null;
-		try {
-			now = df.parse(df.format(new Date()));
-			beginTime1 = df.parse("09:15");
-			endTime1 = df.parse("11:31");
-			
-			beginTime2 = df.parse("13:00");
-			endTime2 = df.parse("15:01");
-			
-			if(belongCalendar(now, beginTime1, endTime1)||belongCalendar(now, beginTime2, endTime2)) {
-				return true;
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;
-	}
 	
 	@Scheduled(cron = "0/30 * * * * *")
 	private void  monitorAll() throws Exception {
-		if(!traceTime()) {
+		if(!DateUtils.traceTime()) {
 			System.out.println("还没开盘");
 			return ;
 		}

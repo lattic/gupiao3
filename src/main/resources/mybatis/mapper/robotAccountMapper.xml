@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+						"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.example.mapper.RobotAccountMapper">
+
+	<resultMap id="robotAccountDo" type="com.example.model.RobotAccountDo">
+		<result column="id" property="id" jdbcType="BIGINT" />
+		<result column="total" property="total" jdbcType="DECIMAL" />
+		<result column="robot_Id" property="robotId" jdbcType="BIGINT" />
+	</resultMap>
+
+	<sql id="All_Column">
+		id,total,robot_Id
+	</sql>
+
+	<select id="getAll" resultMap="robotAccountDo">
+		SELECT
+		<include refid="All_Column" />
+		FROM robot_account
+	</select>
+
+
+	<insert id="insert" parameterType="robotAccountDo">
+		INSERT INTO
+		robot_account
+		(total,robot_Id)
+		VALUES
+		(#{total},#{robotId})
+	</insert>
+
+	<delete id="delete" parameterType="robotAccountDo">
+		DELETE FROM
+		robot_account
+		WHERE
+		id =#{id}
+	</delete>
+
+</mapper>

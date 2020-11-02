@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+						"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.example.mapper.RobotSetMapper">
+
+	<resultMap id="robotSetDo" type="com.example.model.RobotSetDo">
+		<result column="id" property="id" jdbcType="BIGINT" />
+		<result column="begin_time" 	property="beginTime" 	jdbcType="TIMESTAMP" />
+		<result column="end_time" 	property="endTime" 	jdbcType="TIMESTAMP" />
+		<result column="number" property="number" jdbcType="VARCHAR" />
+		<result column="robot_name" property="robotName" jdbcType="VARCHAR" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="dt_id" property="dtId" jdbcType="VARCHAR" />
+		<result column="stop_losses_price" property="stopLossesPrice" jdbcType="DECIMAL" />
+		<result column="is_execution_sale" property="isExecutionSale" jdbcType="INTEGER" />
+	</resultMap>
+
+	<sql id="All_Column">
+		id,begin_time,end_time,number,robot_name,name,dt_id,stop_losses_price,is_execution_sale
+	</sql>
+
+	<select id="getAll" resultMap="robotSetDo">
+		SELECT
+		<include refid="All_Column" />
+		FROM robot_set
+	</select>
+
+
+	<insert id="insert" parameterType="robotSetDo">
+		INSERT INTO
+		robot_set
+		(begin_time,end_time,number,robot_name,name,dt_id,stop_losses_price,is_execution_sale)
+		VALUES
+		(#{beginTime},#{endTime},#{number},#{robotName},#{name},#{dtId},#{stopLossesPrice},#{isExecutionSale})
+	</insert>
+
+	<delete id="delete" parameterType="robotSetDo">
+		DELETE FROM
+		robot_set
+		WHERE
+		id =#{id}
+	</delete>
+</mapper>

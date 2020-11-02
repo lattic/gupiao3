@@ -89,7 +89,7 @@ public class MonitorTask implements InitializingBean {
 		});
 	}
 	
-	@Scheduled(cron = "0 0 0/1 * * *")
+	@Scheduled(cron = "0 0 15 * * *")
 	private void updateAllGuPiao() {
 		pool.execute(new Runnable() {
 			@Override
@@ -183,11 +183,11 @@ public class MonitorTask implements InitializingBean {
 					+"\n 赚钱的机器人："+max
 					+"\n 赚钱股票："+winLog
 					+"\n 亏钱的机器人:"+min
-					+"\n 亏钱股票："+lossLog
-					+"\n 单个机器人最大盈利："
-					+ maxprice.getLogs()
-					+"\n 单个机器人最大亏损："
-					+minprice.getLogs();
+					+"\n 亏钱股票："+lossLog;
+					//+"\n 单个机器人最大盈利："
+					// + maxprice.getLogs()
+					//+"\n 单个机器人最大亏损："
+					//+minprice.getLogs();
 			DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_TEST_SECRET, context, null, false);
 			logger.info(context);
 		} catch (Exception e) {

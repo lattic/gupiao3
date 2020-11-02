@@ -12,5 +12,8 @@
 		<typeAlias alias="realTime" type="com.example.model.RealTimeDo" />
 		<typeAlias alias="stockDo" type="com.example.model.StockDo" />
 		<typeAlias alias="subscriptionDo" type="com.example.model.SubscriptionDo" />
+		<typeAlias alias="tradingRecordDo" type="com.example.model.TradingRecordDo" />
+		<typeAlias alias="robotAccountDo" type="com.example.model.RobotAccountDo" />
+		<typeAlias alias="robotSetDo" type="com.example.model.RobotSetDo" />
 	</typeAliases>
 </configuration>

@@ -118,7 +118,7 @@ public class MonitorTask implements InitializingBean {
 	
 	//初始化map
 	@Scheduled(cron = "0 31 9 * * *")
-	private void AiBuyIn() {
+	public void AiBuyIn() {
 		List<SubscriptionDo> subscriptionList=guPiaoService.listMemberAll();
 		int max=0;
 		int min=0;

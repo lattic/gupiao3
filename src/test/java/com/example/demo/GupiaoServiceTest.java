@@ -16,6 +16,8 @@ import com.example.mapper.TradingRecordMapper;
 import com.example.model.RobotAccountDo;
 import com.example.model.RobotSetDo;
 import com.example.model.TradingRecordDo;
+import com.example.service.task.MonitorTask;
+import com.example.uitls.DingTalkRobotHTTPUtil;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {GupiaoApplication.class})
@@ -27,6 +29,16 @@ public class GupiaoServiceTest {
 	private RobotAccountMapper robotAccountMapper;
 	@Autowired
 	private TradingRecordMapper tradingRecordMapper;
+	@Autowired
+	private MonitorTask monitorTask;
+	
+	
+	
+	@Test
+	public void AiBuyIn() {
+		monitorTask.AiBuyIn();
+	}
+	
 	
 	
 	@Test

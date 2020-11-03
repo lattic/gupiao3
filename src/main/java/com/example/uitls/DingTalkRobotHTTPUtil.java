@@ -26,17 +26,9 @@ import com.alibaba.fastjson.JSONObject;
 public class DingTalkRobotHTTPUtil {
 		public final static String APP_SECRET="477b77570a86de89c4c3a43a662e498d4262e7382ea0b0332563d88c93adc3fc";
 		public final static String APP_TEST_SECRET="bb888ac7199ba68c327c8a0e44fbf0ee6b65b5b0f490beb39a209a295e132a4f";
-		public final static String yelin="4ce1db92d93c1c533045d3c52104bc378a76f19e9e82af29727450a004e34ffa";
-		public final static String zhubin="1ca13615f48b24101a052fc8fb966c7f9f647a4383e9a8ca57fe408200a0f5a7";
-		public final static String wangyongquan="61e94635ad0af3228043a9bf63ea4db70955dc381898ea170bc8981501e94907";
-		public final static String erhuo="49042570dc9011dacfd58b9f8ec44ced8f0e1f8979ca8ab5968f8441f30c8078";
-		public final static String dongxu="17a07b1c73c305763e5da8562b8ac704b96ce9853153d36a6e6e7923891d7037";
-		public final static String wenbin="90a3787b0cfdbb11eceffb33059824de7200c5664f82be046ec6b410e6a57271";
-		public final static String keyi="1580061e071428e8b6f0825ccfdb3777498eaab4b36c0d28b2db0551725fc516";
-		public final static String qingfeng="9c4294edae7ac2f673a2f2442f36f07fecb141df5d5b0430ff047d89c1c629b7";
 		
-		private static boolean isClose=false;
-		private static boolean isTest=false;
+		public static boolean isClose=false;
+		public static boolean isTest=false;
 		
 		private static Logger logger = LoggerFactory.getLogger("dingtalk_log");    
 		public static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(10, 30, 60, TimeUnit.SECONDS , new ArrayBlockingQueue<Runnable>(10), new DingTalkThreadFactory());
@@ -91,7 +83,7 @@ public class DingTalkRobotHTTPUtil {
 		            throw new RuntimeException(errorText);
 		        }
 		        try {
-			        if(isTest) {
+			        if(DingTalkRobotHTTPUtil.isTest) {
 			        	content="测试"+content;
 						 run(DingTalkRobotHTTPUtil.APP_TEST_SECRET, content, notifyList, isAtAll);
 			        	return ;

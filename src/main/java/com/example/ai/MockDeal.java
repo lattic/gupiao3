@@ -12,9 +12,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 
+import com.example.demo.GuPiao;
+import com.example.model.GuPiaoDo;
 import com.example.model.HistoryPriceDo;
 import com.example.model.MockLog;
+import com.example.uitls.DateUtils;
 import com.example.uitls.DingTalkRobotHTTPUtil;
 import com.example.uitls.ReadUrl;
 
@@ -61,6 +65,21 @@ public class MockDeal {
 				logger.warn("当前股票没有数据："+number);
 				return null;
 			}
+			HistoryPriceDo nowPrice = list.get(list.size()-1);
+			if(!DateUtils.isSameDay(nowPrice.getDateime())) {
+				GuPiao date=ReadUrl.readUrl(nowPrice.getNumber(),false);
+				if(date !=null) {
+					GuPiaoDo nowRealTimePrice=new GuPiaoDo();
+					BeanUtils.copyProperties(date, nowRealTimePrice);
+					if(nowRealTimePrice.getDangqianjiage()>0) {
+						nowPrice.setKaipanjia(new BigDecimal(nowRealTimePrice.getKaipanjia()) );
+						nowPrice.setShoupanjia(new BigDecimal(nowRealTimePrice.getDangqianjiage()) );
+						nowPrice.setDateime(DateUtils.getDateForString(nowRealTimePrice.getDate(),nowRealTimePrice.getTime()));
+						list.add(nowPrice);
+					}
+				}
+			}
+			
 			MockLog mockLog=mockDeal(list, beginDate);
 			if(isSendMsg) {
 				DingTalkRobotHTTPUtil.sendMsg(appSecret, mockLog.getLogs(), null, false);

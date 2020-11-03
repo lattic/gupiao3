@@ -34,7 +34,7 @@ import com.example.uitls.ReadUrl;
 
 @Service
 public class MonitorTask implements InitializingBean {
-	private static Logger logger = LoggerFactory.getLogger(MonitorTask.class);
+	private static Logger logger = LoggerFactory.getLogger("mock_log");
 	ThreadPoolExecutor  pool = new ThreadPoolExecutor(20, 100, 1,TimeUnit.SECONDS,
 			new LinkedBlockingDeque<Runnable>(1000), 
 			Executors.defaultThreadFactory(), 

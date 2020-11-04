@@ -1,6 +1,7 @@
 package com.example.service;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.mapper.GuPiaoMapper;
+import com.example.mapper.HistoryStockMapper;
 import com.example.mapper.RealTimeMapper;
 import com.example.mapper.RobotAccountMapper;
 import com.example.mapper.RobotSetMapper;
@@ -18,12 +20,15 @@ import com.example.mapper.StockMapper;
 import com.example.mapper.SubscriptionMapper;
 import com.example.mapper.TradingRecordMapper;
 import com.example.model.GuPiaoDo;
+import com.example.model.HistoryPriceDo;
+import com.example.model.HistoryStockDo;
 import com.example.model.RealTimeDo;
 import com.example.model.RobotAccountDo;
 import com.example.model.RobotSetDo;
 import com.example.model.StockDo;
 import com.example.model.SubscriptionDo;
 import com.example.model.TradingRecordDo;
+import com.example.uitls.ReadUrl;
 
 @Service
 public class GuPiaoServiceImpl implements GuPiaoService,InitializingBean {
@@ -48,7 +53,36 @@ public class GuPiaoServiceImpl implements GuPiaoService,InitializingBean {
 	private RobotAccountMapper robotAccountMapper;
 	@Autowired
 	private TradingRecordMapper tradingRecordMapper;
+	@Autowired
+	private HistoryStockMapper historyStockMapper;
 	
+	@Override
+	public void updateHistoryStock(String number) {
+		
+		List<HistoryPriceDo> list = ReadUrl.readUrl(number, 60);
+		if(list ==null || list.isEmpty()) {
+			logger.warn("没有获取到数据");
+			return ;
+		}
+		final SimpleDateFormat df1 = new SimpleDateFormat("yyyyMMdd");// 设置日期格式
+		final SimpleDateFormat df2 = new SimpleDateFormat("yyyyMMddHHmm");// 设置日期格式
+		for(HistoryPriceDo price:list) {
+			HistoryStockDo tr= new HistoryStockDo();
+			tr.setKaipanjia(price.getKaipanjia());
+			tr.setShoupanjia(price.getShoupanjia());
+			tr.setHeight(price.getZuigaojia());
+			tr.setLow(price.getZuidijia());
+			tr.setMa20Hour(price.getMa20());
+			tr.setMa20Day(new BigDecimal(0));
+			tr.setHistoryDay(df1.format(price.getDateime()));
+			tr.setHistoryAll(df2.format(price.getDateime()));
+			tr.setNumber(number);
+			if(historyStockMapper.getByTime(tr)==null) {
+				historyStockMapper.insert(tr);
+			}
+		}
+	}
+
 
 	@Override
 	public boolean realTimeInsert(RealTimeDo model) {
@@ -120,4 +154,5 @@ public class GuPiaoServiceImpl implements GuPiaoService,InitializingBean {
 		return null; 
 	}
 
+	
 }

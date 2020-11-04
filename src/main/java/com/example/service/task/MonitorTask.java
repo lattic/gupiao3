@@ -69,6 +69,10 @@ public class MonitorTask implements InitializingBean {
 		 followTask();
 	}
 	private void followTask() {
+		if(stockMap == null ||stockMap.isEmpty()) {
+			init();
+		}
+		
 		if(!DateUtils.traceTime()) {
 			System.out.println("还没开盘");
 			return ;
@@ -89,7 +93,7 @@ public class MonitorTask implements InitializingBean {
 		});
 	}
 	
-	@Scheduled(cron = "0 0 15 * * *")
+	@Scheduled(cron = "0 0 12 * * *")
 	private void updateAllGuPiao() {
 		pool.execute(new Runnable() {
 			@Override
@@ -99,15 +103,13 @@ public class MonitorTask implements InitializingBean {
 		});
 	}
 	
-	//初始化map
+	// 从数据库获取股票池初始化map
 	private int init() {
 		List<StockDo> stockList = guPiaoService.getAllStock();
 		stockList.forEach(stock->{
 			if(StringUtils.containsIgnoreCase(stock.getName(), "ST") || StringUtils.containsIgnoreCase(stock.getName(), "债") ) {
 				System.out.println(stock.getName());
-			}else {
-				stockMap.put(stock.getNumber(), stock);
-			}
+			} 
         });
 		return stockList.size();
 	}
@@ -234,6 +236,12 @@ public class MonitorTask implements InitializingBean {
 		    	}
 			}
 		}
+		//获取所有股票的历史60分钟数据
+		List<StockDo> stockList = guPiaoService.getAllStock();
+		stockList.forEach(stock->{
+			guPiaoService.updateHistoryStock(stock.getNumber());
+        });
+		
 	}
 	
 	

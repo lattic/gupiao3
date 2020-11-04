@@ -42,7 +42,7 @@ public class MockDeal {
 //		list.add("sz300588");
 //		list.add("sh600438");
 //		list.add("sz300865");
-		mockDeal("sh000001","2020-09-24",DingTalkRobotHTTPUtil.APP_TEST_SECRET,true);
+		mockDeal("sh601702","2020-09-24",DingTalkRobotHTTPUtil.APP_TEST_SECRET,true);
 //		sendMsgByList(list,"2020-09-24",DingTalkRobotHTTPUtil.APP_TEST_SECRET);
 	}
 
@@ -58,7 +58,7 @@ public class MockDeal {
 		}
 	}
 	
-	public static MockLog mockDeal(String number,String beginDate,String appSecret,Boolean isSendMsg) {
+	private static List<HistoryPriceDo> getHistoryDate(String number){
 		try {
 			List<HistoryPriceDo> list = ReadUrl.readUrl(number, 60);
 			if(list == null) {
@@ -72,14 +72,28 @@ public class MockDeal {
 					GuPiaoDo nowRealTimePrice=new GuPiaoDo();
 					BeanUtils.copyProperties(date, nowRealTimePrice);
 					if(nowRealTimePrice.getDangqianjiage()>0) {
-						nowPrice.setKaipanjia(new BigDecimal(nowRealTimePrice.getKaipanjia()) );
-						nowPrice.setShoupanjia(new BigDecimal(nowRealTimePrice.getDangqianjiage()) );
+						nowPrice.setKaipanjia(new BigDecimal(nowRealTimePrice.getKaipanjia()).setScale(3,BigDecimal.ROUND_HALF_DOWN));
+						nowPrice.setShoupanjia(new BigDecimal(nowRealTimePrice.getDangqianjiage()).setScale(3,BigDecimal.ROUND_HALF_DOWN) );
 						nowPrice.setDateime(DateUtils.getDateForString(nowRealTimePrice.getDate(),nowRealTimePrice.getTime()));
 						list.add(nowPrice);
 					}
 				}
 			}
-			
+			return list;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	
+	public static MockLog mockDeal(String number,String beginDate,String appSecret,Boolean isSendMsg) {
+		try {
+			List<HistoryPriceDo> list = getHistoryDate(number);
+			if(list == null) {
+				logger.warn("当前股票没有数据："+number);
+				return null;
+			}
 			MockLog mockLog=mockDeal(list, beginDate);
 			if(isSendMsg) {
 				DingTalkRobotHTTPUtil.sendMsg(appSecret, mockLog.getLogs(), null, false);

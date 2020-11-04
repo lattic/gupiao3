@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+						"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.example.mapper.HistoryStockMapper">
+
+	<resultMap id="historyStockDo" type="com.example.model.HistoryStockDo">
+		<result column="id" property="id" jdbcType="BIGINT" />
+		<result column="history_day" 	property="historyDay" 	jdbcType="VARCHAR" />
+		<result column="history_all" 	property="historyAll" 	jdbcType="VARCHAR" />
+		<result column="number" property="number" jdbcType="VARCHAR" />
+		<result column="kaipanjia" property="kaipanjia" jdbcType="DECIMAL" />
+		<result column="shoupanjia" property="shoupanjia" jdbcType="DECIMAL" />
+		<result column="ma20_hour" property="ma20Hour" jdbcType="DECIMAL" />
+		<result column="ma20_day" property="ma20Day" jdbcType="DECIMAL" />
+		<result column="height" property="height" jdbcType="DECIMAL" />
+		<result column="low" property="low" jdbcType="DECIMAL" />
+	</resultMap>
+
+	<sql id="All_Column">
+		id,history_day,history_all,number,kaipanjia,shoupanjia,ma20_hour,ma20_day,height,low
+	</sql>
+
+	<select id="getAll" resultMap="historyStockDo">
+		SELECT
+		<include refid="All_Column" />
+		FROM history_stock
+	</select>
+	
+	
+	<select id="getByTime" parameterType="historyStockDo" resultMap="historyStockDo">
+		SELECT
+		<include refid="All_Column" />
+		FROM history_stock
+		WHERE 
+			history_all=#{historyAll}
+		AND number = #{number}
+		limit 1
+	</select>
+
+	<insert id="insert" parameterType="historyStockDo">
+		INSERT INTO
+		history_stock
+		(history_day,history_all,number,kaipanjia,shoupanjia,ma20_hour,ma20_day,height,low)
+		VALUES
+		(#{historyDay},#{historyAll},#{number},#{kaipanjia},#{shoupanjia},#{ma20Hour},#{ma20Day},#{height},#{low})
+	</insert>
+
+	<delete id="delete" parameterType="historyStockDo">
+		DELETE FROM
+		history_stock
+		WHERE
+		id =#{id}
+	</delete>
+
+</mapper>

@@ -10,14 +10,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.alibaba.fastjson.JSON;
+import com.example.mapper.HistoryStockMapper;
 import com.example.mapper.RobotAccountMapper;
 import com.example.mapper.RobotSetMapper;
 import com.example.mapper.TradingRecordMapper;
+import com.example.model.HistoryStockDo;
 import com.example.model.RobotAccountDo;
 import com.example.model.RobotSetDo;
 import com.example.model.TradingRecordDo;
+import com.example.service.GuPiaoService;
 import com.example.service.task.MonitorTask;
-import com.example.uitls.DingTalkRobotHTTPUtil;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {GupiaoApplication.class})
@@ -32,16 +34,44 @@ public class GupiaoServiceTest {
 	@Autowired
 	private MonitorTask monitorTask;
 	
+	@Autowired
+	private HistoryStockMapper historyStockMapper;
 	
+	@Autowired
+	private GuPiaoService guPiaoService;
 	
-	@Test
+	//@Test
 	public void AiBuyIn() {
 		monitorTask.AiBuyIn();
 	}
 	
-	
-	
 	@Test
+	public void updateHistory() {
+		guPiaoService.updateHistoryStock("sh601702");
+	}
+	
+	//@Test
+	public void addHistory() {
+		HistoryStockDo tr= new HistoryStockDo();
+		tr.setKaipanjia(new BigDecimal("10.223"));
+		tr.setMa20Day(new BigDecimal("10.223"));
+		tr.setMa20Hour(new BigDecimal("10.223"));
+		tr.setShoupanjia(new BigDecimal("10.223"));
+		tr.setHistoryDay("2323");
+		tr.setNumber("3434");
+		historyStockMapper.insert(tr);
+	}
+	
+	//@Test
+	public void delHistory() {
+		for(HistoryStockDo rs:historyStockMapper.getAll()) {
+			System.out.println(JSON.toJSONString(rs));
+			historyStockMapper.delete(rs.getId());
+		};
+	}
+	
+	
+	//@Test
 	public void addTradingRecord() {
 		TradingRecordDo tr= new TradingRecordDo();
 		tr.setCreateDate(new Date());
@@ -56,7 +86,7 @@ public class GupiaoServiceTest {
 		tradingRecordMapper.insert(tr);
 	}
 	
-	@Test
+	//@Test
 	public void delTradingRecord() {
 		for(TradingRecordDo tr:tradingRecordMapper.getAll()) {
 			System.out.println(JSON.toJSONString(tr));
@@ -65,7 +95,7 @@ public class GupiaoServiceTest {
 	}
 	
 	
-	@Test
+	//@Test
 	public void addRobotAccount() {
 		RobotAccountDo ra = new RobotAccountDo();
 		ra.setRobotId(342343234L);
@@ -73,7 +103,7 @@ public class GupiaoServiceTest {
 		robotAccountMapper.insert(ra);
 	}
 	
-	@Test
+	//@Test
 	public void delRobotAccount() {
 		for(RobotAccountDo ra:robotAccountMapper.getAll()) {
 			System.out.println(JSON.toJSONString(ra));
@@ -81,7 +111,7 @@ public class GupiaoServiceTest {
 		};
 	}
 	
-	@Test
+	//@Test
 	public void addRobotSet() {
 		RobotSetDo rs=new RobotSetDo();
 		rs.setBeginTime(new Date());
@@ -95,7 +125,7 @@ public class GupiaoServiceTest {
 		robotSetMapper.insert(rs);
 	}
 	
-	@Test
+	//@Test
 	public void delRobotSet() {
 		for(RobotSetDo rs:robotSetMapper.getAll()) {
 			System.out.println(JSON.toJSONString(rs));

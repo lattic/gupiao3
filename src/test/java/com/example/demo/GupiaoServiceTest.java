@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.alibaba.fastjson.JSON;
+import com.example.ai.MockDeal;
 import com.example.mapper.HistoryStockMapper;
 import com.example.mapper.RobotAccountMapper;
 import com.example.mapper.RobotSetMapper;
@@ -24,6 +25,7 @@ import com.example.service.task.MonitorTask;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {GupiaoApplication.class})
 public class GupiaoServiceTest {
+	private static String appSecret="bb888ac7199ba68c327c8a0e44fbf0ee6b65b5b0f490beb39a209a295e132a4f";
 	
 	@Autowired
 	private RobotSetMapper robotSetMapper;
@@ -33,19 +35,24 @@ public class GupiaoServiceTest {
 	private TradingRecordMapper tradingRecordMapper;
 	@Autowired
 	private MonitorTask monitorTask;
-	
 	@Autowired
 	private HistoryStockMapper historyStockMapper;
-	
 	@Autowired
 	private GuPiaoService guPiaoService;
+	@Autowired
+	private MockDeal mockDeal;
+	
+	@Test
+	public void mock() {
+		mockDeal.mockDeal("sh601702", "2020-09-01",appSecret,true);
+	}
 	
 	//@Test
 	public void AiBuyIn() {
 		monitorTask.AiBuyIn();
 	}
 	
-	@Test
+	//@Test
 	public void updateHistory() {
 		guPiaoService.updateHistoryStock("sh601702");
 	}

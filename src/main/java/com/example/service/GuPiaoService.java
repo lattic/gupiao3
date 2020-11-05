@@ -8,6 +8,7 @@ import com.example.model.StockDo;
 import com.example.model.SubscriptionDo;
 
 public interface GuPiaoService {
+	
 	boolean realTimeInsert(RealTimeDo model);
 
 	boolean guPiaoInsert(GuPiaoDo model);

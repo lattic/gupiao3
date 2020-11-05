@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Service;
 
 import com.example.demo.GuPiao;
 import com.example.model.GuPiaoDo;
@@ -22,33 +22,16 @@ import com.example.uitls.DateUtils;
 import com.example.uitls.DingTalkRobotHTTPUtil;
 import com.example.uitls.ReadUrl;
 
+@Service
 public class MockDeal {
 	private static Logger logger = LoggerFactory.getLogger("mock_log");
 	private static ConcurrentHashMap<String, Boolean> buyPorintMap = new ConcurrentHashMap<String, Boolean>();
 	private static ConcurrentHashMap<String, BigDecimal> maxPriceMap = new ConcurrentHashMap<String, BigDecimal>();
 	private static ConcurrentHashMap<String, BigDecimal> minPriceMap = new ConcurrentHashMap<String, BigDecimal>();
 	
-	public static void main(String[] args) {
-		List<String>list=new ArrayList<String>();
-//		list.add("sh605003");
-//		list.add("sz300692");
-//		list.add("sz300647");
-//		list.add("sz300707");
-//		list.add("sz300882");
-//		list.add("sz002372");
-//		list.add("sz002042");
-//		list.add("sh603650");
-//		list.add("sh600601");
-//		list.add("sz300588");
-//		list.add("sh600438");
-//		list.add("sz300865");
-		mockDeal("sh601702","2020-09-24",DingTalkRobotHTTPUtil.APP_TEST_SECRET,true);
-//		sendMsgByList(list,"2020-09-24",DingTalkRobotHTTPUtil.APP_TEST_SECRET);
-	}
-
 	
 	
-	public static void sendMsgByList(List<String>listTest,String beginDate,String appSecret) {
+	public  void sendMsgByList(List<String>listTest,String beginDate,String appSecret) {
 		for(String number:listTest) {
 			try {
 				mockDeal( number, beginDate, appSecret,true);
@@ -58,7 +41,7 @@ public class MockDeal {
 		}
 	}
 	
-	private static List<HistoryPriceDo> getHistoryDate(String number){
+	private  List<HistoryPriceDo> getHistoryDate(String number){
 		try {
 			List<HistoryPriceDo> list = ReadUrl.readUrl(number, 60);
 			if(list == null) {
@@ -72,6 +55,7 @@ public class MockDeal {
 					GuPiaoDo nowRealTimePrice=new GuPiaoDo();
 					BeanUtils.copyProperties(date, nowRealTimePrice);
 					if(nowRealTimePrice.getDangqianjiage()>0) {
+						nowPrice.setName(nowRealTimePrice.getName());
 						nowPrice.setKaipanjia(new BigDecimal(nowRealTimePrice.getKaipanjia()).setScale(3,BigDecimal.ROUND_HALF_DOWN));
 						nowPrice.setShoupanjia(new BigDecimal(nowRealTimePrice.getDangqianjiage()).setScale(3,BigDecimal.ROUND_HALF_DOWN) );
 						nowPrice.setDateime(DateUtils.getDateForString(nowRealTimePrice.getDate(),nowRealTimePrice.getTime()));
@@ -87,7 +71,7 @@ public class MockDeal {
 	}
 	
 	
-	public static MockLog mockDeal(String number,String beginDate,String appSecret,Boolean isSendMsg) {
+	public  MockLog mockDeal(String number,String beginDate,String appSecret,Boolean isSendMsg) {
 		try {
 			List<HistoryPriceDo> list = getHistoryDate(number);
 			if(list == null) {
@@ -106,7 +90,7 @@ public class MockDeal {
 		return null;
 	}
 
-	public static MockLog mockDeal(List<HistoryPriceDo> stortList, String beginDate) {
+	public  MockLog mockDeal(List<HistoryPriceDo> stortList, String beginDate) {
 		MockLog mockLog=new MockLog();
 		if (stortList == null || stortList.isEmpty()) {
 			logger.warn("http请求数据为空");

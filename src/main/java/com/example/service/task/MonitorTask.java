@@ -45,6 +45,9 @@ public class MonitorTask implements InitializingBean {
 	@Autowired
 	private GuPiaoService guPiaoService;
 	
+	@Autowired
+	private MockDeal mockDeal;
+	
 	//股票名称
 	public static ConcurrentHashMap<String, StockDo> stockMap=new ConcurrentHashMap<String, StockDo>();
 	@Scheduled(cron = "0 30 9 * * *")
@@ -88,7 +91,7 @@ public class MonitorTask implements InitializingBean {
 		pool.execute(new Runnable() {
 			@Override
 			public void run() {
-				MockDeal.sendMsgByList(list,"2020-09-24",DingTalkRobotHTTPUtil.APP_TEST_SECRET);
+				mockDeal.sendMsgByList(list,"2020-09-24",DingTalkRobotHTTPUtil.APP_TEST_SECRET);
 			}
 		});
 	}
@@ -119,7 +122,7 @@ public class MonitorTask implements InitializingBean {
 	
 	
 	//初始化map
-	@Scheduled(cron = "0 31 9 * * *")
+	@Scheduled(cron = "0 35 9 * * *")
 	public void AiBuyIn() {
 		List<SubscriptionDo> subscriptionList=guPiaoService.listMemberAll();
 		int max=0;
@@ -130,11 +133,11 @@ public class MonitorTask implements InitializingBean {
 		String winLog="";
 		String lossLog="";
 		for(StockDo stock : stockMap.values()){
-            // Calendar calendar = Calendar.getInstance();  
-			//calendar.add(Calendar.MONTH, -1);
-			//calendar.add(Calendar.DATE, -15);
+            Calendar calendar = Calendar.getInstance();  
+			calendar.add(Calendar.MONTH, -1);
+			calendar.add(Calendar.DATE, -15);
 			SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd");
-			MockLog log=MockDeal.mockDeal(stock.getNumber(), "2020-09-24",DingTalkRobotHTTPUtil.APP_TEST_SECRET,false);
+			MockLog log=mockDeal.mockDeal(stock.getNumber(), dateformat.format(calendar.getTime()),DingTalkRobotHTTPUtil.APP_TEST_SECRET,false);
 			if(log != null && log.getIsBuyin() ) {
 				//近4天出现买入点
 				Calendar before = Calendar.getInstance();  
@@ -253,10 +256,10 @@ public class MonitorTask implements InitializingBean {
 		Date now=new Date();
     	SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String robotbuy = MessageFormat.format("【同步股票池】"+dateformat.format(now)
-											   +"\n 初始化股票池数量："+init(),new Object[] {});
+											   + "\n 初始化股票池数量："
+											   + init(),new Object[] {});
         DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_TEST_SECRET, robotbuy, null, false);
-      //  AiBuyIn();
-      //  followTask();
+        AiBuyIn();
 	}
 	
 	

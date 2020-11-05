@@ -48,7 +48,8 @@ public class MonitorRiskTask {
 	private static ConcurrentHashMap<String, Boolean> notifyMap=new ConcurrentHashMap<String, Boolean>();
 	//AI操盘通知   key—— yyyymmdd_number
 	private static ConcurrentHashMap<String, Boolean> mockAiMap=new ConcurrentHashMap<String, Boolean>();
-	
+	@Autowired
+	private MockDeal mockDeal;
 	
 	@Scheduled(cron = "0/30 * * * * *")
 	private void  monitorAll() throws Exception {
@@ -84,9 +85,9 @@ public class MonitorRiskTask {
 						Calendar calendar = Calendar.getInstance();  
 						calendar.add(Calendar.MONTH, -1);
 						if(StringUtils.isBlank(beginTime)) {
-							MockDeal.mockDeal(number, dateformat.format(calendar.getTime()),appSecret,true);
+							mockDeal.mockDeal(number, dateformat.format(calendar.getTime()),appSecret,true);
 						}else {
-							MockDeal.mockDeal(number, beginTime,appSecret,true);
+							mockDeal.mockDeal(number, beginTime,appSecret,true);
 						}
 						isNotifyByMock=false;
 					}

@@ -136,7 +136,7 @@ public class MonitorTask implements InitializingBean {
 			if(log != null && log.getIsBuyin() ) {
 				//近4天出现买入点
 				Calendar before = Calendar.getInstance();  
-				before.add(Calendar.DATE, -4);
+				before.add(Calendar.DATE, -5);
 				if(log.getLastBuyin().after(before.getTime()) ) {
 					if(maxprice.getWin() == null ) {
 						maxprice=log;

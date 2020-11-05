@@ -21,4 +21,6 @@ public interface GuPiaoService {
 	List<StockDo> getAllStock();
 	
 	List<SubscriptionDo> listMemberAll();
+	
+	void updateHistoryStock(String number);
 }

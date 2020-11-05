@@ -15,5 +15,7 @@
 		<typeAlias alias="tradingRecordDo" type="com.example.model.TradingRecordDo" />
 		<typeAlias alias="robotAccountDo" type="com.example.model.RobotAccountDo" />
 		<typeAlias alias="robotSetDo" type="com.example.model.RobotSetDo" />
+		<typeAlias alias="historyStockDo" type="com.example.model.HistoryStockDo" />
+		
 	</typeAliases>
 </configuration>

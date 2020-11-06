@@ -31,7 +31,7 @@ import com.example.uitls.DateUtils;
 import com.example.uitls.DingTalkRobotHTTPUtil;
 import com.example.uitls.ReadUrl;
 
-@Service
+//@Service
 public class MonitorRiskTask {
 	private static Logger logger = LoggerFactory.getLogger(MonitorRiskTask.class);
 	ThreadPoolExecutor  pool = new ThreadPoolExecutor(20, 100, 1,TimeUnit.SECONDS,

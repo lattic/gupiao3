@@ -1,5 +1,6 @@
 package com.example.uitls;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -52,6 +53,21 @@ public class DateUtils {
 		}
 			
 	}
+	
+	public static Long getDefDays(Date beginTime, Date endTime) {
+		Calendar day1 = Calendar.getInstance();
+		Calendar day2 = Calendar.getInstance();
+		try {
+			day1.setTime(DF_YYYYMMDD.parse(DF_YYYYMMDD.format(beginTime)));
+			day2.setTime(DF_YYYYMMDD.parse(DF_YYYYMMDD.format(endTime)));
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return (day2.getTimeInMillis()-day1.getTimeInMillis())/(1000 * 60 * 60 *24);
+	}
+	
 	
 	public static boolean belongCalendar(Date nowTime, Date beginTime, Date endTime) {
 		Calendar date = Calendar.getInstance();

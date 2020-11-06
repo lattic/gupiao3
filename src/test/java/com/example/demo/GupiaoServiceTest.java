@@ -1,7 +1,9 @@
 package com.example.demo;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,12 +17,14 @@ import com.example.mapper.HistoryStockMapper;
 import com.example.mapper.RobotAccountMapper;
 import com.example.mapper.RobotSetMapper;
 import com.example.mapper.TradingRecordMapper;
+import com.example.model.HistoryPriceDo;
 import com.example.model.HistoryStockDo;
 import com.example.model.RobotAccountDo;
 import com.example.model.RobotSetDo;
 import com.example.model.TradingRecordDo;
 import com.example.service.GuPiaoService;
 import com.example.service.task.MonitorTask;
+import com.example.uitls.DateUtils;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {GupiaoApplication.class})
@@ -33,7 +37,7 @@ public class GupiaoServiceTest {
 	private RobotAccountMapper robotAccountMapper;
 	@Autowired
 	private TradingRecordMapper tradingRecordMapper;
-	@Autowired
+	//@Autowired
 	private MonitorTask monitorTask;
 	@Autowired
 	private HistoryStockMapper historyStockMapper;
@@ -44,7 +48,30 @@ public class GupiaoServiceTest {
 	
 	@Test
 	public void mock() {
-		mockDeal.mockDeal("sh601702", "2020-09-01",appSecret,true);
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		
+		List<HistoryPriceDo>priceList=mockDeal.getBoduan("sh600699", "2020-09-01",appSecret,true);
+		for(int i=1;i<priceList.size();i++) {
+			HistoryPriceDo lastPrice=priceList.get(i-1);
+			HistoryPriceDo nowPrice=priceList.get(i);
+			BigDecimal avgSubtract=nowPrice.getMa20().subtract(lastPrice.getMa20());
+			BigDecimal subtract=nowPrice.getShoupanjia().subtract(lastPrice.getShoupanjia());
+			long days=DateUtils.getDefDays(lastPrice.getDateime(),nowPrice.getDateime());
+			String str="下滑趋势";
+			if(subtract.compareTo(new BigDecimal(0.0))>0) {
+				str="上升趋势";
+			}
+			if(days <=5 ) {
+				str="震荡行情";
+			}
+			System.out.println(sdf.format(lastPrice.getDateime())+"~"+sdf.format(nowPrice.getDateime())
+			+" 平均收益："+avgSubtract
+			+"\t 趋势："+ str
+			+"\t 相隔周期："+days);
+			//}
+			
+		}
+		
 	}
 	
 	//@Test

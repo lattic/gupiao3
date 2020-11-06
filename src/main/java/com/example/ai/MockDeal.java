@@ -4,8 +4,11 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.StringUtils;
@@ -69,6 +72,136 @@ public class MockDeal {
 		}
 		return null;
 	}
+	
+	public  List<HistoryPriceDo> getBoduan(String number,String beginDate,String appSecret,Boolean isSendMsg) {
+		List<HistoryPriceDo> list=new ArrayList<HistoryPriceDo>();
+		try {
+			List<HistoryPriceDo> stortList = getHistoryDate(number);
+			if(stortList == null) {
+				logger.warn("当前股票没有数据："+number);
+				return list;
+			}
+			if (stortList.size()<100) {
+				logger.warn("数据量不满100个60分钟线");
+				return list;
+			}
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			int downCount=0;
+			int upCount=0;
+			Set<String> date=new HashSet<String>();
+			BigDecimal maxPower=new BigDecimal(0.0).setScale(3);
+			BigDecimal max=new BigDecimal(0.0).setScale(3);
+			BigDecimal min=new BigDecimal(0.0).setScale(3);
+			BigDecimal avg=new BigDecimal(0.0).setScale(3);
+			HistoryPriceDo lastPrice=null;
+			for (HistoryPriceDo price : stortList) {
+				boolean isJumpMax=false;
+				boolean isJumpMin=false;
+				//初始化
+				if(max.compareTo(new BigDecimal(0.0)) < 1 || min.compareTo(new BigDecimal(0.0)) < 1) {
+					max=price.getZuigaojia();
+					min=price.getZuidijia();
+				}
+				if(lastPrice ==null) {
+					lastPrice=price;
+				}
+				
+				if(price.getZuigaojia().compareTo(max)>= 1) {
+					max=price.getZuigaojia();
+				}
+				if(price.getZuidijia().compareTo(min)<= -1) {
+					min=price.getZuidijia();
+				}
+				if(price.getKaipanjia().compareTo(lastPrice.getShoupanjia())== 1) {
+					isJumpMax=true;
+				}
+				if(price.getKaipanjia().compareTo(lastPrice.getShoupanjia())== -1) {
+					isJumpMin=true;
+				}
+				avg=(max.add(min)).divide(new BigDecimal(2.0).setScale(3),3,BigDecimal.ROUND_UP);
+				
+				
+				//收盘价在20均线之上属于强势
+				if(price.getShoupanjia().compareTo(price.getMa20())>= 0 ) {
+					upCount++;
+					downCount=0;
+					min=price.getMa20();
+				}
+				//收盘价在20均线之下属于弱势
+				if(price.getShoupanjia().compareTo(price.getMa20())<= -1) {
+					downCount++;
+					upCount=0;
+					max=price.getMa20();
+				}
+				
+				
+				//优化买入卖出位
+				BigDecimal goodSell=max.multiply(new BigDecimal(0.85));
+				BigDecimal goodBuy=min.multiply(new BigDecimal(1.015));
+				BigDecimal avgM20=price.getMa20().multiply(new BigDecimal(1.015));
+				goodSell=goodSell.setScale(3, BigDecimal.ROUND_UP);
+				goodBuy=goodBuy.setScale(3, BigDecimal.ROUND_UP);
+				avgM20=avgM20.setScale(3, BigDecimal.ROUND_UP);
+				//买入点且最低价出现在MA20均值上
+				if(upCount==1 && price.getZuidijia().compareTo(avgM20)< 1) {
+					SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd");
+					String key=sdf1.format(price.getDateime());
+					if(!date.contains(key)) {
+						list.add(price);
+						date.add(key);
+						System.out.println(sdf.format(price.getDateime())+"买入波段 down:"+price.getZuidijia()+" ma20:"+price.getMa20() + "  up:"+goodBuy+" down:"+goodSell);
+					}
+				}
+				
+				//卖出点且最低价出现在MA20均值上
+				if(downCount==1 ) {
+					SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd");
+					String key=sdf1.format(price.getDateime());
+					if(!date.contains(key)) {
+						list.add(price);
+						date.add(key);
+						System.out.println(sdf.format(price.getDateime())+"卖出波段 down:"+price.getZuidijia()+" ma20:"+price.getMa20() + "  up:"+goodBuy+" down:"+goodSell);
+					}
+				}
+				
+				
+				
+				if(upCount>12 && price.getZuigaojia().compareTo(goodSell)>= 0) {
+					System.out.println("目前是高位："+goodSell+" now:"+price.getShoupanjia());
+					
+				}
+				if(downCount>12 && price.getZuidijia().compareTo(goodBuy)>= 0) {
+					System.out.println("目前是低位："+goodBuy+" now:"+price.getShoupanjia());
+					
+				}
+				
+//				System.out.println(
+//						sdf.format(price.getDateime())
+//						+" now:"+price.getShoupanjia()
+//						+" max:"+max
+//						+" sell:"+goodSell
+//						+" min:"+min
+//						+" avg:"+avg 
+//						+" ma20:"+price.getMa20()
+//						+" isJumpMax:"+isJumpMax
+//						+" isJumpMin:"+isJumpMin
+//						+" maxpower:"+maxPower
+//						+" upCount:"+upCount
+//						+" downCount:"+downCount);
+				lastPrice=price;
+			}
+			SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd");
+			String key=sdf1.format(lastPrice.getDateime());
+			if(!date.contains(key)) {
+				list.add(lastPrice);
+				date.add(key);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return list;
+	}
+	
 	
 	
 	public  MockLog mockDeal(String number,String beginDate,String appSecret,Boolean isSendMsg) {

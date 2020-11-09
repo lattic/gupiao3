@@ -32,7 +32,7 @@ import com.example.uitls.DateUtils;
 import com.example.uitls.DingTalkRobotHTTPUtil;
 import com.example.uitls.ReadUrl;
 
-//@Service
+@Service
 public class MonitorTask implements InitializingBean {
 	private static Logger logger = LoggerFactory.getLogger("mock_log");
 	ThreadPoolExecutor  pool = new ThreadPoolExecutor(20, 100, 1,TimeUnit.SECONDS,

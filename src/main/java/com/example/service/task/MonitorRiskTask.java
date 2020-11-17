@@ -82,13 +82,14 @@ public class MonitorRiskTask {
 					}
 					
 					if(isNotifyByMock) {
-						Calendar calendar = Calendar.getInstance();  
-						calendar.add(Calendar.MONTH, -1);
-						if(StringUtils.isBlank(beginTime)) {
-							mockDeal.mockDeal(number, dateformat.format(calendar.getTime()),appSecret,true);
-						}else {
-							mockDeal.mockDeal(number, beginTime,appSecret,true);
-						}
+						DingTalkRobotHTTPUtil.sendMsg(appSecret, guPiaoService.timeInterval(number), null, false);
+//						Calendar calendar = Calendar.getInstance();  
+//						calendar.add(Calendar.MONTH, -1);
+//						if(StringUtils.isBlank(beginTime)) {
+//							mockDeal.mockDeal(number, dateformat.format(calendar.getTime()),appSecret,true);
+//						}else {
+//							mockDeal.mockDeal(number, beginTime,appSecret,true);
+//						}
 						isNotifyByMock=false;
 					}
 					mockAiMap.put(key,isNotifyByMock);

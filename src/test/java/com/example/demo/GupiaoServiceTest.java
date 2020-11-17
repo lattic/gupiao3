@@ -55,25 +55,21 @@ public class GupiaoServiceTest {
 	@Resource
 	private RedisUtil redisUtil;
 
+	@Test
+	public void mock() {
+		System.out.println(guPiaoService.timeInterval("sz002202"));
+	}
+	
+	
 	// @Test
 	public void ramTest() {
 		redisUtil.set("test", "34323423");
 		System.out.println(redisUtil.get("test"));
 	}
 
-	@Test
+	//@Test
 	public void mockDeal() {
 		mockDeal.mockDeal("sz399006", "2020-07-15", appSecret, true);
-	}
-
-	// @Test
-	public void mock() {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		guPiaoService.timeInterval("sh000001");
-		List<HistoryPriceDo> list = mockDeal.cutList("sh000001", "2020-07-15", "2020-07-21");
-		for (HistoryPriceDo price : list) {
-			System.out.println(sdf.format(price.getDateime()));
-		}
 	}
 
 	// @Test

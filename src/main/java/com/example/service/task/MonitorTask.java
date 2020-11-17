@@ -117,9 +117,10 @@ public class MonitorTask implements InitializingBean {
 		List<StockDo> stockList = guPiaoService.getAllStock();
 		stockList.forEach(stock->{
 			if(StringUtils.containsIgnoreCase(stock.getName(), "ST") || StringUtils.containsIgnoreCase(stock.getName(), "债") ) {
-				System.out.println(stock.getName());
+				//System.out.println(stock.getName());
 			}else {
 				redisUtil.set(stock.getNumber(), stock.getName(),86400);
+				stockMap.put(stock.getNumber(), stock);
 			}
         });
 		return stockList.size();

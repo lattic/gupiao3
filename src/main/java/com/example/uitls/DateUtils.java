@@ -65,6 +65,13 @@ public class DateUtils {
 			return new Date();
 		}
 	}
+	public static Date getDateForYYYYMMDDHHMM(String day) {
+		try {
+			return DF_YYYYMMDDHHmm.parse(day);
+		}catch (Exception e) {
+			return new Date();
+		}
+	}
 	public static Date getDateForYYYYMMDD(String day) {
 		try {
 			return DF_YYYY_MM_DD.parse(day);
@@ -125,5 +132,26 @@ public class DateUtils {
 		} else {
 			return false;
 		}
+	}
+	
+	public static boolean belongCalendar2(Date nowTime, Date beginTime, Date endTime) {
+		Calendar date = Calendar.getInstance();
+		date.setTime(nowTime);
+		int hour=date.get(Calendar.DAY_OF_WEEK);
+		
+		if(hour == Calendar.SATURDAY || hour == Calendar.SUNDAY) {
+			return false;
+		}
+ 
+		Calendar begin = Calendar.getInstance();
+		begin.setTime(beginTime);
+ 
+		Calendar end = Calendar.getInstance();
+		end.setTime(endTime);
+ 
+		if(date.getTimeInMillis() >= begin.getTimeInMillis() && date.getTimeInMillis()<= end.getTimeInMillis()) {
+			return true;
+		}
+			return false;
 	}
 }

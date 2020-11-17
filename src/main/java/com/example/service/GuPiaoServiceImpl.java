@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -173,27 +174,61 @@ public class GuPiaoServiceImpl implements GuPiaoService, InitializingBean {
 	@Override
 	public String timeInterval(String number) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		List<HistoryPriceDo>priceList=mockDeal.getBoduan("sh000001");
+		List<HistoryPriceDo>priceList=mockDeal.getBoduan(number);
+		String returnStr="GS======测试波段区间分隔=========\n";
 		for(int i=1;i<priceList.size();i++) {
 			HistoryPriceDo lastPrice=priceList.get(i-1);
 			HistoryPriceDo nowPrice=priceList.get(i);
-			BigDecimal avgSubtract=nowPrice.getMa20().subtract(lastPrice.getMa20());
 			BigDecimal subtract=nowPrice.getShoupanjia().subtract(lastPrice.getShoupanjia());
-			
 			long days=DateUtils.getDefDays(lastPrice.getDateime(),nowPrice.getDateime(),getHolidayList());
 			String str="下滑趋势";
 			if(subtract.compareTo(new BigDecimal(0.0))>0) {
-				str="上升趋势";
+				str="上升趋势 ";
 			}
 			if(days <5 ) {
-				str=str+",震荡行情";
+				str="震荡行情,"+str;
 			}
-			System.out.println(sdf.format(lastPrice.getDateime())+"~"+sdf.format(nowPrice.getDateime())
-			+" 平均收益："+avgSubtract
+			List<HistoryPriceDo> list = mockDeal.cutList(number, sdf.format(lastPrice.getDateime()), sdf.format(nowPrice.getDateime()));
+			BigDecimal max=new BigDecimal(0.0);
+			BigDecimal min=new BigDecimal(100000.0);
+			BigDecimal avg=new BigDecimal(0.0);
+			int count=0;
+			boolean isPoint=true;
+			for (HistoryPriceDo price : list) {
+				count++;
+				avg=avg.add(price.getShoupanjia());
+				if(price.getZuigaojia().compareTo(max)>-1) {
+					max=price.getZuigaojia();
+				}
+				if(price.getZuidijia().compareTo(min)< 1) {
+					min=price.getZuidijia();
+				}
+				if(isPoint && count==1 && StringUtils.contains(str, "下滑趋势")) {
+					str=str+"\t 参考 卖出点1:"+price.getShoupanjia()+"\t";
+					isPoint=false;
+				}
+				if(isPoint && count==1 && StringUtils.contains(str, "上升趋势")) {
+					str=str+"\t 参考 买入点1:"+price.getShoupanjia()+"\t";
+					isPoint=false;
+				}
+				if(isPoint && days>=3 && days<5 && StringUtils.contains(str, "上升趋势")) {
+					str=str+"\t 买入点2:"+price.getShoupanjia()+"\t";
+					isPoint=false;
+				}
+				
+			}
+			avg = avg.divide(new BigDecimal(count), BigDecimal.ROUND_UP);
+			avg=avg.setScale(2);
+			max=max.setScale(2);
+			min=min.setScale(2);
+			returnStr=returnStr+sdf.format(lastPrice.getDateime())+"~"+sdf.format(nowPrice.getDateime())
+			+"\t 压力位:"+max
+			+"\t 支撑位:"+min
+			+"\t 平均值："+avg
 			+"\t 趋势："+ str
-			+"\t 相隔周期："+days);
+			+"\t 相隔周期："+days+"交易日 \n";
 		}
-		return null;
+		return returnStr;
 	}
 
 }

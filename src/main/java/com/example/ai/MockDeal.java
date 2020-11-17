@@ -82,7 +82,7 @@ public class MockDeal {
 		List<HistoryPriceDo> tempList = getHistoryDate(number);
 		List<HistoryPriceDo> list = new ArrayList<HistoryPriceDo>();
 		for(HistoryPriceDo price:tempList) {
-			if(DateUtils.belongCalendar(price.getDateime(),DateUtils.getDateForYYYYMMDD(beginTime),DateUtils.getDateForYYYYMMDD(endTime))) {
+			if(DateUtils.belongCalendar2(price.getDateime(),DateUtils.getDateForYYYYMMDDHHMM(beginTime),DateUtils.getDateForYYYYMMDDHHMM(endTime))) {
 				list.add(price);
 			}
 		}
@@ -110,8 +110,6 @@ public class MockDeal {
 			BigDecimal min=new BigDecimal(0.0).setScale(3);
 			HistoryPriceDo lastPrice=null;
 			for (HistoryPriceDo price : stortList) {
-				boolean isJumpMax=false;
-				boolean isJumpMin=false;
 				//初始化
 				if(max.compareTo(new BigDecimal(0.0)) < 1 || min.compareTo(new BigDecimal(0.0)) < 1) {
 					max=price.getZuigaojia();
@@ -126,12 +124,6 @@ public class MockDeal {
 				}
 				if(price.getZuidijia().compareTo(min)<= -1) {
 					min=price.getZuidijia();
-				}
-				if(price.getKaipanjia().compareTo(lastPrice.getShoupanjia())== 1) {
-					isJumpMax=true;
-				}
-				if(price.getKaipanjia().compareTo(lastPrice.getShoupanjia())== -1) {
-					isJumpMin=true;
 				}
 				//收盘价在20均线之上属于强势
 				if(price.getShoupanjia().compareTo(price.getMa20())>= 0 ) {
@@ -174,28 +166,10 @@ public class MockDeal {
 					}
 				}
 				
-				if(upCount>12 && price.getZuigaojia().compareTo(goodSell)>= 0) {
-					System.out.println("目前是高位："+goodSell+" now:"+price.getShoupanjia());
-					
-				}
 				if(downCount>12 && price.getZuidijia().compareTo(goodBuy)>= 0) {
 					System.out.println("目前是低位："+goodBuy+" now:"+price.getShoupanjia());
-					
 				}
 				
-//				System.out.println(
-//						sdf.format(price.getDateime())
-//						+" now:"+price.getShoupanjia()
-//						+" max:"+max
-//						+" sell:"+goodSell
-//						+" min:"+min
-//						+" avg:"+avg 
-//						+" ma20:"+price.getMa20()
-//						+" isJumpMax:"+isJumpMax
-//						+" isJumpMin:"+isJumpMin
-//						+" maxpower:"+maxPower
-//						+" upCount:"+upCount
-//						+" downCount:"+downCount);
 				lastPrice=price;
 			}
 			SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd");

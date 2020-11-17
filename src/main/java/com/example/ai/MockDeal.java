@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +27,7 @@ import com.example.model.MockLog;
 import com.example.uitls.DateUtils;
 import com.example.uitls.DingTalkRobotHTTPUtil;
 import com.example.uitls.ReadUrl;
+import com.example.uitls.RedisUtil;
 
 @Service
 public class MockDeal {
@@ -32,7 +35,8 @@ public class MockDeal {
 	private static ConcurrentHashMap<String, Boolean> buyPorintMap = new ConcurrentHashMap<String, Boolean>();
 	private static ConcurrentHashMap<String, BigDecimal> maxPriceMap = new ConcurrentHashMap<String, BigDecimal>();
 	private static ConcurrentHashMap<String, BigDecimal> minPriceMap = new ConcurrentHashMap<String, BigDecimal>();
-	
+	@Resource
+	private RedisUtil redisUtil;
 	
 	
 	public  void sendMsgByList(List<String>listTest,String beginDate,String appSecret) {
@@ -540,6 +544,10 @@ public class MockDeal {
 		String context=mockLog.getLogs();
 		if(StringUtils.isBlank(context)) {
 			context="该走势还没找到合适的买入点";
+		}
+		String tempName=(String)redisUtil.get(mockLog.getNumber());
+		if(!StringUtils.isBlank(tempName)) {
+			mockLog.setName(tempName);
 		}
 		context = "GS=========测试AI操盘=================="
 				 +"\n 股票编码："+ mockLog.getNumber()

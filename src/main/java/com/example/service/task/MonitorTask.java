@@ -12,6 +12,8 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +33,7 @@ import com.example.service.GuPiaoService;
 import com.example.uitls.DateUtils;
 import com.example.uitls.DingTalkRobotHTTPUtil;
 import com.example.uitls.ReadUrl;
+import com.example.uitls.RedisUtil;
 
 @Service
 public class MonitorTask implements InitializingBean {
@@ -47,9 +50,12 @@ public class MonitorTask implements InitializingBean {
 	
 	@Autowired
 	private MockDeal mockDeal;
+	@Resource
+	private RedisUtil redisUtil;
 	
 	//股票名称
 	public static ConcurrentHashMap<String, StockDo> stockMap=new ConcurrentHashMap<String, StockDo>();
+	
 	@Scheduled(cron = "0 30 9 * * *")
 	private void followTask1() {
 		followTask();
@@ -112,7 +118,9 @@ public class MonitorTask implements InitializingBean {
 		stockList.forEach(stock->{
 			if(StringUtils.containsIgnoreCase(stock.getName(), "ST") || StringUtils.containsIgnoreCase(stock.getName(), "债") ) {
 				System.out.println(stock.getName());
-			} 
+			}else {
+				redisUtil.set(stock.getNumber(), stock.getName(),86400);
+			}
         });
 		return stockList.size();
 	}

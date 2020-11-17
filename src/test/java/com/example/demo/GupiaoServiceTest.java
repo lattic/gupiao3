@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.annotation.Resource;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,19 +30,20 @@ import com.example.model.TradingRecordDo;
 import com.example.service.GuPiaoService;
 import com.example.service.task.MonitorTask;
 import com.example.uitls.DateUtils;
+import com.example.uitls.RedisUtil;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = {GupiaoApplication.class})
+@SpringBootTest(classes = { GupiaoApplication.class })
 public class GupiaoServiceTest {
-	private static String appSecret="bb888ac7199ba68c327c8a0e44fbf0ee6b65b5b0f490beb39a209a295e132a4f";
-	
+	private static String appSecret = "bb888ac7199ba68c327c8a0e44fbf0ee6b65b5b0f490beb39a209a295e132a4f";
+
 	@Autowired
 	private RobotSetMapper robotSetMapper;
 	@Autowired
 	private RobotAccountMapper robotAccountMapper;
 	@Autowired
 	private TradingRecordMapper tradingRecordMapper;
-	//@Autowired
+	// @Autowired
 	private MonitorTask monitorTask;
 	@Autowired
 	private HistoryStockMapper historyStockMapper;
@@ -48,30 +51,44 @@ public class GupiaoServiceTest {
 	private GuPiaoService guPiaoService;
 	@Autowired
 	private MockDeal mockDeal;
-	
-	@Test
-	public void mock() {
-		 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		 guPiaoService.timeInterval("sh000001");
-		 List<HistoryPriceDo> list = mockDeal.cutList("sh000001","2020-07-15","2020-07-21");
-		 for(HistoryPriceDo price:list) {
-			 System.out.println(sdf.format(price.getDateime()));
-		 }
+
+	@Resource
+	private RedisUtil redisUtil;
+
+	// @Test
+	public void ramTest() {
+		redisUtil.set("test", "34323423");
+		System.out.println(redisUtil.get("test"));
 	}
-	
-	//@Test
+
+	@Test
+	public void mockDeal() {
+		mockDeal.mockDeal("sz399006", "2020-07-15", appSecret, true);
+	}
+
+	// @Test
+	public void mock() {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		guPiaoService.timeInterval("sh000001");
+		List<HistoryPriceDo> list = mockDeal.cutList("sh000001", "2020-07-15", "2020-07-21");
+		for (HistoryPriceDo price : list) {
+			System.out.println(sdf.format(price.getDateime()));
+		}
+	}
+
+	// @Test
 	public void AiBuyIn() {
 		monitorTask.AiBuyIn();
 	}
-	
-	//@Test
+
+	// @Test
 	public void updateHistory() {
 		guPiaoService.updateHistoryStock("sh601702");
 	}
-	
-	//@Test
+
+	// @Test
 	public void addHistory() {
-		HistoryStockDo tr= new HistoryStockDo();
+		HistoryStockDo tr = new HistoryStockDo();
 		tr.setKaipanjia(new BigDecimal("10.223"));
 		tr.setMa20Day(new BigDecimal("10.223"));
 		tr.setMa20Hour(new BigDecimal("10.223"));
@@ -80,19 +97,19 @@ public class GupiaoServiceTest {
 		tr.setNumber("3434");
 		historyStockMapper.insert(tr);
 	}
-	
-	//@Test
+
+	// @Test
 	public void delHistory() {
-		for(HistoryStockDo rs:historyStockMapper.getAll()) {
+		for (HistoryStockDo rs : historyStockMapper.getAll()) {
 			System.out.println(JSON.toJSONString(rs));
 			historyStockMapper.delete(rs.getId());
-		};
+		}
+		;
 	}
-	
-	
-	//@Test
+
+	// @Test
 	public void addTradingRecord() {
-		TradingRecordDo tr= new TradingRecordDo();
+		TradingRecordDo tr = new TradingRecordDo();
 		tr.setCreateDate(new Date());
 		tr.setDtId("3f3f33f3f");
 		tr.setName("nadfdf");
@@ -104,35 +121,36 @@ public class GupiaoServiceTest {
 		tr.setRemark("cdcdc");
 		tradingRecordMapper.insert(tr);
 	}
-	
-	//@Test
+
+	// @Test
 	public void delTradingRecord() {
-		for(TradingRecordDo tr:tradingRecordMapper.getAll()) {
+		for (TradingRecordDo tr : tradingRecordMapper.getAll()) {
 			System.out.println(JSON.toJSONString(tr));
 			tradingRecordMapper.delete(tr.getId());
-		};
+		}
+		;
 	}
-	
-	
-	//@Test
+
+	// @Test
 	public void addRobotAccount() {
 		RobotAccountDo ra = new RobotAccountDo();
 		ra.setRobotId(342343234L);
 		ra.setTotal(new BigDecimal("10.223"));
 		robotAccountMapper.insert(ra);
 	}
-	
-	//@Test
+
+	// @Test
 	public void delRobotAccount() {
-		for(RobotAccountDo ra:robotAccountMapper.getAll()) {
+		for (RobotAccountDo ra : robotAccountMapper.getAll()) {
 			System.out.println(JSON.toJSONString(ra));
 			robotAccountMapper.delete(ra.getId());
-		};
+		}
+		;
 	}
-	
-	//@Test
+
+	// @Test
 	public void addRobotSet() {
-		RobotSetDo rs=new RobotSetDo();
+		RobotSetDo rs = new RobotSetDo();
 		rs.setBeginTime(new Date());
 		rs.setEndTime(new Date());
 		rs.setDtId("3333");
@@ -143,13 +161,14 @@ public class GupiaoServiceTest {
 		rs.setStopLossesPrice(new BigDecimal("10.223"));
 		robotSetMapper.insert(rs);
 	}
-	
-	//@Test
+
+	// @Test
 	public void delRobotSet() {
-		for(RobotSetDo rs:robotSetMapper.getAll()) {
+		for (RobotSetDo rs : robotSetMapper.getAll()) {
 			System.out.println(JSON.toJSONString(rs));
 			robotSetMapper.delete(rs.getId());
-		};
+		}
+		;
 	}
-	
+
 }

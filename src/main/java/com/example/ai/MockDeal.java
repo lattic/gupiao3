@@ -5,6 +5,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -73,7 +74,19 @@ public class MockDeal {
 		return null;
 	}
 	
-	public  List<HistoryPriceDo> getBoduan(String number,String beginDate,String appSecret,Boolean isSendMsg) {
+	public  List<HistoryPriceDo> cutList(String number,String beginTime,String endTime) {
+		List<HistoryPriceDo> tempList = getHistoryDate(number);
+		List<HistoryPriceDo> list = new ArrayList<HistoryPriceDo>();
+		for(HistoryPriceDo price:tempList) {
+			if(DateUtils.belongCalendar(price.getDateime(),DateUtils.getDateForYYYYMMDD(beginTime),DateUtils.getDateForYYYYMMDD(endTime))) {
+				list.add(price);
+			}
+		}
+		return list;
+	}
+	
+	
+	public  List<HistoryPriceDo> getBoduan(String number) {
 		List<HistoryPriceDo> list=new ArrayList<HistoryPriceDo>();
 		try {
 			List<HistoryPriceDo> stortList = getHistoryDate(number);
@@ -89,10 +102,8 @@ public class MockDeal {
 			int downCount=0;
 			int upCount=0;
 			Set<String> date=new HashSet<String>();
-			BigDecimal maxPower=new BigDecimal(0.0).setScale(3);
 			BigDecimal max=new BigDecimal(0.0).setScale(3);
 			BigDecimal min=new BigDecimal(0.0).setScale(3);
-			BigDecimal avg=new BigDecimal(0.0).setScale(3);
 			HistoryPriceDo lastPrice=null;
 			for (HistoryPriceDo price : stortList) {
 				boolean isJumpMax=false;
@@ -118,9 +129,6 @@ public class MockDeal {
 				if(price.getKaipanjia().compareTo(lastPrice.getShoupanjia())== -1) {
 					isJumpMin=true;
 				}
-				avg=(max.add(min)).divide(new BigDecimal(2.0).setScale(3),3,BigDecimal.ROUND_UP);
-				
-				
 				//收盘价在20均线之上属于强势
 				if(price.getShoupanjia().compareTo(price.getMa20())>= 0 ) {
 					upCount++;
@@ -133,8 +141,6 @@ public class MockDeal {
 					upCount=0;
 					max=price.getMa20();
 				}
-				
-				
 				//优化买入卖出位
 				BigDecimal goodSell=max.multiply(new BigDecimal(0.85));
 				BigDecimal goodBuy=min.multiply(new BigDecimal(1.015));
@@ -163,8 +169,6 @@ public class MockDeal {
 						System.out.println(sdf.format(price.getDateime())+"卖出波段 down:"+price.getZuidijia()+" ma20:"+price.getMa20() + "  up:"+goodBuy+" down:"+goodSell);
 					}
 				}
-				
-				
 				
 				if(upCount>12 && price.getZuigaojia().compareTo(goodSell)>= 0) {
 					System.out.println("目前是高位："+goodSell+" now:"+price.getShoupanjia());

@@ -2,13 +2,17 @@ package com.example.uitls;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class DateUtils {
+import com.example.model.HolidayDo;
 
+public class DateUtils {
+	private static final SimpleDateFormat DF_YYYY_MM_DD = new SimpleDateFormat("yyyy-MM-dd");// 设置日期格式
 	private static final SimpleDateFormat DF_YYYYMMDD = new SimpleDateFormat("yyyyMMdd");// 设置日期格式
 	private static final SimpleDateFormat DF_YYYYMMDDHHmm = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");// 设置日期格式
 	public static boolean traceTime() {
@@ -44,6 +48,15 @@ public class DateUtils {
 			return false;
 		}
 	}
+	public static boolean isSameDay(Date day1,Date day2) {
+		String temp=DF_YYYYMMDD.format(day1);
+		String nowtemp=DF_YYYYMMDD.format(day2);
+		if (StringUtils.equalsIgnoreCase(nowtemp, temp)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 	
 	public static Date  getDateForString(String day,String time) {
 		try {
@@ -51,21 +64,44 @@ public class DateUtils {
 		}catch (Exception e) {
 			return new Date();
 		}
-			
+	}
+	public static Date getDateForYYYYMMDD(String day) {
+		try {
+			return DF_YYYY_MM_DD.parse(day);
+		}catch (Exception e) {
+			return new Date();
+		}
 	}
 	
-	public static Long getDefDays(Date beginTime, Date endTime) {
+	public static Long getDefDays(Date beginTime, Date endTime,List<HolidayDo> list) {
 		Calendar day1 = Calendar.getInstance();
 		Calendar day2 = Calendar.getInstance();
 		try {
 			day1.setTime(DF_YYYYMMDD.parse(DF_YYYYMMDD.format(beginTime)));
 			day2.setTime(DF_YYYYMMDD.parse(DF_YYYYMMDD.format(endTime)));
+			long temp=(day2.getTimeInMillis()-day1.getTimeInMillis())/(1000 * 60 * 60 *24);
+			long day=0;
+			if(list==null) {
+				list=new ArrayList<HolidayDo>();
+			}
+			for(long i=0;i<temp;i++) {
+				day1.add(Calendar.DAY_OF_WEEK, 1);
+				if(day1.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY ||  day1.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY){
+					day++;
+					continue;
+				}
+				for(HolidayDo holiday:list) {
+					if(isSameDay(day1.getTime(),holiday.getHoliday())) {
+						day++;
+						continue;
+					}
+				}
+			}
+			return temp-day;
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		return (day2.getTimeInMillis()-day1.getTimeInMillis())/(1000 * 60 * 60 *24);
+		return 0L;
 	}
 	
 	

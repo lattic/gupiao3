@@ -25,13 +25,6 @@ public class ReadUrl {
 	private static Logger logger = LoggerFactory.getLogger("real_time_monitor");
 	
 	
-	private static ConcurrentHashMap<String, BigDecimal> maxPriceMap=new ConcurrentHashMap<String, BigDecimal>();
-	private static ConcurrentHashMap<String, BigDecimal> minPriceMap=new ConcurrentHashMap<String, BigDecimal>();
-	
-	public static void main(String[] args) {
-		
-	}
-	
 	
 	public static HistoryPriceDo getLastMa20(String title,int type) {
 		List<HistoryPriceDo> list=ReadUrl.readUrl(title,type);
@@ -54,7 +47,6 @@ public class ReadUrl {
 			return null;
 		}
 		JSONArray  priceList=(JSONArray)JSON.parseObject(code).get("record");
-		int powerValue=0;
 		double ma20_5=0;
 		Calendar calendar=Calendar.getInstance();
 		calendar.set(Calendar.HOUR_OF_DAY,-24);
@@ -87,46 +79,19 @@ public class ReadUrl {
 		            price.setMa20number(getBigDecimal(priceObjList.get(13)));
 		            price.setHuanshoulv(getBigDecimal(priceObjList.get(14)));
 		            price.setPianlizhi(price.getMa20().divide(price.getShoupanjia(),BigDecimal.ROUND_HALF_UP));
-		            BigDecimal max=price.getZuigaojia();
-		            BigDecimal tempMax=maxPriceMap.get(number);
-		            BigDecimal min=price.getZuidijia();
-		            BigDecimal tempMin=minPriceMap.get(number);
-		            if(null == tempMax || tempMax.compareTo(max)< 1) {
-		            	maxPriceMap.put(number, max);
-		            }
-		            if(null == tempMin || tempMin.compareTo(min)> -1) {
-		            	minPriceMap.put(number, min);
-		            }
 		            if(ma20_5 <=0) {
 		            	ma20_5=price.getMa20().doubleValue();
 		            }
-		            
 		            //收盘价比MA20高
 		            if(price.getShoupanjia().compareTo(price.getMa20()) > -1) {
 		            	if(price.getMa20().doubleValue() - ma20_5>0) {
 		            		price.setUp(true);
-			            	logger.info("编号："+price.getNumber()+" 上升趋势 "+sdf.format(price.getDateime())+"价格："+price.getShoupanjia()+" 差值："+(price.getMa20().doubleValue() - ma20_5));
 	            		}
-		            	logger.info(sdf.format(price.getDateime())+":"+price.getNumber()+" "+price.getShoupanjia()+">="+price.getMa20()+"=趋势上升   "+"当前能量值："+powerValue+" 偏移量："+price.getPianlizhi());
-		            	
-		            }else {
-		            	powerValue--;
-		            	logger.info(sdf.format(price.getDateime())+":"+price.getNumber()+" "+price.getShoupanjia()+"<"+price.getMa20()+"=趋势下降  "+"当前能量值："+powerValue+" 偏移量："+price.getPianlizhi());
 		            }
 		            list.add(price);
 		        } catch (ParseException e) {
 		        	logger.error(e.getMessage(),e);
 		        }
-		}
-		for(HistoryPriceDo price:list) {
-			BigDecimal tempMax=maxPriceMap.get(number);
-			if(tempMax!=null) {
-				price.setYaliwei(tempMax);
-			}
-			BigDecimal tempMin=minPriceMap.get(number);
-			if(tempMin!=null) {
-				price.setZhichengwei(tempMin);
-			}
 		}
 		return list;
 	}

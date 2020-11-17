@@ -3,6 +3,7 @@ package com.example.service;
 import java.util.List;
 
 import com.example.model.GuPiaoDo;
+import com.example.model.HolidayDo;
 import com.example.model.RealTimeDo;
 import com.example.model.StockDo;
 import com.example.model.SubscriptionDo;
@@ -24,4 +25,8 @@ public interface GuPiaoService {
 	List<SubscriptionDo> listMemberAll();
 	
 	void updateHistoryStock(String number);
+	
+	List<HolidayDo> getHolidayList();
+	
+	String timeInterval(String number);
 }

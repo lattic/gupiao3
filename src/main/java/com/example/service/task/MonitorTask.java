@@ -259,7 +259,6 @@ public class MonitorTask implements InitializingBean {
 											   + "\n 初始化股票池数量："
 											   + init(),new Object[] {});
         DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_TEST_SECRET, robotbuy, null, false);
-        AiBuyIn();
 	}
 	
 	

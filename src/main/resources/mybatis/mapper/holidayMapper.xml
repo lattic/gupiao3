@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+						"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.example.mapper.HolidayMapper">
+
+	<resultMap id="holidayDo" type="com.example.model.HolidayDo">
+		<result column="id" 			property="id" 			jdbcType="BIGINT" />
+		<result column="holiday" 		property="holiday" 		jdbcType="TIMESTAMP" />
+	</resultMap>
+
+	<sql id="All_Column">
+		id, holiday
+	</sql>
+
+	<select id="getAll" resultMap="holidayDo">
+		SELECT
+		<include refid="All_Column" />
+		FROM holiday
+	</select>
+
+
+</mapper>

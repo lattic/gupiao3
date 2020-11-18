@@ -15,6 +15,7 @@ public class DateUtils {
 	private static final SimpleDateFormat DF_YYYY_MM_DD = new SimpleDateFormat("yyyy-MM-dd");// 设置日期格式
 	private static final SimpleDateFormat DF_YYYYMMDD = new SimpleDateFormat("yyyyMMdd");// 设置日期格式
 	private static final SimpleDateFormat DF_YYYYMMDDHHmm = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");// 设置日期格式
+	private static final SimpleDateFormat DF_YYYYMMDDHHMM_NUMBER = new SimpleDateFormat("yyyyMMddHHmm");// 设置日期格式
 	public static boolean traceTime() {
 		SimpleDateFormat df = new SimpleDateFormat("HH:mm");// 设置日期格式
 		Date now = null;
@@ -61,6 +62,15 @@ public class DateUtils {
 	public static Date  getDateForString(String day,String time) {
 		try {
 			return DF_YYYYMMDDHHmm.parse(day+" "+time);
+		}catch (Exception e) {
+			return new Date();
+		}
+	}
+	
+	
+	public static Date getDateForYYYYMMDDHHMM_NUMBER(String day) {
+		try {
+			return DF_YYYYMMDDHHMM_NUMBER.parse(day);
 		}catch (Exception e) {
 			return new Date();
 		}

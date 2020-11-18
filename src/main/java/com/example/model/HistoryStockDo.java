@@ -30,6 +30,57 @@ public class HistoryStockDo implements Serializable {
 	private BigDecimal height;
 	
 	private BigDecimal low;
+	
+	//波段类型 1=上升 2=下跌 3=震荡
+	private Integer type;
+	
+	private BigDecimal boxMax;
+	
+	private BigDecimal boxMin;
+	
+	private BigDecimal boxAvg;
+	
+	private String remark;
+	
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
+	public Integer getType() {
+		return type;
+	}
+
+	public void setType(Integer type) {
+		this.type = type;
+	}
+
+	public BigDecimal getBoxMax() {
+		return boxMax;
+	}
+
+	public void setBoxMax(BigDecimal boxMax) {
+		this.boxMax = boxMax;
+	}
+
+	public BigDecimal getBoxMin() {
+		return boxMin;
+	}
+
+	public void setBoxMin(BigDecimal boxMin) {
+		this.boxMin = boxMin;
+	}
+
+	public BigDecimal getBoxAvg() {
+		return boxAvg;
+	}
+
+	public void setBoxAvg(BigDecimal boxAvg) {
+		this.boxAvg = boxAvg;
+	}
 
 	public BigDecimal getHeight() {
 		return height;

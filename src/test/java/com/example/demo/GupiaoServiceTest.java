@@ -55,6 +55,7 @@ public class GupiaoServiceTest {
 	@Resource
 	private RedisUtil redisUtil;
 
+	
 	@Test
 	public void mock() {
 		System.out.println(guPiaoService.timeInterval("sz002202"));

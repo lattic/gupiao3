@@ -32,4 +32,5 @@ public interface GuPiaoService {
 	String timeInterval(String number);
 	
 	HistoryPriceDo getLastZhichengwei(String number);
+	
 }

@@ -123,6 +123,7 @@ public class MonitorTask implements InitializingBean {
 				stockMap.put(stock.getNumber(), stock);
 			}
         });
+		
 		return stockList.size();
 	}
 		
@@ -147,57 +148,61 @@ public class MonitorTask implements InitializingBean {
 			calendar.add(Calendar.DATE, -15);
 			SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd");
 			MockLog log=mockDeal.mockDeal(stock.getNumber(), dateformat.format(calendar.getTime()),DingTalkRobotHTTPUtil.APP_TEST_SECRET,false);
-			if(log != null && log.getIsBuyin() ) {
-				//近4天出现买入点
-				Calendar before = Calendar.getInstance();  
-				before.add(Calendar.DATE, -5);
-				if(log.getLastBuyin().after(before.getTime()) ) {
-					if(maxprice.getWin() == null ) {
-						maxprice=log;
-					}
-					
-					if(log.getWin()!=null && log.getWin()> maxprice.getWin()) {
-						if(log.getWinRate().doubleValue()>=3 && log.getWinRate().doubleValue()<=40) {
-							log.setLogs(log.getLogs().replace("测试AI操盘", "AI个股推荐"));
-							for(SubscriptionDo realTime:subscriptionList) {
-								if(StringUtils.equals(realTime.getNumber(), "0")) {
-									DingTalkRobotHTTPUtil.sendMsg(realTime.getDingtalkId(), log.getLogs(), null, false);
-								}
-							}
+			if(log == null ) {
+				continue;
+			}
+			//初始化
+			if(maxprice.getWin() == null ) {
+				maxprice=log;
+			}
+			if(minprice.getWin() == null ) {
+				minprice=log;
+			}
+			//替换最大值
+			if(log.getWin()!=null && log.getWin() >= maxprice.getWin() ) {
+				maxprice=log;
+			}
+			//替换最小值
+			if(log.getWin()!=null && log.getWin() <= minprice.getWin()) {
+				minprice=log;
+				if(log.getWinRate().doubleValue()<=-3) {
+					//DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_TEST_SECRET, log.getLogs(), null, false);
+				}
+			}
+			
+			if(log.getWinRate() != null && log.getWinRate()>0) {
+				winLog+=log.getNumber()+"  "+log.getName()+" "+log.getWinRate()+"\n";
+				max++;
+			}
+			if(log.getWinRate() != null &&  log.getWinRate()<0) { 
+				min++;
+				lossLog+=log.getNumber()+"  "+log.getName()+" "+log.getWinRate()+"\n";
+			}
+			//统计金额
+			if(log.getWin() != null) {
+				total+=log.getWin();
+			}
+			
+			//近5天出现买入点,推荐
+			Calendar before = Calendar.getInstance();  
+			before.add(Calendar.DATE, -5);
+			if(log.getIsBuyin() && log.getLastBuyin()!= null && log.getLastBuyin().after(before.getTime()) ) {
+				if(log.getWinRate().doubleValue()>=3 && log.getWinRate().doubleValue()<=40) {
+					log.setLogs(log.getLogs().replace("测试AI操盘", "AI个股推荐"));
+					for(SubscriptionDo realTime:subscriptionList) {
+						if(StringUtils.equals(realTime.getNumber(), "0")) {
+							//DingTalkRobotHTTPUtil.sendMsg(realTime.getDingtalkId(), log.getLogs(), null, false);
 						}
-						maxprice=log;
-					}
-					if(minprice.getWin() == null ) {
-						minprice=log;
-					}
-					
-					if(log.getWin()!=null && log.getWin()< minprice.getWin()) {
-						minprice=log;
-						if(log.getWinRate().doubleValue()<=-3) {
-							DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_TEST_SECRET, log.getLogs(), null, false);
-						}
-					}
-					
-					if(log.getWinRate() != null && log.getWinRate()>0) {
-						winLog+=log.getNumber()+"  "+log.getName()+" "+log.getWinRate()+"\n";
-						max++;
-					}
-					if(log.getWinRate() != null &&  log.getWinRate()<0) { 
-						min++;
-						lossLog+=log.getNumber()+"  "+log.getName()+" "+log.getWinRate()+"\n";
-					}
-					if(log.getWin() != null) {
-						total+=log.getWin();
 					}
 				}
 			}
-        }
+		}
 		try {
-			String  context = "所有机器人总收益："+total
-					+"\n 赚钱的机器人："+max
-					+"\n 赚钱股票："+winLog
-					+"\n 亏钱的机器人:"+min
-					+"\n 亏钱股票："+lossLog;
+			String  context = "所有机器人总收益:"+total
+					+"\n 赚钱的机器人:"+max
+					//+"\n 赚钱股票："+winLog
+					+"\n 亏钱的机器人:"+min;
+					//+"\n 亏钱股票："+lossLog;
 					//+"\n 单个机器人最大盈利："
 					// + maxprice.getLogs()
 					//+"\n 单个机器人最大亏损："
@@ -248,12 +253,15 @@ public class MonitorTask implements InitializingBean {
 		    	}
 			}
 		}
+		
+	}
+	private void  updateHistory() {
 		//获取所有股票的历史60分钟数据
 		List<StockDo> stockList = guPiaoService.getAllStock();
 		stockList.forEach(stock->{
 			guPiaoService.updateHistoryStock(stock.getNumber());
+			guPiaoService.timeInterval(stock.getNumber());
         });
-		
 	}
 	
 	
@@ -268,6 +276,13 @@ public class MonitorTask implements InitializingBean {
 											   + "\n 初始化股票池数量："
 											   + init(),new Object[] {});
         DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_TEST_SECRET, robotbuy, null, false);
+        pool.execute(new Runnable() {
+			@Override
+			public void run() {
+				 updateHistory();
+			}
+		});
+       
 	}
 	
 	

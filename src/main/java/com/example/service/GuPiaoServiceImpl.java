@@ -2,6 +2,7 @@ package com.example.service;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -76,9 +77,40 @@ public class GuPiaoServiceImpl implements GuPiaoService, InitializingBean {
 	@Resource
 	private RedisUtil redisUtil;
 	
+
+
+	private void updateHistoryStockByDB(List<HistoryStockDo> list,Integer type,String remark) {
+		BigDecimal max=new BigDecimal(0.00);
+		BigDecimal min=new BigDecimal(100000.00);
+		BigDecimal avg=new BigDecimal(0.00);
+		for(HistoryStockDo stock:list) {
+			if(stock.getHeight().compareTo(max)>= 1) {
+				max=stock.getHeight();
+			}
+			if(stock.getLow().compareTo(min)<= -1) {
+				min=stock.getLow();
+			}
+			avg=avg.add(stock.getShoupanjia());
+		}
+		avg=avg.divide(new BigDecimal(list.size()),3,BigDecimal.ROUND_HALF_UP);
+		for(HistoryStockDo stock:list) {
+			stock.setBoxMax(max);
+			stock.setBoxMin(min);
+			stock.setBoxAvg(avg);
+			stock.setType(type);
+			stock.setRemark(remark);
+			try {
+				historyStockMapper.updateHistoryStock(stock);
+			}catch (Exception e) {
+				e.printStackTrace();
+				System.err.println(remark);
+			}
+		}
+	}
+	
+	
 	@Override
 	public void updateHistoryStock(String number) {
-
 		List<HistoryPriceDo> list = ReadUrl.readUrl(number, 60);
 		if (list == null || list.isEmpty()) {
 			logger.warn("没有获取到数据");
@@ -179,32 +211,31 @@ public class GuPiaoServiceImpl implements GuPiaoService, InitializingBean {
 
 	@Override
 	public HistoryPriceDo getLastZhichengwei(String number) {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		HistoryPriceDo last=new HistoryPriceDo();
-		List<HistoryPriceDo>priceList=mockDeal.getBoduan(number);
+		List<HistoryStockDo>priceList=mockDeal.getBoduan(number);
 		int i=priceList.size()-2;
 		while(last.getMa20() == null && i>0){
-			HistoryPriceDo lastPrice=priceList.get(i);
-			HistoryPriceDo nowPrice=priceList.get(priceList.size()-1);
-			long days=DateUtils.getDefDays(lastPrice.getDateime(),nowPrice.getDateime(),getHolidayList());
+			HistoryStockDo lastPrice=priceList.get(i);
+			HistoryStockDo nowPrice=priceList.get(priceList.size()-1);
+			long days=DateUtils.getDefDays(DateUtils.getDateForYYYYMMDD(lastPrice.getHistoryDay()),DateUtils.getDateForYYYYMMDD(nowPrice.getHistoryDay()),getHolidayList());
 			if(days<5) {
 				i--;
 				continue;
 			}
 			
-			List<HistoryPriceDo> list = mockDeal.cutList(number, sdf.format(lastPrice.getDateime()), sdf.format(nowPrice.getDateime()));
+			List<HistoryStockDo> list = mockDeal.cutList(number, lastPrice.getHistoryAll(), nowPrice.getHistoryAll());
 			BigDecimal max=new BigDecimal(0.0);
 			BigDecimal min=new BigDecimal(100000.0);
 			BigDecimal avg=new BigDecimal(0.0);
 			int count=0;
-			for (HistoryPriceDo price : list) {
+			for (HistoryStockDo price : list) {
 				count++;
 				avg=avg.add(price.getShoupanjia());
-				if(price.getZuigaojia().compareTo(max)>-1) {
-					max=price.getZuigaojia();
+				if(price.getHeight().compareTo(max)>-1) {
+					max=price.getHeight();
 				}
-				if(price.getZuidijia().compareTo(min)< 1) {
-					min=price.getZuidijia();
+				if(price.getLow().compareTo(min)< 1) {
+					min=price.getLow();
 				}
 				
 			}
@@ -223,37 +254,40 @@ public class GuPiaoServiceImpl implements GuPiaoService, InitializingBean {
 	
 	@Override
 	public String timeInterval(String number) {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		List<HistoryPriceDo>priceList=mockDeal.getBoduan(number);
+		List<HistoryStockDo>priceList=mockDeal.getBoduan(number);
 		String returnStr="GS======测试波段区间分隔=========\n";
 		returnStr=returnStr+"股票编码："+number+" \n";
 		returnStr=returnStr+"股票名称："+(String)redisUtil.get(number)+" \n";
 		for(int i=1;i<priceList.size();i++) {
-			HistoryPriceDo lastPrice=priceList.get(i-1);
-			HistoryPriceDo nowPrice=priceList.get(i);
+			HistoryStockDo lastPrice=priceList.get(i-1);
+			HistoryStockDo nowPrice=priceList.get(i);
 			BigDecimal subtract=nowPrice.getShoupanjia().subtract(lastPrice.getShoupanjia());
-			long days=DateUtils.getDefDays(lastPrice.getDateime(),nowPrice.getDateime(),getHolidayList());
+			long days=DateUtils.getDefDays(DateUtils.getDateForYYYYMMDDHHMM_NUMBER(lastPrice.getHistoryAll()),DateUtils.getDateForYYYYMMDDHHMM_NUMBER(nowPrice.getHistoryAll()),getHolidayList());
+			int type=2;
 			String str="下滑趋势";
 			if(subtract.compareTo(new BigDecimal(0.0))>0) {
 				str="上升趋势 ";
+				type=1;
 			}
 			if(days <5 ) {
 				str="震荡行情,"+str;
+				type=3;
 			}
-			List<HistoryPriceDo> list = mockDeal.cutList(number, sdf.format(lastPrice.getDateime()), sdf.format(nowPrice.getDateime()));
+			List<HistoryStockDo> list = mockDeal.cutList(number, lastPrice.getHistoryAll(), nowPrice.getHistoryAll());
 			BigDecimal max=new BigDecimal(0.0);
 			BigDecimal min=new BigDecimal(100000.0);
 			BigDecimal avg=new BigDecimal(0.0);
 			int count=0;
+			
 			boolean isPoint=true;
-			for (HistoryPriceDo price : list) {
+			for (HistoryStockDo price : list) {
 				count++;
 				avg=avg.add(price.getShoupanjia());
-				if(price.getZuigaojia().compareTo(max)>-1) {
-					max=price.getZuigaojia();
+				if(price.getHeight().compareTo(max)>-1) {
+					max=price.getHeight();
 				}
-				if(price.getZuidijia().compareTo(min)< 1) {
-					min=price.getZuidijia();
+				if(price.getLow().compareTo(min)< 1) {
+					min=price.getLow();
 				}
 				if(isPoint && count==1 && StringUtils.contains(str, "下滑趋势")) {
 					str=str+"\t 参考 卖出点1:"+price.getShoupanjia()+"\t";
@@ -267,18 +301,24 @@ public class GuPiaoServiceImpl implements GuPiaoService, InitializingBean {
 					str=str+"\t 买入点2:"+price.getShoupanjia()+"\t";
 					isPoint=false;
 				}
-				
 			}
+			if(count == 0) {
+				count=1;
+			}
+			
 			avg = avg.divide(new BigDecimal(count),2, BigDecimal.ROUND_UP);
 			max=max.setScale(2);
 			min=min.setScale(2);
-			returnStr=returnStr+sdf.format(lastPrice.getDateime())+"~"+sdf.format(nowPrice.getDateime())
+			String context=lastPrice.getHistoryDay()+"~"+nowPrice.getHistoryDay()
 			+"\t 压力位:"+max
 			+"\t 支撑位:"+min
 			+"\t 平均值："+avg
 			+"\t 趋势："+ str
 			+"\t 相隔周期："+days+"交易日 \n";
+			returnStr=returnStr+context;
+			updateHistoryStockByDB(list,type,context);
 		}
+		System.out.println(returnStr);
 		return returnStr;
 	}
 

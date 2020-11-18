@@ -15,10 +15,16 @@
 		<result column="ma20_day" property="ma20Day" jdbcType="DECIMAL" />
 		<result column="height" property="height" jdbcType="DECIMAL" />
 		<result column="low" property="low" jdbcType="DECIMAL" />
+		<result column="type" property="type" jdbcType="INTEGER" />
+		<result column="box_max" property="boxMax" jdbcType="DECIMAL" />
+		<result column="box_min" property="boxMin" jdbcType="DECIMAL" />
+		<result column="box_avg" property="boxAvg" jdbcType="DECIMAL" />
+		<result column="remark" property="remark" jdbcType="VARCHAR" />
+		
 	</resultMap>
 
 	<sql id="All_Column">
-		id,history_day,history_all,number,kaipanjia,shoupanjia,ma20_hour,ma20_day,height,low
+		id,history_day,history_all,number,kaipanjia,shoupanjia,ma20_hour,ma20_day,height,low,type,box_max,box_min,box_avg,remark
 	</sql>
 
 	<select id="getAll" resultMap="historyStockDo">
@@ -27,6 +33,13 @@
 		FROM history_stock
 	</select>
 	
+	<select id="getNumber"  resultMap="historyStockDo">
+		SELECT
+		<include refid="All_Column" />
+		FROM history_stock
+		where number=#{number}
+		order by history_all 
+	</select>
 	
 	<select id="getByTime" parameterType="historyStockDo" resultMap="historyStockDo">
 		SELECT
@@ -38,12 +51,25 @@
 		limit 1
 	</select>
 
+	<update id="updateHistoryStock" parameterType="historyStockDo">
+		update history_stock set
+			  type=#{type}
+		<if test="boxMax">	, box_max = #{boxMax} </if>
+		<if test="boxMin">	, box_min = #{boxMin} </if>
+		<if test="boxAvg">	, box_avg = #{boxAvg} </if>
+		<if test="remark">	, remark  = #{remark} </if>
+		where id=#{id}
+	</update>
+
+
+
+
 	<insert id="insert" parameterType="historyStockDo">
 		INSERT INTO
 		history_stock
-		(history_day,history_all,number,kaipanjia,shoupanjia,ma20_hour,ma20_day,height,low)
+		(history_day,history_all,number,kaipanjia,shoupanjia,ma20_hour,ma20_day,height,low,type,box_max,box_min,box_avg,remark)
 		VALUES
-		(#{historyDay},#{historyAll},#{number},#{kaipanjia},#{shoupanjia},#{ma20Hour},#{ma20Day},#{height},#{low})
+		(#{historyDay},#{historyAll},#{number},#{kaipanjia},#{shoupanjia},#{ma20Hour},#{ma20Day},#{height},#{low},#{type},#{boxMax},#{boxMin},#{boxAvg},#{remark})
 	</insert>
 
 	<delete id="delete" parameterType="historyStockDo">

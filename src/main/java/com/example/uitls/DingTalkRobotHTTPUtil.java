@@ -31,7 +31,7 @@ public class DingTalkRobotHTTPUtil {
 		public static boolean isTest=false;
 		
 		private static Logger logger = LoggerFactory.getLogger("dingtalk_log");    
-		public static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(10, 30, 60, TimeUnit.SECONDS , new ArrayBlockingQueue<Runnable>(10), new DingTalkThreadFactory());
+		public static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(10, 300, 60, TimeUnit.SECONDS , new ArrayBlockingQueue<Runnable>(1000), new DingTalkThreadFactory());
 		public static String WEBHOOK_TOKEN = "https://oapi.dingtalk.com/robot/send?access_token=";
 
 		    public static void main(String[] args) throws Exception {

@@ -183,7 +183,7 @@ public class GuPiaoServiceImpl implements GuPiaoService, InitializingBean {
 		List<HistoryPriceDo>priceList=mockDeal.getBoduan(number);
 		String returnStr="GS======测试波段区间分隔=========\n";
 		returnStr=returnStr+"股票编码："+number+" \n";
-		returnStr=returnStr+"股票名称："+redisUtil.get(number)+" \n";
+		returnStr=returnStr+"股票名称："+(String)redisUtil.get(number)+" \n";
 		for(int i=1;i<priceList.size();i++) {
 			HistoryPriceDo lastPrice=priceList.get(i-1);
 			HistoryPriceDo nowPrice=priceList.get(i);

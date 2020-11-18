@@ -82,7 +82,8 @@ public class MonitorRiskTask {
 					}
 					
 					if(isNotifyByMock) {
-						DingTalkRobotHTTPUtil.sendMsg(appSecret, guPiaoService.timeInterval(number), null, false);
+						String msg=guPiaoService.timeInterval(number);
+						DingTalkRobotHTTPUtil.sendMsg(appSecret, msg, null, false);
 //						Calendar calendar = Calendar.getInstance();  
 //						calendar.add(Calendar.MONTH, -1);
 //						if(StringUtils.isBlank(beginTime)) {

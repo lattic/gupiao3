@@ -5,6 +5,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +36,7 @@ import com.example.model.SubscriptionDo;
 import com.example.model.TradingRecordDo;
 import com.example.uitls.DateUtils;
 import com.example.uitls.ReadUrl;
+import com.example.uitls.RedisUtil;
 
 @Service
 public class GuPiaoServiceImpl implements GuPiaoService, InitializingBean {
@@ -69,6 +72,9 @@ public class GuPiaoServiceImpl implements GuPiaoService, InitializingBean {
 	
 	@Autowired
 	private MockDeal mockDeal;
+	
+	@Resource
+	private RedisUtil redisUtil;
 	
 	@Override
 	public void updateHistoryStock(String number) {
@@ -176,6 +182,8 @@ public class GuPiaoServiceImpl implements GuPiaoService, InitializingBean {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		List<HistoryPriceDo>priceList=mockDeal.getBoduan(number);
 		String returnStr="GS======测试波段区间分隔=========\n";
+		returnStr=returnStr+"股票编码："+number+" \n";
+		returnStr=returnStr+"股票名称："+redisUtil.get(number)+" \n";
 		for(int i=1;i<priceList.size();i++) {
 			HistoryPriceDo lastPrice=priceList.get(i-1);
 			HistoryPriceDo nowPrice=priceList.get(i);

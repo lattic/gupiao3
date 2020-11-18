@@ -119,7 +119,7 @@ public class MonitorTask implements InitializingBean {
 			if(StringUtils.containsIgnoreCase(stock.getName(), "ST") || StringUtils.containsIgnoreCase(stock.getName(), "债") ) {
 				//System.out.println(stock.getName());
 			}else {
-				redisUtil.set(stock.getNumber(), stock.getName(),86400);
+				redisUtil.set(stock.getNumber(), stock.getName());
 				stockMap.put(stock.getNumber(), stock);
 			}
         });

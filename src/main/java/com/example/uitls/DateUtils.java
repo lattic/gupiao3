@@ -80,6 +80,7 @@ public class DateUtils {
 		}
 	}
 	
+	
 	public static Long getDefDays(Date beginTime, Date endTime,List<HolidayDo> list) {
 		Calendar day1 = Calendar.getInstance();
 		Calendar day2 = Calendar.getInstance();
@@ -103,6 +104,9 @@ public class DateUtils {
 						continue;
 					}
 				}
+			}
+			if(temp-day<0) {
+				return 1L;
 			}
 			return temp-day;
 		} catch (ParseException e) {

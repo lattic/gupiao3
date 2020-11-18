@@ -178,6 +178,50 @@ public class GuPiaoServiceImpl implements GuPiaoService, InitializingBean {
 	}
 
 	@Override
+	public HistoryPriceDo getLastZhichengwei(String number) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		HistoryPriceDo last=new HistoryPriceDo();
+		List<HistoryPriceDo>priceList=mockDeal.getBoduan(number);
+		int i=priceList.size()-2;
+		while(last.getMa20() == null && i>0){
+			HistoryPriceDo lastPrice=priceList.get(i);
+			HistoryPriceDo nowPrice=priceList.get(priceList.size()-1);
+			long days=DateUtils.getDefDays(lastPrice.getDateime(),nowPrice.getDateime(),getHolidayList());
+			if(days<5) {
+				i--;
+				continue;
+			}
+			
+			List<HistoryPriceDo> list = mockDeal.cutList(number, sdf.format(lastPrice.getDateime()), sdf.format(nowPrice.getDateime()));
+			BigDecimal max=new BigDecimal(0.0);
+			BigDecimal min=new BigDecimal(100000.0);
+			BigDecimal avg=new BigDecimal(0.0);
+			int count=0;
+			for (HistoryPriceDo price : list) {
+				count++;
+				avg=avg.add(price.getShoupanjia());
+				if(price.getZuigaojia().compareTo(max)>-1) {
+					max=price.getZuigaojia();
+				}
+				if(price.getZuidijia().compareTo(min)< 1) {
+					min=price.getZuidijia();
+				}
+				
+			}
+			avg = avg.divide(new BigDecimal(count),2, BigDecimal.ROUND_UP);
+			max=max.setScale(2);
+			min=min.setScale(2);
+			last.setZhichengwei(min);
+			last.setYaliwei(max);
+			last.setMa20(avg);
+			last.setNumber(number);
+			last.setName((String)redisUtil.get(number));
+			return last;
+		}
+		return last;
+	}
+	
+	@Override
 	public String timeInterval(String number) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		List<HistoryPriceDo>priceList=mockDeal.getBoduan(number);
@@ -225,8 +269,7 @@ public class GuPiaoServiceImpl implements GuPiaoService, InitializingBean {
 				}
 				
 			}
-			avg = avg.divide(new BigDecimal(count), BigDecimal.ROUND_UP);
-			avg=avg.setScale(2);
+			avg = avg.divide(new BigDecimal(count),2, BigDecimal.ROUND_UP);
 			max=max.setScale(2);
 			min=min.setScale(2);
 			returnStr=returnStr+sdf.format(lastPrice.getDateime())+"~"+sdf.format(nowPrice.getDateime())
@@ -238,5 +281,7 @@ public class GuPiaoServiceImpl implements GuPiaoService, InitializingBean {
 		}
 		return returnStr;
 	}
+
+	
 
 }

@@ -13,6 +13,8 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +32,7 @@ import com.example.service.GuPiaoService;
 import com.example.uitls.DateUtils;
 import com.example.uitls.DingTalkRobotHTTPUtil;
 import com.example.uitls.ReadUrl;
+import com.example.uitls.RedisUtil;
 
 @Service
 public class MonitorRiskTask {
@@ -44,10 +47,14 @@ public class MonitorRiskTask {
 	
 	//目前是否弱势
 	private static ConcurrentHashMap<String, Boolean> lossMap=new ConcurrentHashMap<String, Boolean>();
-	//目前是否通知
-	private static ConcurrentHashMap<String, Boolean> notifyMap=new ConcurrentHashMap<String, Boolean>();
 	//AI操盘通知   key—— yyyymmdd_number
 	private static ConcurrentHashMap<String, Boolean> mockAiMap=new ConcurrentHashMap<String, Boolean>();
+	
+	@Resource
+	private RedisUtil redisUtil;
+	
+	
+	
 	@Autowired
 	private MockDeal mockDeal;
 	
@@ -100,13 +107,23 @@ public class MonitorRiskTask {
 			}
 		});
 	}
-	
 
-	private void listenRealTime(final String key,final String appSecret) throws Exception {
+	private void setNotify(String number,Boolean isNotify) {
+		SimpleDateFormat dateformat = new SimpleDateFormat("yyyyMMdd");
+		String key=dateformat.format(new Date())+"_"+number;
+		redisUtil.set(key, isNotify,5000L);
+	}
+	private Boolean getNotify(String number) {
+		SimpleDateFormat dateformat = new SimpleDateFormat("yyyyMMdd");
+		String key=dateformat.format(new Date())+"_"+number;
+		return (Boolean)redisUtil.get(key);
+	}
+
+	private void listenRealTime(final String number,final String appSecret) throws Exception {
 		DecimalFormat    df   = new DecimalFormat("######0.00");  
 		Date now=new Date();
     	SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    	GuPiao date=ReadUrl.readUrl(key,false);
+    	GuPiao date=ReadUrl.readUrl(number,false);
 		if(date !=null) {
 			GuPiaoDo nowPrice=new GuPiaoDo();
 			BeanUtils.copyProperties(date, nowPrice);
@@ -115,13 +132,13 @@ public class MonitorRiskTask {
 			}
 			
 			//获取走势
-			HistoryPriceDo riskPrice=ReadUrl.getLastMa20(key, 60);
-			Boolean status=lossMap.get(key);
-			Boolean isNotify=notifyMap.get(key);
+			HistoryPriceDo riskPrice=guPiaoService.getLastZhichengwei(number);
+			Boolean status=lossMap.get(number);
+			Boolean isNotify=getNotify(number);
 			//通知开关
 			if(isNotify == null) {
 				isNotify=true;
-				notifyMap.put(key,isNotify);
+				setNotify(number,isNotify);
 			}
 			
 			//止损 当前价格低于历史支撑位
@@ -136,7 +153,7 @@ public class MonitorRiskTask {
 				logger.info(content);
 				if(isNotify) {
 					DingTalkRobotHTTPUtil.sendMsg(appSecret, content, null, false);
-					notifyMap.put(key,false);
+					setNotify(number,false);
 				}
 			}
 			
@@ -156,7 +173,7 @@ public class MonitorRiskTask {
 					if(isNotify) {
 						DingTalkRobotHTTPUtil.sendMsg(appSecret, content, null, false);
 					}
-					lossMap.put(key,true);
+					lossMap.put(number,true);
 					return;
 				}
 				
@@ -171,9 +188,9 @@ public class MonitorRiskTask {
 					logger.info(content);
 					if(isNotify) {
 						DingTalkRobotHTTPUtil.sendMsg(appSecret, content, null, false);
-						notifyMap.put(key,false);
+						setNotify(number,false);
 					}
-					lossMap.put(key,true);
+					lossMap.put(number,true);
 				}
 			}
 			
@@ -191,7 +208,7 @@ public class MonitorRiskTask {
 			        		        		 "目前属于上升趋势"});
 					logger.info(content);
 					DingTalkRobotHTTPUtil.sendMsg(appSecret, content, null, false);
-					lossMap.put(key,false);
+					lossMap.put(number,false);
 					return;
 				}
 				if(status) {
@@ -205,9 +222,9 @@ public class MonitorRiskTask {
 					logger.info(content);
 					if(isNotify) {
 						DingTalkRobotHTTPUtil.sendMsg(appSecret, content, null, false);
-						notifyMap.put(key,false);
+						setNotify(number,false);
 					}
-					lossMap.put(key,false);
+					lossMap.put(number,false);
 				}
 			}
 		}

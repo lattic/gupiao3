@@ -3,6 +3,7 @@ package com.example.service;
 import java.util.List;
 
 import com.example.model.GuPiaoDo;
+import com.example.model.HistoryPriceDo;
 import com.example.model.HolidayDo;
 import com.example.model.RealTimeDo;
 import com.example.model.StockDo;
@@ -29,4 +30,6 @@ public interface GuPiaoService {
 	List<HolidayDo> getHolidayList();
 	
 	String timeInterval(String number);
+	
+	HistoryPriceDo getLastZhichengwei(String number);
 }

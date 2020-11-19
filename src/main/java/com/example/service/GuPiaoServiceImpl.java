@@ -3,8 +3,11 @@ package com.example.service;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -15,6 +18,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson.JSON;
 import com.example.ai.MockDeal;
 import com.example.mapper.GuPiaoMapper;
 import com.example.mapper.HistoryStockMapper;
@@ -30,13 +34,11 @@ import com.example.model.HistoryPriceDo;
 import com.example.model.HistoryStockDo;
 import com.example.model.HolidayDo;
 import com.example.model.RealTimeDo;
-import com.example.model.RobotAccountDo;
-import com.example.model.RobotSetDo;
 import com.example.model.StockDo;
 import com.example.model.SubscriptionDo;
-import com.example.model.TradingRecordDo;
 import com.example.uitls.DateUtils;
-import com.example.uitls.ReadUrl;
+import com.example.uitls.ReadApiUrl;
+import com.example.uitls.RedisKeyUtil;
 import com.example.uitls.RedisUtil;
 
 @Service
@@ -77,6 +79,9 @@ public class GuPiaoServiceImpl implements GuPiaoService, InitializingBean {
 	@Resource
 	private RedisUtil redisUtil;
 	
+	@Autowired
+	private ReadApiUrl readApiUrl;
+	
 
 
 	private void updateHistoryStockByDB(List<HistoryStockDo> list,Integer type,String remark) {
@@ -111,7 +116,7 @@ public class GuPiaoServiceImpl implements GuPiaoService, InitializingBean {
 	
 	@Override
 	public void updateHistoryStock(String number) {
-		List<HistoryPriceDo> list = ReadUrl.readUrl(number, 60);
+		List<HistoryPriceDo> list = readApiUrl.readHistoryApiUrl(number, 60);
 		if (list == null || list.isEmpty()) {
 			logger.warn("没有获取到数据");
 			return;
@@ -212,62 +217,45 @@ public class GuPiaoServiceImpl implements GuPiaoService, InitializingBean {
 	@Override
 	public HistoryPriceDo getLastZhichengwei(String number) {
 		HistoryPriceDo last=new HistoryPriceDo();
-		List<HistoryStockDo>priceList=mockDeal.getBoduan(number);
-		if(priceList.size()<=2) {
+		String key=RedisKeyUtil.getLastHistoryPrice(number, DateUtils.getToday());
+		if(redisUtil.hasKey(key)) {
+			last=JSON.parseObject((String)redisUtil.get(key), HistoryPriceDo.class);
+			if(last!=null) {
+				return last;
+			}
+		}
+		
+		List<HistoryStockDo>priceList=getLastHistoryStock(number,1);
+		if(priceList.size()<1) {
 			return null; 
 		}
-		int i=priceList.size()-2;
-		while(last.getMa20() == null && i>0){
-			HistoryStockDo lastPrice=priceList.get(i);
-			HistoryStockDo nowPrice=priceList.get(priceList.size()-1);
-			long days=DateUtils.getDefDays(DateUtils.getDateForYYYYMMDDHHMM_NUMBER(lastPrice.getHistoryAll()),DateUtils.getDateForYYYYMMDDHHMM_NUMBER(nowPrice.getHistoryAll()),getHolidayList());
-			if(days<5) {
-				i--;
-				continue;
-			}
-			
-			List<HistoryStockDo> list = mockDeal.cutList(number, lastPrice.getHistoryAll(), nowPrice.getHistoryAll());
-			BigDecimal max=new BigDecimal(0.0);
-			BigDecimal min=new BigDecimal(100000.0);
-			BigDecimal avg=new BigDecimal(0.0);
-			int count=0;
-			for (HistoryStockDo price : list) {
-				count++;
-				avg=avg.add(price.getShoupanjia());
-				if(price.getHeight().compareTo(max)>-1) {
-					max=price.getHeight();
-				}
-				if(price.getLow().compareTo(min)< 1) {
-					min=price.getLow();
-				}
-				
-			}
-			avg = avg.divide(new BigDecimal(count),2, BigDecimal.ROUND_UP);
-			max=max.setScale(2);
-			min=min.setScale(2);
-			last.setZhichengwei(min);
-			last.setYaliwei(max);
-			last.setMa20(avg);
-			last.setNumber(number);
-			last.setName((String)redisUtil.get(number));
-			return last;
+		HistoryStockDo price=priceList.get(0);
+		last.setZhichengwei(price.getBoxMin());
+		last.setYaliwei(price.getBoxMax());
+		last.setMa20(price.getBoxAvg());
+		last.setNumber(number);
+		last.setName((String)redisUtil.get(RedisKeyUtil.getStockName(number)));
+		if(price.getType()==1) {
+			last.setUp(true);
 		}
+		logger.info("获取上一个趋势："+JSON.toJSONString(price));
+		redisUtil.set(key, JSON.toJSONString(price),86400L);
+		
 		return last;
 	}
 	
 	@Override
-	public String timeInterval(String number) {
-		List<HistoryStockDo>priceList=mockDeal.getBoduan(number);
-		if(priceList.size()<2) {
-			System.out.println(number+" 波段长度少于2");
-			return "";
+	public void timeInterval(String number) {
+		List<HistoryStockDo> stortList=getBoduanList(number);
+		if(stortList.size()<2) {
+			return;
 		}
 		String returnStr="GS======测试波段区间分隔=========\n";
 		returnStr=returnStr+"股票编码："+number+" \n";
-		returnStr=returnStr+"股票名称："+(String)redisUtil.get(number)+" \n";
-		for(int i=1;i<priceList.size();i++) {
-			HistoryStockDo lastPrice=priceList.get(i-1);
-			HistoryStockDo nowPrice=priceList.get(i);
+		returnStr=returnStr+"股票名称："+(String)redisUtil.get(RedisKeyUtil.getStockName(number))+" \n";
+		for(int i=1;i<stortList.size();i++) {
+			HistoryStockDo lastPrice=stortList.get(i-1);
+			HistoryStockDo nowPrice=stortList.get(i);
 			BigDecimal subtract=nowPrice.getShoupanjia().subtract(lastPrice.getShoupanjia());
 			long days=DateUtils.getDefDays(DateUtils.getDateForYYYYMMDDHHMM_NUMBER(lastPrice.getHistoryAll()),DateUtils.getDateForYYYYMMDDHHMM_NUMBER(nowPrice.getHistoryAll()),getHolidayList());
 			int type=2;
@@ -325,7 +313,103 @@ public class GuPiaoServiceImpl implements GuPiaoService, InitializingBean {
 			returnStr=returnStr+context;
 			updateHistoryStockByDB(list,type,context);
 		}
-		return returnStr;
+	}
+
+
+	private List<HistoryStockDo> getBoduanList(String number) {
+		List<HistoryStockDo> list=new ArrayList<HistoryStockDo>();
+		List<HistoryStockDo> stortList = historyStockMapper.getNumber(number);
+		if(stortList == null) {
+			logger.warn("当前股票没有数据："+number);
+			return null;
+		}
+		if (stortList.size()<100) {
+			logger.warn("数据量不满100个60分钟线");
+			return null;
+		}
+		int downCount=0;
+		int upCount=0;
+		Set<String> date=new HashSet<String>();
+		BigDecimal max=new BigDecimal(0.0).setScale(3);
+		BigDecimal min=new BigDecimal(0.0).setScale(3);
+		HistoryStockDo lastPrice=null;
+		for (HistoryStockDo price : stortList) {
+			//初始化
+			if(max.compareTo(new BigDecimal(0.0)) < 1 || min.compareTo(new BigDecimal(0.0)) < 1) {
+				max=price.getHeight();
+				min=price.getLow();
+			}
+			if(lastPrice ==null) {
+				lastPrice=price;
+			}
+			
+			if(price.getHeight().compareTo(max)>= 1) {
+				max=price.getHeight();
+			}
+			if(price.getLow().compareTo(min)<= -1) {
+				min=price.getLow();
+			}
+			//收盘价在20均线之上属于强势
+			if(price.getShoupanjia().compareTo(price.getMa20Hour())>= 0 ) {
+				upCount++;
+				downCount=0;
+				min=price.getMa20Hour();
+			}
+			//收盘价在20均线之下属于弱势
+			if(price.getShoupanjia().compareTo(price.getMa20Hour())<= -1) {
+				downCount++;
+				upCount=0;
+				max=price.getMa20Hour();
+			}
+			//优化买入卖出位
+			BigDecimal goodSell=max.multiply(new BigDecimal(0.85));
+			BigDecimal goodBuy=min.multiply(new BigDecimal(1.015));
+			BigDecimal avgM20=price.getMa20Hour().multiply(new BigDecimal(1.015));
+			goodSell=goodSell.setScale(3, BigDecimal.ROUND_UP);
+			goodBuy=goodBuy.setScale(3, BigDecimal.ROUND_UP);
+			avgM20=avgM20.setScale(3, BigDecimal.ROUND_UP);
+			//买入点且最低价出现在MA20均值上
+			if(upCount==1 && price.getHeight().compareTo(avgM20)< 1) {
+				String key=price.getHistoryAll();
+				if(!date.contains(key)) {
+					list.add(price);
+					date.add(key);
+				}
+			}
+			
+			//卖出点且最低价出现在MA20均值上
+			if(downCount==1 ) {
+				String key=price.getHistoryAll();
+				if(!date.contains(key)) {
+					list.add(price);
+					date.add(key);
+				}
+			}
+			lastPrice=price;
+		}
+		String key=lastPrice.getHistoryAll();
+		if(!date.contains(key)) {
+			list.add(lastPrice);
+			date.add(key);
+		}
+		return list;
+	}
+
+
+	@Override
+	public List<HistoryStockDo> getLastHistoryStock(String number, Integer size) {
+		List<HistoryStockDo> rsList=new  ArrayList<HistoryStockDo>();
+		List<HistoryStockDo> list=historyStockMapper.getNumber(number);
+		Collections.reverse(list);
+		String temp="";
+		for(HistoryStockDo stock:list) {
+			if(!StringUtils.equalsAnyIgnoreCase(temp, stock.getRemark())&& rsList.size()<size) {
+				temp=stock.getRemark();
+				rsList.add(stock);
+			}
+		}
+		Collections.reverse(rsList);
+		return rsList;
 	}
 
 	

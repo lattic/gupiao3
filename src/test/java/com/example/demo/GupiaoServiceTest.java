@@ -1,10 +1,7 @@
 package com.example.demo;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import javax.annotation.Resource;
 
@@ -12,8 +9,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.alibaba.fastjson.JSON;
@@ -22,14 +17,14 @@ import com.example.mapper.HistoryStockMapper;
 import com.example.mapper.RobotAccountMapper;
 import com.example.mapper.RobotSetMapper;
 import com.example.mapper.TradingRecordMapper;
-import com.example.model.HistoryPriceDo;
 import com.example.model.HistoryStockDo;
 import com.example.model.RobotAccountDo;
 import com.example.model.RobotSetDo;
 import com.example.model.TradingRecordDo;
 import com.example.service.GuPiaoService;
+import com.example.service.task.DataTask;
 import com.example.service.task.MonitorTask;
-import com.example.uitls.DateUtils;
+import com.example.uitls.ReadApiUrl;
 import com.example.uitls.RedisUtil;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -49,16 +44,28 @@ public class GupiaoServiceTest {
 	private HistoryStockMapper historyStockMapper;
 	@Autowired
 	private GuPiaoService guPiaoService;
-	@Autowired
+	
 	private MockDeal mockDeal;
 
 	@Resource
 	private RedisUtil redisUtil;
-
+	@Autowired
+	private ReadApiUrl readApiUrl;
+	
+	@Autowired
+	private DataTask  dataTask;
+	
+	
+	private String number="sh600305";
+	//@Test
+	public void readUrl() {
+		readApiUrl.readHistoryApiUrl(number, 60);
+	}
+	
 	
 	@Test
-	public void mock() {
-		System.out.println(guPiaoService.timeInterval("sz002202"));
+	public void mock() throws Exception {
+		guPiaoService.getLastZhichengwei(number);
 	}
 	
 	

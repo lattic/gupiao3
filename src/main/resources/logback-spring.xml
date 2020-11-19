@@ -43,6 +43,22 @@
 			<totalSizeCap>20GB</totalSizeCap>
 		</rollingPolicy>
 	</appender>
+	<appender name="READ_API"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_PATH}/api.log</file>
+		<encoder>
+			<pattern>${FILE_LOG_PATTERN}</pattern>
+		</encoder>
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_PATH}/api.%d{yyyy-MM-dd}.%i.log
+			</fileNamePattern>
+			<maxHistory>7</maxHistory>
+			<maxFileSize>50MB</maxFileSize>
+			<totalSizeCap>20GB</totalSizeCap>
+		</rollingPolicy>
+	</appender>
+	
 	<appender name="DINGTALK_LOG"
 		class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<file>${LOG_PATH}/dingtalk.log</file>
@@ -75,6 +91,21 @@
 		</rollingPolicy>
 	</appender>
 
+	<appender name="TASK_LOG"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_PATH}/task.log</file>
+		<encoder>
+			<pattern>${FILE_LOG_PATTERN}</pattern>
+		</encoder>
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_PATH}/task.%d{yyyy-MM-dd}.%i.log
+			</fileNamePattern>
+			<maxHistory>7</maxHistory>
+			<maxFileSize>50MB</maxFileSize>
+			<totalSizeCap>20GB</totalSizeCap>
+		</rollingPolicy>
+	</appender>
 
 	<appender name="CONSOLE"
 		class="ch.qos.logback.core.ConsoleAppender">
@@ -83,6 +114,16 @@
 			<charset>utf8</charset>
 		</encoder>
 	</appender>
+
+
+
+	<logger name="task_log" level="INFO" additivity="false">
+		<appender-ref ref="TASK_LOG" />
+	</logger>
+	
+	<logger name="api_log" level="INFO" additivity="false">
+		<appender-ref ref="READ_API" />
+	</logger>
 
 	<logger name="mock_log" level="INFO" additivity="false">
 		<appender-ref ref="MOCK_LOG" />

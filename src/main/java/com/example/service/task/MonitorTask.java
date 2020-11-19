@@ -36,7 +36,7 @@ import com.example.uitls.ReadUrl;
 import com.example.uitls.RedisUtil;
 
 @Service
-public class MonitorTask implements InitializingBean {
+public class MonitorTask  {
 	private static Logger logger = LoggerFactory.getLogger("mock_log");
 	ThreadPoolExecutor  pool = new ThreadPoolExecutor(20, 100, 1,TimeUnit.SECONDS,
 			new LinkedBlockingDeque<Runnable>(1000), 
@@ -60,29 +60,10 @@ public class MonitorTask implements InitializingBean {
 	private void followTask1() {
 		followTask();
 	}
-	@Scheduled(cron = "0 30 10 * * *")
-	private void followTask2() {
-		followTask();
-	}
-	@Scheduled(cron = "0 30 11 * * *")
-	private void followTask3() {
-		followTask();
-	}
-	@Scheduled(cron = "0 0 14 * * *")
-	private void followTask4() {
-		followTask();
-	}
-	 
-	@Scheduled(cron = "0 0 15 * * *")
-	private void followTask5() {
-		 followTask();
-	}
+	
 	private void followTask() {
-		if(stockMap == null ||stockMap.isEmpty()) {
-			init();
-		}
 		
-		if(!DateUtils.traceTime()) {
+		if(!DateUtils.traceTime(guPiaoService.getHolidayList())) {
 			System.out.println("还没开盘");
 			return ;
 		}
@@ -102,30 +83,8 @@ public class MonitorTask implements InitializingBean {
 		});
 	}
 	
-	@Scheduled(cron = "0 0 12 * * *")
-	private void updateAllGuPiao() {
-		pool.execute(new Runnable() {
-			@Override
-			public void run() {
-				getAllGuPiao();
-			}
-		});
-	}
 	
-	// 从数据库获取股票池初始化map
-	private int init() {
-		List<StockDo> stockList = guPiaoService.getAllStock();
-		stockList.forEach(stock->{
-			if(StringUtils.containsIgnoreCase(stock.getName(), "ST") || StringUtils.containsIgnoreCase(stock.getName(), "债") ) {
-				//System.out.println(stock.getName());
-			}else {
-				redisUtil.set(stock.getNumber(), stock.getName());
-				stockMap.put(stock.getNumber(), stock);
-			}
-        });
-		
-		return stockList.size();
-	}
+	
 		
 	
 	
@@ -215,71 +174,13 @@ public class MonitorTask implements InitializingBean {
 	}
 	
 	
-	//更新股票池
-	private void  getAllGuPiao() {
-		System.out.println(new Date()+" ==>开始更新股票");
-		for(int i=0;i<=99999;i++) {
-			GuPiao date=ReadUrl.readUrl(i, "sz0",false);
-			if(date !=null) {
-				GuPiaoDo model=new GuPiaoDo();
-				BeanUtils.copyProperties(date, model);
-				//System.out.println(new Date()+" ==>"+model.getNumber()+" "+model.getName());
-				guPiaoService.updateStock(model.getNumber(),model.getName(), 2) ;
-				StockDo stock=stockMap.get(model.getNumber());
-		    	if(stock != null) {
-		    		stockMap.put(model.getNumber(), stock);
-		    	}
-			}
-			date=ReadUrl.readUrl(i, "sz3",false);
-			if(date !=null) {
-				GuPiaoDo model=new GuPiaoDo();
-				BeanUtils.copyProperties(date, model);
-				//System.out.println(new Date()+" ==>"+model.getNumber()+" "+model.getName());
-				guPiaoService.updateStock(model.getNumber(),model.getName(), 3) ;
-				StockDo stock=stockMap.get(model.getNumber());
-		    	if(stock != null) {
-		    		stockMap.put(model.getNumber(), stock);
-		    	}
-			}
-			date=ReadUrl.readUrl(i, "sh6",false);
-			if(date !=null) {
-				GuPiaoDo model=new GuPiaoDo();
-				BeanUtils.copyProperties(date, model);
-				//System.out.println(new Date()+" ==>"+model.getNumber()+" "+model.getName());
-				guPiaoService.updateStock(model.getNumber(),model.getName(), 1) ;
-				StockDo stock=stockMap.get(model.getNumber());
-		    	if(stock != null) {
-		    		stockMap.put(model.getNumber(), stock);
-		    	}
-			}
-		}
-		
-	}
 	
-	@Scheduled(cron = "0 1 15 * * *")
-	private void  updateHistory() {
-		//获取所有股票的历史60分钟数据
-		List<StockDo> stockList = guPiaoService.getAllStock();
-		stockList.forEach(stock->{
-			guPiaoService.updateHistoryStock(stock.getNumber());
-			guPiaoService.timeInterval(stock.getNumber());
-        });
-	}
+	
 	
 	
 	
 
 	
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		Date now=new Date();
-    	SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		String robotbuy = MessageFormat.format("【同步股票池】"+dateformat.format(now)
-											   + "\n 初始化股票池数量："
-											   + init(),new Object[] {});
-        DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_TEST_SECRET, robotbuy, null, false);
-       
-	}
 	
 	
 }

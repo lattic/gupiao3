@@ -27,11 +27,13 @@ import com.example.ai.MockDeal;
 import com.example.demo.GuPiao;
 import com.example.model.GuPiaoDo;
 import com.example.model.HistoryPriceDo;
+import com.example.model.HistoryStockDo;
 import com.example.model.SubscriptionDo;
 import com.example.service.GuPiaoService;
 import com.example.uitls.DateUtils;
 import com.example.uitls.DingTalkRobotHTTPUtil;
 import com.example.uitls.ReadUrl;
+import com.example.uitls.RedisKeyUtil;
 import com.example.uitls.RedisUtil;
 
 @Service
@@ -45,22 +47,14 @@ public class MonitorRiskTask {
 	@Autowired
 	private GuPiaoService guPiaoService;
 	
-	//目前是否弱势
-	private static ConcurrentHashMap<String, Boolean> lossMap=new ConcurrentHashMap<String, Boolean>();
-	//AI操盘通知   key—— yyyymmdd_number
-	private static ConcurrentHashMap<String, Boolean> mockAiMap=new ConcurrentHashMap<String, Boolean>();
 	
 	@Resource
 	private RedisUtil redisUtil;
 	
 	
-	
-	@Autowired
-	private MockDeal mockDeal;
-	
 	@Scheduled(cron = "0/30 * * * * *")
 	private void  monitorAll() throws Exception {
-		if(!DateUtils.traceTime()) {
+		if(!DateUtils.traceTime(guPiaoService.getHolidayList())) {
 			System.out.println("还没开盘");
 			return ;
 		}
@@ -80,27 +74,6 @@ public class MonitorRiskTask {
 			public void run() {
 				try {
 					listenRealTime(number,appSecret);
-					SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd");
-					String key=dateformat.format(new Date())+"_"+number;
-					Boolean isNotifyByMock=mockAiMap.get(key);
-					//通知开关
-					if(isNotifyByMock == null || isNotifyByMock) {
-						isNotifyByMock=true;
-					}
-					
-					if(isNotifyByMock) {
-						String msg=guPiaoService.timeInterval(number);
-						DingTalkRobotHTTPUtil.sendMsg(appSecret, msg, null, false);
-//						Calendar calendar = Calendar.getInstance();  
-//						calendar.add(Calendar.MONTH, -1);
-//						if(StringUtils.isBlank(beginTime)) {
-//							mockDeal.mockDeal(number, dateformat.format(calendar.getTime()),appSecret,true);
-//						}else {
-//							mockDeal.mockDeal(number, beginTime,appSecret,true);
-//						}
-						isNotifyByMock=false;
-					}
-					mockAiMap.put(key,isNotifyByMock);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -108,15 +81,17 @@ public class MonitorRiskTask {
 		});
 	}
 
+	private void setRealTimeStatus(String number,Boolean isNotify) {
+		redisUtil.set(RedisKeyUtil.getRealTimeStatus(number), isNotify,86500L);
+	}
+	private Boolean getRealTimeStatus(String number) {
+		return (Boolean)redisUtil.get(RedisKeyUtil.getRealTimeStatus(number));
+	}
 	private void setNotify(String number,Boolean isNotify) {
-		SimpleDateFormat dateformat = new SimpleDateFormat("yyyyMMdd");
-		String key=dateformat.format(new Date())+"_"+number;
-		redisUtil.set(key, isNotify,5000L);
+		redisUtil.set(RedisKeyUtil.getRealTimeNotify(number), isNotify,600L);
 	}
 	private Boolean getNotify(String number) {
-		SimpleDateFormat dateformat = new SimpleDateFormat("yyyyMMdd");
-		String key=dateformat.format(new Date())+"_"+number;
-		return (Boolean)redisUtil.get(key);
+		return (Boolean)redisUtil.get(RedisKeyUtil.getRealTimeNotify(number));
 	}
 
 	private void listenRealTime(final String number,final String appSecret) throws Exception {
@@ -133,8 +108,8 @@ public class MonitorRiskTask {
 			
 			//获取走势
 			HistoryPriceDo riskPrice=guPiaoService.getLastZhichengwei(number);
-			Boolean status=lossMap.get(number);
-			Boolean isNotify=getNotify(number);
+			Boolean status= getRealTimeStatus(number);
+			Boolean isNotify = getNotify(number);
 			//通知开关
 			if(isNotify == null) {
 				isNotify=true;
@@ -173,7 +148,7 @@ public class MonitorRiskTask {
 					if(isNotify) {
 						DingTalkRobotHTTPUtil.sendMsg(appSecret, content, null, false);
 					}
-					lossMap.put(number,true);
+					setRealTimeStatus(number,true);
 					return;
 				}
 				
@@ -190,7 +165,7 @@ public class MonitorRiskTask {
 						DingTalkRobotHTTPUtil.sendMsg(appSecret, content, null, false);
 						setNotify(number,false);
 					}
-					lossMap.put(number,true);
+					setRealTimeStatus(number,true);
 				}
 			}
 			
@@ -208,7 +183,7 @@ public class MonitorRiskTask {
 			        		        		 "目前属于上升趋势"});
 					logger.info(content);
 					DingTalkRobotHTTPUtil.sendMsg(appSecret, content, null, false);
-					lossMap.put(number,false);
+					setRealTimeStatus(number,false);
 					return;
 				}
 				if(status) {
@@ -224,7 +199,7 @@ public class MonitorRiskTask {
 						DingTalkRobotHTTPUtil.sendMsg(appSecret, content, null, false);
 						setNotify(number,false);
 					}
-					lossMap.put(number,false);
+					setRealTimeStatus(number,false);
 				}
 			}
 		}

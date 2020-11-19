@@ -41,6 +41,7 @@
 		order by history_all 
 	</select>
 	
+	
 	<select id="getByTime" parameterType="historyStockDo" resultMap="historyStockDo">
 		SELECT
 		<include refid="All_Column" />

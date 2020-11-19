@@ -17,7 +17,13 @@ public class DateUtils {
 	private static final SimpleDateFormat DF_YYYYMMDD = new SimpleDateFormat("yyyyMMdd");// 设置日期格式
 	private static final SimpleDateFormat DF_YYYYMMDDHHmm = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");// 设置日期格式
 	private static final SimpleDateFormat DF_YYYYMMDDHHMM_NUMBER = new SimpleDateFormat("yyyyMMddHHmm");// 设置日期格式
-	public static boolean traceTime() {
+	
+	public static String getToday() {
+		return DF_YYYYMMDD.format(new Date());
+	}
+	
+	
+	public static boolean traceTime(List<HolidayDo> list) {
 		SimpleDateFormat df = new SimpleDateFormat("HH:mm");// 设置日期格式
 		Date now = null;
 		Date beginTime1 = null;
@@ -31,6 +37,16 @@ public class DateUtils {
 			
 			beginTime2 = df.parse("13:00");
 			endTime2 = df.parse("15:01");
+			
+			Calendar today = Calendar.getInstance();
+			if(today.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY ||  today.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY){
+				return false;
+			}
+			for(HolidayDo holiday:list) {
+				if(isSameDay(today.getTime(),holiday.getHoliday())) {
+					return false;
+				}
+			}
 			
 			if(belongCalendar(now, beginTime1, endTime1)||belongCalendar(now, beginTime2, endTime2)) {
 				return true;

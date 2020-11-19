@@ -2,6 +2,8 @@ package com.example.mapper;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.example.model.HistoryStockDo;
 
 /**
@@ -16,7 +18,7 @@ public interface HistoryStockMapper {
 	List<HistoryStockDo> getAll();
 	
 	List<HistoryStockDo> getNumber(String number);
-
+	
 	int insert(HistoryStockDo obj);
 
 	int delete(Long id);

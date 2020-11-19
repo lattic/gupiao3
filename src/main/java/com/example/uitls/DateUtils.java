@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.alibaba.fastjson.JSON;
 import com.example.model.HolidayDo;
 
 public class DateUtils {
@@ -120,6 +121,9 @@ public class DateUtils {
 			}
 			return temp-day;
 		} catch (ParseException e) {
+			System.out.println(JSON.toJSONString(beginTime));
+			System.out.println(JSON.toJSONString(endTime));
+			System.out.println(JSON.toJSONString(list));
 			e.printStackTrace();
 		}
 		return 0L;

@@ -255,6 +255,8 @@ public class MonitorTask implements InitializingBean {
 		}
 		
 	}
+	
+	@Scheduled(cron = "0 1 15 * * *")
 	private void  updateHistory() {
 		//获取所有股票的历史60分钟数据
 		List<StockDo> stockList = guPiaoService.getAllStock();
@@ -276,12 +278,6 @@ public class MonitorTask implements InitializingBean {
 											   + "\n 初始化股票池数量："
 											   + init(),new Object[] {});
         DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_TEST_SECRET, robotbuy, null, false);
-        pool.execute(new Runnable() {
-			@Override
-			public void run() {
-				 updateHistory();
-			}
-		});
        
 	}
 	

@@ -213,11 +213,14 @@ public class GuPiaoServiceImpl implements GuPiaoService, InitializingBean {
 	public HistoryPriceDo getLastZhichengwei(String number) {
 		HistoryPriceDo last=new HistoryPriceDo();
 		List<HistoryStockDo>priceList=mockDeal.getBoduan(number);
+		if(priceList.size()<=2) {
+			return null; 
+		}
 		int i=priceList.size()-2;
 		while(last.getMa20() == null && i>0){
 			HistoryStockDo lastPrice=priceList.get(i);
 			HistoryStockDo nowPrice=priceList.get(priceList.size()-1);
-			long days=DateUtils.getDefDays(DateUtils.getDateForYYYYMMDD(lastPrice.getHistoryDay()),DateUtils.getDateForYYYYMMDD(nowPrice.getHistoryDay()),getHolidayList());
+			long days=DateUtils.getDefDays(DateUtils.getDateForYYYYMMDDHHMM_NUMBER(lastPrice.getHistoryAll()),DateUtils.getDateForYYYYMMDDHHMM_NUMBER(nowPrice.getHistoryAll()),getHolidayList());
 			if(days<5) {
 				i--;
 				continue;
@@ -255,6 +258,10 @@ public class GuPiaoServiceImpl implements GuPiaoService, InitializingBean {
 	@Override
 	public String timeInterval(String number) {
 		List<HistoryStockDo>priceList=mockDeal.getBoduan(number);
+		if(priceList.size()<2) {
+			System.out.println(number+" 波段长度少于2");
+			return "";
+		}
 		String returnStr="GS======测试波段区间分隔=========\n";
 		returnStr=returnStr+"股票编码："+number+" \n";
 		returnStr=returnStr+"股票名称："+(String)redisUtil.get(number)+" \n";
@@ -318,7 +325,6 @@ public class GuPiaoServiceImpl implements GuPiaoService, InitializingBean {
 			returnStr=returnStr+context;
 			updateHistoryStockByDB(list,type,context);
 		}
-		System.out.println(returnStr);
 		return returnStr;
 	}
 

@@ -3,12 +3,10 @@ package com.example.service.task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.example.demo.GuPiao;
 import com.example.model.RealTimeDo;
 import com.example.service.GuPiaoService;
-import com.example.uitls.HttpClientUtil;
 import com.example.uitls.ReadUrl;
 
 public class UpdateRealTimeTask  implements Runnable {

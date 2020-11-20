@@ -52,10 +52,10 @@ public class MonitorRiskTask {
 	private RedisUtil redisUtil;
 	
 	
-	@Scheduled(cron = "0/30 * * * * *")
+	@Scheduled(cron = "0/30 * 9-15 * * MON-FRI")
 	private void  monitorAll() throws Exception {
 		if(!DateUtils.traceTime(guPiaoService.getHolidayList())) {
-			System.out.println("还没开盘");
+			System.out.println("实时监控,还没开盘");
 			return ;
 		}
 
@@ -88,7 +88,7 @@ public class MonitorRiskTask {
 		return (Boolean)redisUtil.get(RedisKeyUtil.getRealTimeStatus(number));
 	}
 	private void setNotify(String number,Boolean isNotify) {
-		redisUtil.set(RedisKeyUtil.getRealTimeNotify(number), isNotify,600L);
+		redisUtil.set(RedisKeyUtil.getRealTimeNotify(number), isNotify,1800L);
 	}
 	private Boolean getNotify(String number) {
 		return (Boolean)redisUtil.get(RedisKeyUtil.getRealTimeNotify(number));
@@ -108,6 +108,10 @@ public class MonitorRiskTask {
 			
 			//获取走势
 			HistoryPriceDo riskPrice=guPiaoService.getLastZhichengwei(number);
+			if(riskPrice == null || riskPrice.getZhichengwei() == null) {
+				System.out.println("找不到最近一次指标："+number);
+				return;
+			}
 			Boolean status= getRealTimeStatus(number);
 			Boolean isNotify = getNotify(number);
 			//通知开关

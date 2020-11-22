@@ -146,7 +146,7 @@ public class DataTask  implements InitializingBean {
 						isNotifyByMock=true;
 					}
 					List<HistoryStockDo> list= guPiaoService.getLastHistoryStock(number,3);
-					String msg="GS========测试个股波段分析=========GS"
+					String msg="GS========超短线策略波段分析(3-5天)=========GS"
 							+ "\n 股票编号："+number
 							+ "\n 股票名称："+(String)redisUtil.get(RedisKeyUtil.getStockName(number))
 							+ "\n";

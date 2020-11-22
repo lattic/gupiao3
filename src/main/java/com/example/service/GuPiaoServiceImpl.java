@@ -220,7 +220,7 @@ public class GuPiaoServiceImpl implements GuPiaoService, InitializingBean {
 		String key=RedisKeyUtil.getLastHistoryPrice(number, DateUtils.getToday());
 		if(redisUtil.hasKey(key)) {
 			last=JSON.parseObject((String)redisUtil.get(key), HistoryPriceDo.class);
-			if(last!=null) {
+			if(last!=null && last.getYaliwei()!=null) {
 				return last;
 			}
 		}
@@ -246,13 +246,22 @@ public class GuPiaoServiceImpl implements GuPiaoService, InitializingBean {
 	
 	@Override
 	public void timeInterval(String number) {
-		List<HistoryStockDo> stortList=getBoduanList(number);
-		if(stortList.size()<2) {
-			return;
-		}
 		String returnStr="GS======测试波段区间分隔=========\n";
 		returnStr=returnStr+"股票编码："+number+" \n";
 		returnStr=returnStr+"股票名称："+(String)redisUtil.get(RedisKeyUtil.getStockName(number))+" \n";
+		
+		List<HistoryStockDo> stortList=getBoduanList(number);
+		if(stortList == null) {
+			returnStr=returnStr+"股票找不到波段，返回空";
+			logger.warn(returnStr);
+			return ;
+		}
+		if(stortList.size()<2) {
+			returnStr=returnStr+"股票波段少于2，返回空";
+			logger.warn(returnStr);
+			return;
+		}
+		
 		for(int i=1;i<stortList.size();i++) {
 			HistoryStockDo lastPrice=stortList.get(i-1);
 			HistoryStockDo nowPrice=stortList.get(i);

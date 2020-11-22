@@ -1,8 +1,6 @@
 package com.example.service.task;
 
 import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -52,9 +50,27 @@ public class DataTask  implements InitializingBean {
 		String robotbuy = MessageFormat.format("【初始化股票池】"
 											   + "\n 初始化股票池数量："
 											   + init(),new Object[] {});
+		logger.info(robotbuy);
         DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_TEST_SECRET, robotbuy, null, false);
-        showBoduan();
+        pool.execute(new Runnable() {
+			
+			@Override
+			public void run() {
+				 updateHistory();
+			}
+		});
+       
 	}
+	
+	// 从数据库获取股票池初始化map
+	private int init() {
+		List<StockDo> stockList = guPiaoService.getAllStock();
+		stockList.forEach(stock->{
+			redisUtil.set(RedisKeyUtil.getStockName(stock.getNumber()), stock.getName());
+        });
+		return stockList.size();
+	}
+	
 	
 	/**
 	 * 所有到的股票池
@@ -98,8 +114,9 @@ public class DataTask  implements InitializingBean {
 		logger.info("开始复盘昨天的数据");
 		List<StockDo> stockList = guPiaoService.getAllStock();
 		stockList.forEach(stock->{
-			String key="fp_"+stock.getNumber()+"_"+DateUtils.getToday();
+			String key=RedisKeyUtil.getRecheckStock(stock.getNumber());
 			if(!redisUtil.hasKey(key)) {
+				logger.info("更新数据--->"+stock.getNumber()+" "+redisUtil.get(RedisKeyUtil.getStockName(stock.getNumber()))+" "+DateUtils.getToday());
 				guPiaoService.updateHistoryStock(stock.getNumber());
 				guPiaoService.timeInterval(stock.getNumber());
 				redisUtil.set(key, true);
@@ -107,17 +124,7 @@ public class DataTask  implements InitializingBean {
         });
 	}
 	
-	// 从数据库获取股票池初始化map
-	private int init() {
-		List<StockDo> stockList = guPiaoService.getAllStock();
-		stockList.forEach(stock->{
-			if(StringUtils.containsIgnoreCase(stock.getName(), "ST") || StringUtils.containsIgnoreCase(stock.getName(), "债") ) {
-			}else {
-				redisUtil.set(RedisKeyUtil.getStockName(stock.getNumber()), stock.getName());
-			}
-        });
-		return stockList.size();
-	}
+	
 	
 	@Scheduled(cron = "0 35 9 * * *")
 	private void showBoduan() {
@@ -138,17 +145,17 @@ public class DataTask  implements InitializingBean {
 					if(isNotifyByMock == null || isNotifyByMock) {
 						isNotifyByMock=true;
 					}
+					List<HistoryStockDo> list= guPiaoService.getLastHistoryStock(number,3);
+					String msg="GS========测试个股波段分析=========GS"
+							+ "\n 股票编号："+number
+							+ "\n 股票名称："+(String)redisUtil.get(RedisKeyUtil.getStockName(number))
+							+ "\n";
+					for(HistoryStockDo stock:list) {
+						msg=msg+stock.getRemark();
+					}
+					logger.info(msg);
 					
 					if(isNotifyByMock) {
-						List<HistoryStockDo> list= guPiaoService.getLastHistoryStock(number,3);
-						String msg="GS========测试个股波段分析=========GS"
-								+ "\n 股票编号："+number
-								+ "\n 股票名称："+(String)redisUtil.get(RedisKeyUtil.getStockName(number))
-								+ "\n";
-						for(HistoryStockDo stock:list) {
-							msg=msg+stock.getRemark();
-						}
-						
 						DingTalkRobotHTTPUtil.sendMsg(appSecret, msg, null, false);
 						isNotifyByMock=false;
 					}

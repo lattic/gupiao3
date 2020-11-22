@@ -1,5 +1,6 @@
 package com.example.service.task;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson.JSON;
 import com.example.ai.MockDeal;
 import com.example.demo.GuPiao;
 import com.example.model.GuPiaoDo;
@@ -52,10 +54,10 @@ public class MonitorRiskTask {
 	private RedisUtil redisUtil;
 	
 	
-	@Scheduled(cron = "0/30 * * * * *")
+	@Scheduled(cron = "0/30 * 9-15 * * MON-FRI")
 	private void  monitorAll() throws Exception {
 		if(!DateUtils.traceTime(guPiaoService.getHolidayList())) {
-			System.out.println("还没开盘");
+			System.out.println("实时监控,还没开盘");
 			return ;
 		}
 
@@ -88,7 +90,7 @@ public class MonitorRiskTask {
 		return (Boolean)redisUtil.get(RedisKeyUtil.getRealTimeStatus(number));
 	}
 	private void setNotify(String number,Boolean isNotify) {
-		redisUtil.set(RedisKeyUtil.getRealTimeNotify(number), isNotify,600L);
+		redisUtil.set(RedisKeyUtil.getRealTimeNotify(number), isNotify,1800L);
 	}
 	private Boolean getNotify(String number) {
 		return (Boolean)redisUtil.get(RedisKeyUtil.getRealTimeNotify(number));
@@ -108,6 +110,10 @@ public class MonitorRiskTask {
 			
 			//获取走势
 			HistoryPriceDo riskPrice=guPiaoService.getLastZhichengwei(number);
+			if(riskPrice == null || riskPrice.getZhichengwei() == null) {
+				System.out.println("找不到最近一次指标："+number);
+				return;
+			}
 			Boolean status= getRealTimeStatus(number);
 			Boolean isNotify = getNotify(number);
 			//通知开关
@@ -125,6 +131,9 @@ public class MonitorRiskTask {
 		        		        		 riskPrice.getMa20().doubleValue(),
 		        		        		 df.format(nowPrice.getDangqianjiage()), 
 		        		        		 "股价已经破位，请及时止损！！"});
+				riskPrice.setZhichengwei(new BigDecimal(nowPrice.getDangqianjiage()).setScale(2));
+				String key=RedisKeyUtil.getLastHistoryPrice(number, DateUtils.getToday());
+				redisUtil.set(key, JSON.toJSONString(riskPrice),86400L);
 				logger.info(content);
 				if(isNotify) {
 					DingTalkRobotHTTPUtil.sendMsg(appSecret, content, null, false);

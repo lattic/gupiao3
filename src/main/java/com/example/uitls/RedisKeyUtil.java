@@ -8,8 +8,13 @@ public class RedisKeyUtil {
 	private final static SimpleDateFormat dateformat = new SimpleDateFormat("yyyyMMdd");
 	
 	public static String getStockName(String number) {
-		return number;
+		return "stock_name_"+number;
 	}
+	
+	//复盘数据
+		public static String getRecheckStock(String number) {
+			return "recheck_stock_"+dateformat.format(new Date())+"_"+number;
+		}
 	
 	//实时通知降噪
 	public static String getRealTimeNotify(String number) {
@@ -20,6 +25,11 @@ public class RedisKeyUtil {
 	public static String getBoduanNotify(String number,String appId) {
 		return "boduan_"+dateformat.format(new Date())+"_"+number+"_"+appId;
 	}
+	
+	//个股波段分析
+		public static String getStockSellNotify(String number,String appId) {
+			return "stock_sell_"+dateformat.format(new Date())+"_"+number+"_"+appId;
+		}
 	
 	//上一个趋势指标
 	public static String getLastHistoryPrice(String number,String today) {

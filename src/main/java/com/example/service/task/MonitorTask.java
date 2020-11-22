@@ -33,6 +33,7 @@ import com.example.service.GuPiaoService;
 import com.example.uitls.DateUtils;
 import com.example.uitls.DingTalkRobotHTTPUtil;
 import com.example.uitls.ReadUrl;
+import com.example.uitls.RedisKeyUtil;
 import com.example.uitls.RedisUtil;
 
 @Service
@@ -101,7 +102,7 @@ public class MonitorTask  {
 		MockLog minprice=new MockLog();
 		String winLog="";
 		String lossLog="";
-		for(StockDo stock : stockMap.values()){
+		for(StockDo stock : guPiaoService.getAllStock()){
             Calendar calendar = Calendar.getInstance();  
 			calendar.add(Calendar.MONTH, -1);
 			calendar.add(Calendar.DATE, -15);
@@ -144,14 +145,23 @@ public class MonitorTask  {
 			
 			//近5天出现买入点,推荐
 			Calendar before = Calendar.getInstance();  
-			before.add(Calendar.DATE, -5);
+			before.add(Calendar.DATE, -3);
 			if(log.getIsBuyin() && log.getLastBuyin()!= null && log.getLastBuyin().after(before.getTime()) ) {
 				if(log.getWinRate().doubleValue()>=3 && log.getWinRate().doubleValue()<=40) {
 					log.setLogs(log.getLogs().replace("测试AI操盘", "AI个股推荐"));
 					for(SubscriptionDo realTime:subscriptionList) {
-						if(StringUtils.equals(realTime.getNumber(), "0")) {
-							//DingTalkRobotHTTPUtil.sendMsg(realTime.getDingtalkId(), log.getLogs(), null, false);
+						String key=RedisKeyUtil.getStockSellNotify(realTime.getNumber(), realTime.getDingtalkId());
+						Boolean isNotifyByMock=(Boolean)redisUtil.get(key);
+						//通知开关
+						if(isNotifyByMock == null || isNotifyByMock) {
+							isNotifyByMock=true;
 						}
+						
+						if(StringUtils.equals(realTime.getNumber(), "0") && isNotifyByMock) {
+							isNotifyByMock=false;
+							DingTalkRobotHTTPUtil.sendMsg(realTime.getDingtalkId(), log.getLogs(), null, false);
+						}
+						redisUtil.set(key,isNotifyByMock,86400L);
 					}
 				}
 			}

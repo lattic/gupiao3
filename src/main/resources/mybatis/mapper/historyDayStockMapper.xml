@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+						"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.example.mapper.HistoryDayStockMapper">
+
+	<resultMap id="historyDayStockDo" type="com.example.model.HistoryDayStockDo">
+		<result column="id" property="id" jdbcType="BIGINT" />
+		<result column="history_day" 	property="historyDay" 	jdbcType="VARCHAR" />
+		<result column="number" property="number" jdbcType="VARCHAR" />
+		<result column="open" property="open" jdbcType="DECIMAL" />
+		<result column="close" property="close" jdbcType="DECIMAL" />
+		<result column="high" property="high" jdbcType="DECIMAL" />
+		<result column="low" property="low" jdbcType="DECIMAL" />
+		<result column="avg" property="avg" jdbcType="DECIMAL" />
+		<result column="ma5_day" property="ma5Day" jdbcType="DECIMAL" />
+		<result column="ma20_day" property="ma20Day" jdbcType="DECIMAL" />
+		<result column="ma200_day" property="ma200Day" jdbcType="DECIMAL" />
+		<result column="type" property="type" jdbcType="INTEGER" />
+		<result column="box_max" property="boxMax" jdbcType="DECIMAL" />
+		<result column="box_min" property="boxMin" jdbcType="DECIMAL" />
+		<result column="box_avg" property="boxAvg" jdbcType="DECIMAL" />
+		<result column="remark" property="remark" jdbcType="VARCHAR" />
+		
+	</resultMap>
+
+	<sql id="All_Column">
+		id,history_day,number,open,close,high,low,avg,ma5_day,ma20_day,ma200_day,type,box_max,box_min,box_avg,remark
+	</sql>
+
+	<select id="getAll" resultMap="historyDayStockDo">
+		SELECT
+		<include refid="All_Column" />
+		FROM history_day_stock
+	</select>
+	
+	<select id="getNumber"  resultMap="historyDayStockDo">
+		SELECT
+		<include refid="All_Column" />
+		FROM history_day_stock
+		where number=#{number}
+		order by history_all 
+	</select>
+	
+	
+	<select id="getByTime" parameterType="historyDayStockDo" resultMap="historyDayStockDo">
+		SELECT
+		<include refid="All_Column" />
+		FROM history_day_stock
+		WHERE 
+			history_day=#{historyDay}
+		AND number = #{number}
+		limit 1
+	</select>
+
+	<update id="updateHistoryStock" parameterType="historyDayStockDo">
+		update history_day_stock set
+			  type=#{type}
+		<if test="boxMax">	, box_max = #{boxMax} </if>
+		<if test="boxMin">	, box_min = #{boxMin} </if>
+		<if test="boxAvg">	, box_avg = #{boxAvg} </if>
+		<if test="remark">	, remark  = #{remark} </if>
+		where id=#{id}
+	</update>
+
+
+
+
+	<insert id="insert" parameterType="historyDayStockDo">
+		INSERT INTO
+		history_day_stock
+		(history_day,number,open,close,high,low,avg,ma5_day,ma20_day,ma200_day,type,box_max,box_min,box_avg,remark)
+		VALUES
+		(#{historyDay},#{number},#{open},#{close},#{high},#{low},#{avg},#{ma5Day},#{ma20Day},#{ma200Day},#{type},#{boxMax},#{boxMin},#{boxAvg},#{remark})
+	</insert>
+
+	<delete id="delete" parameterType="historyDayStockDo">
+		DELETE FROM
+		history_day_stock
+		WHERE
+		id =#{id}
+	</delete>
+
+</mapper>

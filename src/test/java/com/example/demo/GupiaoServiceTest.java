@@ -2,9 +2,11 @@ package com.example.demo;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,19 +15,25 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.alibaba.fastjson.JSON;
 import com.example.ai.MockDeal;
+import com.example.mapper.HistoryDayStockMapper;
 import com.example.mapper.HistoryStockMapper;
 import com.example.mapper.RobotAccountMapper;
 import com.example.mapper.RobotSetMapper;
 import com.example.mapper.TradingRecordMapper;
+import com.example.model.HistoryDayStockDo;
 import com.example.model.HistoryStockDo;
 import com.example.model.RobotAccountDo;
 import com.example.model.RobotSetDo;
+import com.example.model.StockDo;
 import com.example.model.TradingRecordDo;
+import com.example.model.ths.HistoryRsDate;
 import com.example.service.GuPiaoService;
 import com.example.service.task.DataTask;
 import com.example.service.task.MonitorTask;
 import com.example.uitls.ReadApiUrl;
 import com.example.uitls.RedisUtil;
+
+import Ths.JDIBridge;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = { GupiaoApplication.class })
@@ -55,15 +63,99 @@ public class GupiaoServiceTest {
 	@Autowired
 	private DataTask  dataTask;
 	
+	@Autowired
+	private HistoryDayStockMapper historyDayStockMapper;
 	
 	private String number="sh600305";
+	
+	
+	@Test
+	public void TestDay() {
+		int i=0;
+		List<StockDo> list = guPiaoService.getAllStock();
+		for(StockDo stock:list) {
+			i++;
+			String number = stock.getNumber();
+			if(number.equalsIgnoreCase("sh600332")) {
+				System.out.println(i+"/"+list.size());
+			}
+			
+//			if(number.contains("sz")) {
+//				updateDay(number.replace("sz", "")+".SZ"); 
+//			}
+//			if(number.contains("sh")) {
+//				updateDay(number.replace("sh", "")+".SH"); 
+//			}
+		}
+		
+	}
+	
+	
+	public void updateDay(String number) {
+		System.out.println(System.getProperty("java.library.path"));
+		System.load("D:\\API\\bin\\x64\\iFinDJava_x64.dll");
+		JDIBridge.THS_iFinDLogin("wmg027", "644850");
+		String strResulthis = JDIBridge.THS_HistoryQuotes(number,"close,avgPrice,open,low,high","Interval:D,CPS:1,baseDate:1900-01-01,Currency:YSHB,fill:Previous","2010-11-01","2020-11-22");
+		System.out.println("THS_iFinDhis ==> " + strResulthis);
+		HistoryRsDate rs=JSON.parseObject(strResulthis,HistoryRsDate.class);
+		if(rs.getTables().get(0).getTable().getClose() == null) {
+			return ;
+		}
+		
+		List<BigDecimal> closeList =rs.getTables().get(0).getTable().getClose();
+		List<BigDecimal> avgPriceList = rs.getTables().get(0).getTable().getAvgPrice();
+		List<BigDecimal> openList = rs.getTables().get(0).getTable().getOpen();
+		List<BigDecimal> lowList = rs.getTables().get(0).getTable().getLow();
+		List<BigDecimal> highList = rs.getTables().get(0).getTable().getHigh();
+		List<String> times=rs.getTables().get(0).getTime();
+		int total=times.size();
+		for(int i=0;i<total;i++) {
+			String time = times.get(i).replace("-", "");
+			BigDecimal avg=avgPriceList.get(i).setScale(2,BigDecimal.ROUND_HALF_UP);
+			BigDecimal open=openList.get(i).setScale(2,BigDecimal.ROUND_HALF_UP);
+			BigDecimal close=closeList.get(i).setScale(2,BigDecimal.ROUND_HALF_UP);
+			BigDecimal low=lowList.get(i).setScale(2,BigDecimal.ROUND_HALF_UP);
+			BigDecimal high=highList.get(i).setScale(2,BigDecimal.ROUND_HALF_UP);
+			
+			HistoryDayStockDo obj =new HistoryDayStockDo();
+			if(number.contains(".SZ")) {
+				obj.setNumber("sz"+number.replace(".SZ", "")); 
+			}
+			if(number.contains(".SH")) {
+				obj.setNumber("sh"+number.replace(".SH", "")); 
+			}
+			obj.setOpen(open);
+			obj.setClose(close);
+			obj.setAvg(avg);
+			obj.setHigh(high);
+			obj.setLow(low);
+			obj.setHistoryDay(time);
+			if(historyDayStockMapper.getByTime(obj) == null) {
+				historyDayStockMapper.insert(obj);
+			}
+			
+		}
+		JDIBridge.THS_iFinDLogout();
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	//@Test
 	public void readUrl() {
 		readApiUrl.readHistoryApiUrl(number, 60);
 	}
 	
 	
-	@Test
+	//@Test
 	public void mock() throws Exception {
 		guPiaoService.getLastZhichengwei(number);
 	}

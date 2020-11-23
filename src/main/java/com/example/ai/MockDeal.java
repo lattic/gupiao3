@@ -29,7 +29,7 @@ import com.example.model.HistoryStockDo;
 import com.example.model.MockLog;
 import com.example.uitls.DateUtils;
 import com.example.uitls.DingTalkRobotHTTPUtil;
-import com.example.uitls.ReadUrl;
+import com.example.uitls.ReadApiUrl;
 import com.example.uitls.RedisUtil;
 
 @Service
@@ -40,7 +40,8 @@ public class MockDeal {
 	private static ConcurrentHashMap<String, BigDecimal> minPriceMap = new ConcurrentHashMap<String, BigDecimal>();
 	@Resource
 	private RedisUtil redisUtil;
-	
+	@Autowired
+	private ReadApiUrl apiUrl;
 	@Autowired
 	private HistoryStockMapper historyStockMapper;
 	
@@ -57,14 +58,14 @@ public class MockDeal {
 	
 	private  List<HistoryPriceDo> getHistoryDate(String number){
 		try {
-			List<HistoryPriceDo> list = ReadUrl.readUrl(number, 60);
+			List<HistoryPriceDo> list = apiUrl.readHistoryApiUrl(number, 60);
 			if(list == null) {
 				logger.warn("当前股票没有数据："+number);
 				return null;
 			}
 			HistoryPriceDo nowPrice = list.get(list.size()-1);
 			if(!DateUtils.isSameDay(nowPrice.getDateime())) {
-				GuPiao date=ReadUrl.readUrl(nowPrice.getNumber(),false);
+				GuPiao date=apiUrl.readUrl(nowPrice.getNumber(),false);
 				if(date !=null) {
 					GuPiaoDo nowRealTimePrice=new GuPiaoDo();
 					BeanUtils.copyProperties(date, nowRealTimePrice);

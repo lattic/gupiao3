@@ -139,4 +139,33 @@ public class ReadApiUrl {
 		}
 		return null;
 	}
+
+	public GuPiao readUrl(String number, boolean isCache) {
+		if(!isCache) {
+			return readRealTimeUrl( number);
+		}
+		
+		String key = RedisKeyUtil.getRealTime(number);
+		if(redisUtil.hasKey(key)) {
+			return (GuPiao)redisUtil.get(key);
+		}
+		GuPiao gp=readRealTimeUrl(number);
+		redisUtil.set(key, gp, 60L);
+		return gp;
+	}
+	
+	public GuPiao readUrl(int i, String title, boolean isCache) {
+		String number = String.format("%05d", i);
+		if(!isCache) {
+			return readRealTimeUrl( title + number);
+		}
+		
+		String key = RedisKeyUtil.getRealTime(number);
+		if(redisUtil.hasKey(key)) {
+			return (GuPiao)redisUtil.get(key);
+		}
+		GuPiao gp=readRealTimeUrl( title + number);
+		redisUtil.set(key, gp, 60L);
+		return gp;
+	}
 }

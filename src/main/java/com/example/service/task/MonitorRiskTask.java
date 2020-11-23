@@ -34,7 +34,7 @@ import com.example.model.SubscriptionDo;
 import com.example.service.GuPiaoService;
 import com.example.uitls.DateUtils;
 import com.example.uitls.DingTalkRobotHTTPUtil;
-import com.example.uitls.ReadUrl;
+import com.example.uitls.ReadApiUrl;
 import com.example.uitls.RedisKeyUtil;
 import com.example.uitls.RedisUtil;
 
@@ -48,7 +48,8 @@ public class MonitorRiskTask {
 
 	@Autowired
 	private GuPiaoService guPiaoService;
-	
+	@Autowired
+	private ReadApiUrl apiUrl;
 	
 	@Resource
 	private RedisUtil redisUtil;
@@ -100,7 +101,7 @@ public class MonitorRiskTask {
 		DecimalFormat    df   = new DecimalFormat("######0.00");  
 		Date now=new Date();
     	SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    	GuPiao date=ReadUrl.readUrl(number,false);
+    	GuPiao date=apiUrl.readUrl(number,false);
 		if(date !=null) {
 			GuPiaoDo nowPrice=new GuPiaoDo();
 			BeanUtils.copyProperties(date, nowPrice);

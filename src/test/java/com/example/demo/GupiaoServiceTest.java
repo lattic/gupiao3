@@ -52,7 +52,7 @@ public class GupiaoServiceTest {
 	private HistoryStockMapper historyStockMapper;
 	@Autowired
 	private GuPiaoService guPiaoService;
-	
+	@Autowired
 	private MockDeal mockDeal;
 
 	@Resource
@@ -68,8 +68,12 @@ public class GupiaoServiceTest {
 	
 	private String number="sh600305";
 	
-	
 	@Test
+	public void MockAi() {
+		mockDeal.mockDeal("sz002202", "2020-11-01", appSecret, true);
+	}
+	
+	//@Test
 	public void TestDay() {
 		int i=0;
 		List<StockDo> list = guPiaoService.getAllStock();

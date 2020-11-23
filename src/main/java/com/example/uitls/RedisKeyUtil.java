@@ -6,6 +6,7 @@ import java.util.Date;
 public class RedisKeyUtil {
 
 	private final static SimpleDateFormat dateformat = new SimpleDateFormat("yyyyMMdd");
+	private final static SimpleDateFormat dateformat_min = new SimpleDateFormat("yyyyMMddHHmm");
 	
 	public static String getStockName(String number) {
 		return "stock_name_"+number;
@@ -39,5 +40,9 @@ public class RedisKeyUtil {
 	//实时状态判断
 	public static String getRealTimeStatus(String number) {
 		return "realtime_status_"+dateformat.format(new Date())+"_"+number;
+	}
+
+	public static String getRealTime(String number) {
+		return "realtime_status_"+dateformat_min.format(new Date())+"_"+number;
 	}
 }

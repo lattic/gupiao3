@@ -32,7 +32,6 @@ import com.example.model.SubscriptionDo;
 import com.example.service.GuPiaoService;
 import com.example.uitls.DateUtils;
 import com.example.uitls.DingTalkRobotHTTPUtil;
-import com.example.uitls.ReadUrl;
 import com.example.uitls.RedisKeyUtil;
 import com.example.uitls.RedisUtil;
 
@@ -54,8 +53,6 @@ public class MonitorTask  {
 	@Resource
 	private RedisUtil redisUtil;
 	
-	//股票名称
-	public static ConcurrentHashMap<String, StockDo> stockMap=new ConcurrentHashMap<String, StockDo>();
 	
 	@Scheduled(cron = "0 30 9 * * *")
 	private void followTask1() {
@@ -105,7 +102,6 @@ public class MonitorTask  {
 		for(StockDo stock : guPiaoService.getAllStock()){
             Calendar calendar = Calendar.getInstance();  
 			calendar.add(Calendar.MONTH, -1);
-			calendar.add(Calendar.DATE, -15);
 			SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd");
 			MockLog log=mockDeal.mockDeal(stock.getNumber(), dateformat.format(calendar.getTime()),DingTalkRobotHTTPUtil.APP_TEST_SECRET,false);
 			if(log == null ) {

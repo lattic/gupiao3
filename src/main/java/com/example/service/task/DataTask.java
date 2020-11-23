@@ -26,7 +26,7 @@ import com.example.model.SubscriptionDo;
 import com.example.service.GuPiaoService;
 import com.example.uitls.DateUtils;
 import com.example.uitls.DingTalkRobotHTTPUtil;
-import com.example.uitls.ReadUrl;
+import com.example.uitls.ReadApiUrl;
 import com.example.uitls.RedisKeyUtil;
 import com.example.uitls.RedisUtil;
 
@@ -43,6 +43,8 @@ public class DataTask  implements InitializingBean {
 	private GuPiaoService guPiaoService;
 	@Resource
 	private RedisUtil redisUtil;
+	@Autowired
+	private ReadApiUrl apiUrl;
 	
 	
 	@Override
@@ -83,19 +85,19 @@ public class DataTask  implements InitializingBean {
 			public void run() {
 				logger.info("==>开始更新股票");
 				for(int i=0;i<=99999;i++) {
-					GuPiao date=ReadUrl.readUrl(i, "sz0",false);
+					GuPiao date=apiUrl.readUrl(i, "sz0",false);
 					if(date !=null) {
 						GuPiaoDo model=new GuPiaoDo();
 						BeanUtils.copyProperties(date, model);
 						guPiaoService.updateStock(model.getNumber(),model.getName(), 2) ;
 					}
-					date=ReadUrl.readUrl(i, "sz3",false);
+					date=apiUrl.readUrl(i, "sz3",false);
 					if(date !=null) {
 						GuPiaoDo model=new GuPiaoDo();
 						BeanUtils.copyProperties(date, model);
 						guPiaoService.updateStock(model.getNumber(),model.getName(), 3) ;
 					}
-					date=ReadUrl.readUrl(i, "sh6",false);
+					date=apiUrl.readUrl(i, "sh6",false);
 					if(date !=null) {
 						GuPiaoDo model=new GuPiaoDo();
 						BeanUtils.copyProperties(date, model);

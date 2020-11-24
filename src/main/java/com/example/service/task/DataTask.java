@@ -110,7 +110,7 @@ public class DataTask  implements InitializingBean {
 		});
 	}
 	
-	@Scheduled(cron = "0 10 9 * * *")
+	@Scheduled(cron = "0 0 9 * * *")
 	private void  updateHistory() {
 		//获取所有股票的历史60分钟数据
 		logger.info("开始复盘昨天的数据");

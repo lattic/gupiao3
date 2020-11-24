@@ -162,21 +162,21 @@ public class MonitorRiskTask {
 					return;
 				}
 				
-				if(!status) {
-					String content = MessageFormat.format("GS【卖出信号提示】"+dateformat.format(now)
-			        +"\n------------------------------------ \n股票代码：{0}\n股票名称：{1}\n条件价格:{2}\n当前价格:{3}\n策略规则:{4}", 
-			        		                 new Object[] {date.getNumber(), 
-			        		        		 date.getName(), 
-			        		        		 riskPrice.getMa20().doubleValue(),
-			        		        		 df.format(nowPrice.getDangqianjiage()), 
-			        		        		 "当前股票从强转弱趋势，请及时止盈或止损"});
-					logger.info(content);
-					if(isNotify) {
-						DingTalkRobotHTTPUtil.sendMsg(appSecret, content, null, false);
-						setNotify(number,false);
-					}
-					setRealTimeStatus(number,true);
-				}
+//				if(!status) {
+//					String content = MessageFormat.format("GS【卖出信号提示】"+dateformat.format(now)
+//			        +"\n------------------------------------ \n股票代码：{0}\n股票名称：{1}\n条件价格:{2}\n当前价格:{3}\n策略规则:{4}", 
+//			        		                 new Object[] {date.getNumber(), 
+//			        		        		 date.getName(), 
+//			        		        		 riskPrice.getMa20().doubleValue(),
+//			        		        		 df.format(nowPrice.getDangqianjiage()), 
+//			        		        		 "当前股票从强转弱趋势，请及时止盈或止损"});
+//					logger.info(content);
+//					if(isNotify) {
+//						DingTalkRobotHTTPUtil.sendMsg(appSecret, content, null, false);
+//						setNotify(number,false);
+//					}
+//					setRealTimeStatus(number,true);
+//				}
 			}
 			
 			//强势 当前价格大于20天线

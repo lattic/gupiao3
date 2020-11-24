@@ -46,7 +46,6 @@ public class GupiaoServiceTest {
 	private RobotAccountMapper robotAccountMapper;
 	@Autowired
 	private TradingRecordMapper tradingRecordMapper;
-	// @Autowired
 	private MonitorTask monitorTask;
 	@Autowired
 	private HistoryStockMapper historyStockMapper;
@@ -60,7 +59,6 @@ public class GupiaoServiceTest {
 	@Autowired
 	private ReadApiUrl readApiUrl;
 	
-	@Autowired
 	private DataTask  dataTask;
 	
 	@Autowired
@@ -68,28 +66,24 @@ public class GupiaoServiceTest {
 	
 	private String number="sh600305";
 	
-	@Test
+	//@Test
 	public void MockAi() {
 		mockDeal.mockDeal("sz002202", "2020-11-01", appSecret, true);
 	}
 	
-	//@Test
+	@Test
 	public void TestDay() {
-		int i=0;
 		List<StockDo> list = guPiaoService.getAllStock();
-		for(StockDo stock:list) {
-			i++;
+		for(int i=4618;i<list.size();i++) {
+			StockDo stock=list.get(i);
 			String number = stock.getNumber();
-			if(number.equalsIgnoreCase("sh600332")) {
-				System.out.println(i+"/"+list.size());
+			System.out.println(number+"==>"+i+"/"+list.size());
+			if(number.contains("sz")) {
+				updateDay(number.replace("sz", "")+".SZ"); 
 			}
-			
-//			if(number.contains("sz")) {
-//				updateDay(number.replace("sz", "")+".SZ"); 
-//			}
-//			if(number.contains("sh")) {
-//				updateDay(number.replace("sh", "")+".SH"); 
-//			}
+			if(number.contains("sh")) {
+				updateDay(number.replace("sh", "")+".SH"); 
+			}
 		}
 		
 	}
@@ -98,8 +92,9 @@ public class GupiaoServiceTest {
 	public void updateDay(String number) {
 		System.out.println(System.getProperty("java.library.path"));
 		System.load("D:\\API\\bin\\x64\\iFinDJava_x64.dll");
-		JDIBridge.THS_iFinDLogin("wmg027", "644850");
-		String strResulthis = JDIBridge.THS_HistoryQuotes(number,"close,avgPrice,open,low,high","Interval:D,CPS:1,baseDate:1900-01-01,Currency:YSHB,fill:Previous","2010-11-01","2020-11-22");
+		//JDIBridge.THS_iFinDLogin("wmg027", "644850");
+		JDIBridge.THS_iFinDLogin("sjjk010", "273645");
+		String strResulthis = JDIBridge.THS_HistoryQuotes(number,"close,avgPrice,open,low,high","Interval:D,CPS:1,baseDate:1900-01-01,Currency:YSHB,fill:Previous","2020-01-01","2020-11-22");
 		System.out.println("THS_iFinDhis ==> " + strResulthis);
 		HistoryRsDate rs=JSON.parseObject(strResulthis,HistoryRsDate.class);
 		if(rs.getTables().get(0).getTable().getClose() == null) {
@@ -135,6 +130,7 @@ public class GupiaoServiceTest {
 			obj.setLow(low);
 			obj.setHistoryDay(time);
 			if(historyDayStockMapper.getByTime(obj) == null) {
+				System.out.println(obj.getNumber());
 				historyDayStockMapper.insert(obj);
 			}
 			

@@ -66,12 +66,20 @@ public class GupiaoServiceTest {
 	
 	private String number="sh600305";
 	
+	@Test
+	public void boduan() {
+		List<HistoryStockDo> list = guPiaoService.getLastHistoryStock(number,3);
+		for(HistoryStockDo stock:list) {
+			System.out.println(stock.getBoxMax()+"  "+stock.getBoxMin()+ " "+ stock.getRemark());
+		}
+	}
+	
 	//@Test
 	public void MockAi() {
 		mockDeal.mockDeal("sz002202", "2020-11-01", appSecret, true);
 	}
 	
-	@Test
+	//@Test
 	public void TestDay() {
 		List<StockDo> list = guPiaoService.getAllStock();
 		for(int i=4618;i<list.size();i++) {

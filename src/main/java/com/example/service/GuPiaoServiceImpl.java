@@ -134,9 +134,13 @@ public class GuPiaoServiceImpl implements GuPiaoService, InitializingBean {
 			tr.setHistoryDay(df1.format(price.getDateime()));
 			tr.setHistoryAll(df2.format(price.getDateime()));
 			tr.setNumber(number);
-			if (historyStockMapper.getByTime(tr) == null) {
-				historyStockMapper.insert(tr);
-			}
+			try {
+				if (historyStockMapper.getByTime(tr) == null) {
+					historyStockMapper.insert(tr);
+				}
+			} catch (Exception e) {
+				logger.warn(e.getMessage(),e);
+			}	
 		}
 	}
 
@@ -412,7 +416,10 @@ public class GuPiaoServiceImpl implements GuPiaoService, InitializingBean {
 		Collections.reverse(list);
 		String temp="";
 		for(HistoryStockDo stock:list) {
-			if(!StringUtils.equalsAnyIgnoreCase(temp, stock.getRemark())&& rsList.size()<size) {
+			if(rsList.size()>=size) {
+				break;
+			}
+			if(!StringUtils.equalsAnyIgnoreCase(temp, stock.getRemark())) {
 				temp=stock.getRemark();
 				rsList.add(stock);
 			}

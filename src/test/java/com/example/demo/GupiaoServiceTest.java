@@ -68,7 +68,10 @@ public class GupiaoServiceTest {
 	
 	private String number="sh600305";
 	
-	@Test
+	
+	
+	
+	//@Test
 	public void task() {
 		try {
 			realTimeTask.task1();
@@ -76,6 +79,7 @@ public class GupiaoServiceTest {
 			realTimeTask.task3();
 			realTimeTask.task4();
 			realTimeTask.task5();
+			dataTask.updateAllDayGuPiao();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -289,7 +293,6 @@ public class GupiaoServiceTest {
 			System.out.println(JSON.toJSONString(rs));
 			robotSetMapper.delete(rs.getId());
 		}
-		;
 	}
 
 }

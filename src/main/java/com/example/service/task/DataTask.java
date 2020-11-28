@@ -1,6 +1,9 @@
 package com.example.service.task;
 
+import java.math.BigDecimal;
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -19,8 +22,11 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.GuPiao;
+import com.example.mapper.HistoryDayStockMapper;
 import com.example.model.GuPiaoDo;
+import com.example.model.HistoryDayStockDo;
 import com.example.model.HistoryStockDo;
+import com.example.model.RealTimeDo;
 import com.example.model.StockDo;
 import com.example.model.SubscriptionDo;
 import com.example.service.GuPiaoService;
@@ -45,7 +51,8 @@ public class DataTask  implements InitializingBean {
 	private RedisUtil redisUtil;
 	@Autowired
 	private ReadApiUrl apiUrl;
-	
+	@Autowired
+	private HistoryDayStockMapper historyDayStockMapper;
 	
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -78,6 +85,12 @@ public class DataTask  implements InitializingBean {
 			public void run() {
 				logger.info("==>开始更新股票");
 				for(int i=0;i<=99999;i++) {
+					String number = String.format("%05d", i);
+					if(redisUtil.hasKey(RedisKeyUtil.getStockName("sz0"+number))
+							|| redisUtil.hasKey(RedisKeyUtil.getStockName("sz3"+number))
+							|| redisUtil.hasKey(RedisKeyUtil.getStockName("sh6"+number))) {
+						continue;
+					}
 					GuPiao date=apiUrl.readUrl(i, "sz0",false);
 					if(date !=null) {
 						GuPiaoDo model=new GuPiaoDo();
@@ -101,7 +114,45 @@ public class DataTask  implements InitializingBean {
 				init();
 			}
 		});
+		
 	}
+	
+	/**
+	 * 所有到的股票池
+	 */
+	@Scheduled(cron = "0 10 15 * * *")
+	public void updateAllDayGuPiao() {
+		List<StockDo> stockList = guPiaoService.getAllStock();
+		final SimpleDateFormat dateformat = new SimpleDateFormat("yyyyMMdd");
+		stockList.forEach(stock->{
+			RealTimeDo model=new RealTimeDo();
+			model.setNumber(stock.getNumber());
+			model.setDate(dateformat.format(new Date()));
+			String key =RedisKeyUtil.getRealTimeListByRealTimeDo(model);
+			List<RealTimeDo> list=(List<RealTimeDo>) redisUtil.get(key);
+			if(list != null && list.size()>0) {
+				double avg=0;
+				for(RealTimeDo rt:list) {
+					avg+=rt.getDangqianjiage();
+				}
+				avg=avg/list.size();
+				RealTimeDo last=list.get(list.size()-1);
+				HistoryDayStockDo obj =new HistoryDayStockDo();
+				obj.setOpen(new BigDecimal(last.getKaipanjia()));
+				obj.setClose(new BigDecimal(last.getDangqianjiage()));
+				obj.setAvg(new BigDecimal(avg));
+				obj.setHigh(new BigDecimal(last.getTop()));
+				obj.setLow(new BigDecimal(last.getLow()));
+				obj.setHistoryDay(last.getDate());
+				obj.setVolume(last.getChengjiaogupiao().longValue());
+				if(historyDayStockMapper.getByTime(obj) == null) {
+					System.out.println(obj.getNumber());
+					historyDayStockMapper.insert(obj);
+				}
+			}
+        });
+	}
+	
 	
 	/**
 	 * 补60分钟线上

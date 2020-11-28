@@ -30,8 +30,7 @@ public class UpdateRealTimeTask  implements Runnable {
 					BeanUtils.copyProperties(date, model);
 					String key = RedisKeyUtil.getRealTimeByRealTimeDo(model);
 					if(redisUtil.hasKey(key)) {
-						logger.info("已经存在:"+key);
-						logger.info("已有缓存:"+key);
+						logger.debug("读取缓存:"+number+" "+model.getName()+" 时间:"+model.getDate()+" "+model.getTime()+" 当前价格:"+model.getDangqianjiage());
 						return ;
 					}
 					redisUtil.set(key, model,60);
@@ -45,7 +44,7 @@ public class UpdateRealTimeTask  implements Runnable {
 					redisUtil.set(key2, map,86000);
 					String key3 =RedisKeyUtil.getRealTime(number);
 					redisUtil.set(key3, date,30);
-					logger.info("写入缓存成功:"+number+ "time:"+model.getDate()+model.getTime()+" 当前价格:"+model.getDangqianjiage());
+					logger.info("写入缓存成功:"+number+" "+model.getName()+" 时间:"+model.getDate()+" "+model.getTime()+" 当前价格:"+model.getDangqianjiage());
 				}else {
 					logger.error("查询失败:"+number);
 				}

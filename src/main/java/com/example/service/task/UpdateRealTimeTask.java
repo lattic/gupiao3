@@ -1,31 +1,47 @@
 package com.example.service.task;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.example.demo.GuPiao;
 import com.example.model.RealTimeDo;
 import com.example.service.GuPiaoService;
 import com.example.uitls.ReadApiUrl;
+import com.example.uitls.RedisKeyUtil;
+import com.example.uitls.RedisUtil;
 
 public class UpdateRealTimeTask  implements Runnable {
-
+	private static Logger logger = LoggerFactory.getLogger("real_time_monitor");
 	private String number;
 	private GuPiaoService guPiaoService;
-	private static Logger logger = LoggerFactory.getLogger("real_time_monitor");
 	private ReadApiUrl apiUrl;
+	private RedisUtil redisUtil;
 	
 	@Override
 	public void run() {
 			try {
 				GuPiao date=apiUrl.readUrl(number,true);
-				if(date !=null && guPiaoService!=null) {
-					logger.info("写入数据库"+number);
+				if(date !=null) {
+					logger.info("写入缓存:"+number);
 					RealTimeDo model=new RealTimeDo();
 					BeanUtils.copyProperties(date, model);
-					guPiaoService.realTimeInsert(model);
+					String key = RedisKeyUtil.getRealTimeByRealTimeDo(model);
+					if(redisUtil.hasKey(key)) {
+						logger.info("已经存在:"+key);
+						return ;
+					}
+					redisUtil.set(key, model,60);
+					String key2 =RedisKeyUtil.getRealTimeListByRealTimeDo(model);
+					List<RealTimeDo> list=(List<RealTimeDo>) redisUtil.get(key2);
+					if(list == null) {
+						list=new ArrayList<RealTimeDo>();
+					}
+					list.add(model);
+					redisUtil.set(key2, list,86000);
 				}
 			} catch (Exception e) {
 				logger.warn(e.getMessage(),e);
@@ -48,6 +64,12 @@ public class UpdateRealTimeTask  implements Runnable {
 		this.guPiaoService = guPiaoService;
 	}
 
+	public UpdateRealTimeTask(GuPiaoService guPiaoService,String number,ReadApiUrl apiUrl,RedisUtil redisUtil) {
+		this.guPiaoService = guPiaoService;
+		this.number = number;
+		this.apiUrl = apiUrl;
+		this.redisUtil = redisUtil;
+	}
 
 	
 }

@@ -3,11 +3,17 @@ package com.example.service;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 
@@ -21,6 +27,7 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSON;
 import com.example.ai.MockDeal;
 import com.example.mapper.GuPiaoMapper;
+import com.example.mapper.HistoryDayStockMapper;
 import com.example.mapper.HistoryStockMapper;
 import com.example.mapper.HolidayMapper;
 import com.example.mapper.RealTimeMapper;
@@ -30,20 +37,30 @@ import com.example.mapper.StockMapper;
 import com.example.mapper.SubscriptionMapper;
 import com.example.mapper.TradingRecordMapper;
 import com.example.model.GuPiaoDo;
+import com.example.model.HistoryDayStockDo;
 import com.example.model.HistoryPriceDo;
 import com.example.model.HistoryStockDo;
 import com.example.model.HolidayDo;
 import com.example.model.RealTimeDo;
 import com.example.model.StockDo;
 import com.example.model.SubscriptionDo;
+import com.example.model.ths.HistoryRsDate;
 import com.example.uitls.DateUtils;
 import com.example.uitls.ReadApiUrl;
 import com.example.uitls.RedisKeyUtil;
 import com.example.uitls.RedisUtil;
 
+import Ths.JDIBridge;
+
 @Service
 public class GuPiaoServiceImpl implements GuPiaoService, InitializingBean {
 
+	ThreadPoolExecutor  pool = new ThreadPoolExecutor(10, 20, 5,TimeUnit.SECONDS,
+			new LinkedBlockingDeque<Runnable>(1000), 
+			Executors.defaultThreadFactory(), 
+			new ThreadPoolExecutor.CallerRunsPolicy());
+
+	
 	private static Logger logger = LoggerFactory.getLogger(GuPiaoServiceImpl.class);
 
 	@Autowired
@@ -66,6 +83,10 @@ public class GuPiaoServiceImpl implements GuPiaoService, InitializingBean {
 	
 	@Autowired
 	private TradingRecordMapper tradingRecordMapper;
+	
+	@Autowired
+	private HistoryDayStockMapper historyDayStockMapper;
+	
 	
 	@Autowired
 	private HistoryStockMapper historyStockMapper;
@@ -428,6 +449,98 @@ public class GuPiaoServiceImpl implements GuPiaoService, InitializingBean {
 		return rsList;
 	}
 
-	
+
+	@Override
+	public void updateDayStockByThs() {
+		logger.info(System.getProperty("java.library.path"));
+		System.load("D:\\API\\bin\\x64\\iFinDJava_x64.dll");
+		//JDIBridge.THS_iFinDLogin("wmg027", "644850");
+		JDIBridge.THS_iFinDLogin("sjjk010", "273645");
+		List<StockDo> list = getAllStock();
+		for(int i=0;i<list.size();i++) {
+			StockDo stock=list.get(i);
+			String number = stock.getNumber();
+			logger.info("updateDayStockByThs:"+number+"==>"+i+"/"+list.size());
+			if(StringUtils.isBlank(number)) {
+				return ;
+			}
+			if(number.contains("sz")) {
+				updateDay(number.replace("sz", "")+".SZ"); 
+			}
+			if(number.contains("sh")) {
+				updateDay(number.replace("sh", "")+".SH"); 
+			}
+		}
+		JDIBridge.THS_iFinDLogout();
+	}
+
+	private void updateDay(String number) {
+		final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");// 设置日期格式
+		Calendar calendar=Calendar.getInstance();
+		 
+		String today=dateFormat.format(calendar.getTime());
+		calendar.set(Calendar.DATE,-1);
+		String yesterday=dateFormat.format(calendar.getTime());
+		
+		String strResulthis = JDIBridge.THS_HistoryQuotes(number,"close,avgPrice,open,low,high,volume","Interval:D,CPS:1,baseDate:1900-01-01,Currency:YSHB,fill:Previous",yesterday,today);
+		logger.info("THS_iFinDhis ==> " + strResulthis);
+		if(strResulthis == null) {
+			return;
+		}
+		HistoryRsDate rs=JSON.parseObject(strResulthis,HistoryRsDate.class);
+		if(rs.getTables().get(0).getTable().getClose() == null) {
+			String myNumber="";
+			
+			if(number.contains(".SZ")) {
+				myNumber="sz"+number.replace(".SZ", "");
+			}
+			if(number.contains(".SH")) {
+				myNumber="sh"+number.replace(".SH", "");
+			}
+			StockDo obj=stockMapper.getNumber(myNumber);
+			if(obj!=null) {
+				stockMapper.delete(obj);
+			}
+			return ;
+		}
+		
+		List<BigDecimal> closeList =rs.getTables().get(0).getTable().getClose();
+		List<BigDecimal> avgPriceList = rs.getTables().get(0).getTable().getAvgPrice();
+		List<BigDecimal> openList = rs.getTables().get(0).getTable().getOpen();
+		List<BigDecimal> lowList = rs.getTables().get(0).getTable().getLow();
+		List<BigDecimal> highList = rs.getTables().get(0).getTable().getHigh();
+		List<Long> volumeList = rs.getTables().get(0).getTable().getVolume();
+		
+		List<String> times=rs.getTables().get(0).getTime();
+		int total=times.size();
+		for(int i=0;i<total;i++) {
+			String time = times.get(i).replace("-", "");
+			BigDecimal avg=avgPriceList.get(i).setScale(2,BigDecimal.ROUND_HALF_UP);
+			BigDecimal open=openList.get(i).setScale(2,BigDecimal.ROUND_HALF_UP);
+			BigDecimal close=closeList.get(i).setScale(2,BigDecimal.ROUND_HALF_UP);
+			BigDecimal low=lowList.get(i).setScale(2,BigDecimal.ROUND_HALF_UP);
+			BigDecimal high=highList.get(i).setScale(2,BigDecimal.ROUND_HALF_UP);
+			Long volume = volumeList.get(i);
+			HistoryDayStockDo obj =new HistoryDayStockDo();
+			if(number.contains(".SZ")) {
+				obj.setNumber("sz"+number.replace(".SZ", "")); 
+			}
+			if(number.contains(".SH")) {
+				obj.setNumber("sh"+number.replace(".SH", "")); 
+			}
+			obj.setOpen(open);
+			obj.setClose(close);
+			obj.setAvg(avg);
+			obj.setHigh(high);
+			obj.setLow(low);
+			obj.setHistoryDay(time);
+			obj.setVolume(volume);
+			if(historyDayStockMapper.getByTime(obj) == null) {
+				System.out.println(obj.getNumber());
+				historyDayStockMapper.insert(obj);
+			}
+			
+		}
+	}
 
 }

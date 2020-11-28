@@ -22,6 +22,8 @@ public class StockPriceVo {
 	
 	private BigDecimal avg;
 	
+	private BigDecimal ma20hour;
+	
 	private BigDecimal ma5Day;
 	
 	private BigDecimal ma20Day;
@@ -32,7 +34,25 @@ public class StockPriceVo {
 	
 	private BigDecimal boxAvg;
 	
+	private Long volume;
+	
 	private String remark;
+
+	public Long getVolume() {
+		return volume;
+	}
+
+	public void setVolume(Long volume) {
+		this.volume = volume;
+	}
+
+	public BigDecimal getMa20hour() {
+		return ma20hour;
+	}
+
+	public void setMa20hour(BigDecimal ma20hour) {
+		this.ma20hour = ma20hour;
+	}
 
 	public String getNumber() {
 		return number;

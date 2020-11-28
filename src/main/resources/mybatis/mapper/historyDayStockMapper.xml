@@ -21,11 +21,13 @@
 		<result column="box_min" property="boxMin" jdbcType="DECIMAL" />
 		<result column="box_avg" property="boxAvg" jdbcType="DECIMAL" />
 		<result column="remark" property="remark" jdbcType="VARCHAR" />
+		<result column="volume" property="volume" jdbcType="BIGINT" />
+		
 		
 	</resultMap>
 
 	<sql id="All_Column">
-		id,history_day,number,open,close,high,low,avg,ma5_day,ma20_day,ma200_day,type,box_max,box_min,box_avg,remark
+		id,history_day,number,open,close,high,low,avg,ma5_day,ma20_day,ma200_day,type,box_max,box_min,box_avg,remark,volume
 	</sql>
 
 	<select id="getAll" resultMap="historyDayStockDo">
@@ -39,7 +41,7 @@
 		<include refid="All_Column" />
 		FROM history_day_stock
 		where number=#{number}
-		order by history_all 
+		order by history_day 
 	</select>
 	
 	
@@ -60,6 +62,7 @@
 		<if test="boxMin">	, box_min = #{boxMin} </if>
 		<if test="boxAvg">	, box_avg = #{boxAvg} </if>
 		<if test="remark">	, remark  = #{remark} </if>
+		<if test="volume">	, volume  = #{volume} </if>
 		where id=#{id}
 	</update>
 
@@ -69,9 +72,9 @@
 	<insert id="insert" parameterType="historyDayStockDo">
 		INSERT INTO
 		history_day_stock
-		(history_day,number,open,close,high,low,avg,ma5_day,ma20_day,ma200_day,type,box_max,box_min,box_avg,remark)
+		(history_day,number,open,close,high,low,avg,ma5_day,ma20_day,ma200_day,type,box_max,box_min,box_avg,remark,volume)
 		VALUES
-		(#{historyDay},#{number},#{open},#{close},#{high},#{low},#{avg},#{ma5Day},#{ma20Day},#{ma200Day},#{type},#{boxMax},#{boxMin},#{boxAvg},#{remark})
+		(#{historyDay},#{number},#{open},#{close},#{high},#{low},#{avg},#{ma5Day},#{ma20Day},#{ma200Day},#{type},#{boxMax},#{boxMin},#{boxAvg},#{remark},#{volume})
 	</insert>
 
 	<delete id="delete" parameterType="historyDayStockDo">

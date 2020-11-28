@@ -3,6 +3,8 @@ package com.example.uitls;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import com.example.model.RealTimeDo;
+
 public class RedisKeyUtil {
 
 	private final static SimpleDateFormat dateformat = new SimpleDateFormat("yyyyMMdd");
@@ -44,5 +46,13 @@ public class RedisKeyUtil {
 
 	public static String getRealTime(String number) {
 		return "realtime_status_"+dateformat_min.format(new Date())+"_"+number;
+	}
+	
+	public static String getRealTimeByRealTimeDo(RealTimeDo model) {
+		return "realTime_RealTimeDo"+model.getNumber()+"_"+model.getDate().replace("-", "")+"_"+model.getTime().replace(":", "");
+	}
+	
+	public static String getRealTimeListByRealTimeDo(RealTimeDo model) {
+		return "realTime_RealTimeDo_list_"+model.getNumber()+"_"+model.getDate().replace("-", "")+"_"+model.getTime().replace(":", "");
 	}
 }

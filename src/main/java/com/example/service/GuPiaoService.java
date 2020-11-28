@@ -48,4 +48,9 @@ public interface GuPiaoService {
 	 * @return
 	 */
 	List<HistoryStockDo> getLastHistoryStock(String number,Integer size);
+	
+	/**
+	 * 同花顺补日线数据
+	 */
+	void updateDayStockByThs();
 }

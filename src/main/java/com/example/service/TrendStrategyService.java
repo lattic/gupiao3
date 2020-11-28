@@ -1,7 +1,12 @@
-package com.example.strategy;
+package com.example.service;
 
 import java.util.List;
 
+import org.ta4j.core.BarSeries;
+
+import com.example.chart.base.entity.Candle;
+import com.example.chart.entity.BollEntity;
+import com.example.chart.entity.MAEntity;
 import com.example.model.HistoryDayStockDo;
 import com.example.model.HistoryPriceDo;
 import com.example.model.MockLog;
@@ -33,6 +38,21 @@ public interface TrendStrategyService {
 	 * @return
 	 */
 	List<StockPriceVo> transformByRealTime(List<RealTimeDo> list);
+	
+	/**
+	 * 指标转换
+	 * @param list
+	 * @return
+	 */
+	List<Candle> transformStockPrice(List<StockPriceVo> list);
+	
+	/**
+	 * 指标转换
+	 * @param list
+	 * @return
+	 */
+	BarSeries transformBarSeriesByStockPrice(List<StockPriceVo> list);
+	
 	
 	/**
 	 * 转换到模拟结果
@@ -69,12 +89,21 @@ public interface TrendStrategyService {
 	List<TradingRecordDo> getStrategyByRebound(List<StockPriceVo> list,RobotAccountDo account,RobotSetDo config);
 	
 	/**
-	 * 移动平均线（60分钟，日线）
+	 * 移动平均线
 	 * @param list
 	 * @param account 资金
 	 * @param config  参数
 	 * @return
 	 */
-	List<TradingRecordDo> getStrategyByMa(List<StockPriceVo> list,RobotAccountDo account,RobotSetDo config);
+	MAEntity getStrategyByMa(List<StockPriceVo> list,RobotAccountDo account,RobotSetDo config);
 	
+	
+	/**
+	 * 布林线
+	 * @param list
+	 * @param account
+	 * @param config
+	 * @return
+	 */
+	BollEntity getStrateByBoll(List<StockPriceVo> list,RobotAccountDo account,RobotSetDo config);
 }

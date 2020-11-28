@@ -30,13 +30,13 @@
 
 	<appender name="REAL_TIME_MONITOR"
 		class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${LOG_PATH}/RealTimeMonitor.log</file>
+		<file>${LOG_PATH}/realTime.log</file>
 		<encoder>
 			<pattern>${FILE_LOG_PATTERN}</pattern>
 		</encoder>
 		<rollingPolicy
 			class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-			<fileNamePattern>${LOG_PATH}/RemoteMonitor.%d{yyyy-MM-dd}.%i.log
+			<fileNamePattern>${LOG_PATH}/realTime.%d{yyyy-MM-dd}.%i.log
 			</fileNamePattern>
 			<maxHistory>7</maxHistory>
 			<maxFileSize>50MB</maxFileSize>
@@ -131,6 +131,9 @@
 
 	<logger name="dingtalk_log" level="INFO" additivity="false">
 		<appender-ref ref="DINGTALK_LOG" />
+	</logger>
+	<logger name="real_time" level="INFO" additivity="false">
+		<appender-ref ref="REAL_TIME_MONITOR" />
 	</logger>
 	
 	

@@ -28,6 +28,7 @@
 		<include refid="All_Column" />
 		FROM stock
 		WHERE number = #{number}
+		and status =1
 		limit 1
 	</select>
 
@@ -38,12 +39,13 @@
 		VALUES
 		(#{number},#{name},#{createDate},#{type},#{status})
 	</insert>
+	
+	
 
-	<delete id="delete" parameterType="stockDo">
-		DELETE FROM
-		stock
+	<update id="delete" parameterType="stockDo">
+		update stock set status=0
 		WHERE
-		id =#{id}
-	</delete>
+		number =#{number}
+	</update>
 
 </mapper>

@@ -22,8 +22,8 @@ public class GuPiao {
 		this.low = Double.valueOf(low);
 		this.jbuy1 = Double.valueOf(jbuy1);
 		this.jsell1 = Double.valueOf(jsell1);
-		this.chengjiaogupiao =new BigDecimal(chengjiaogupiao);
-		this.chengjiaojine =new BigDecimal(chengjiaojine) ;
+		this.chengjiaogupiao =Double.valueOf(chengjiaogupiao);
+		this.chengjiaojine =Double.valueOf(chengjiaojine) ;
 		this.buy1number = Double.valueOf(buy1number);
 		this.buy1 = Double.valueOf(buy1);
 		this.buy2number = Double.valueOf(buy2number);
@@ -72,8 +72,8 @@ public class GuPiao {
 	private Double low;
 	private Double jbuy1;
 	private Double jsell1;
-	private BigDecimal chengjiaogupiao;
-	private BigDecimal chengjiaojine;
+	private Double chengjiaogupiao;
+	private Double chengjiaojine;
 	private Double buy1number;
 	private Double buy1;
 	private Double buy2number;
@@ -186,22 +186,22 @@ public class GuPiao {
 	}
 
 
-	public BigDecimal getChengjiaogupiao() {
+	public Double getChengjiaogupiao() {
 		return chengjiaogupiao;
 	}
 
 
-	public void setChengjiaogupiao(BigDecimal chengjiaogupiao) {
+	public void setChengjiaogupiao(Double chengjiaogupiao) {
 		this.chengjiaogupiao = chengjiaogupiao;
 	}
 
 
-	public BigDecimal  getChengjiaojine() {
+	public Double  getChengjiaojine() {
 		return chengjiaojine;
 	}
 
 
-	public void setChengjiaojine(BigDecimal  chengjiaojine) {
+	public void setChengjiaojine(Double  chengjiaojine) {
 		this.chengjiaojine = chengjiaojine;
 	}
 

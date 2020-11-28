@@ -58,7 +58,6 @@ public class MonitorRiskTask {
 	@Scheduled(cron = "0/30 * 9-15 * * MON-FRI")
 	private void  monitorAll() throws Exception {
 		if(!DateUtils.traceTime(guPiaoService.getHolidayList())) {
-			System.out.println("实时监控,还没开盘");
 			return ;
 		}
 

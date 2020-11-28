@@ -17,7 +17,7 @@ public class DateUtils {
 	private static final SimpleDateFormat DF_YYYYMMDD = new SimpleDateFormat("yyyyMMdd");// 设置日期格式
 	private static final SimpleDateFormat DF_YYYYMMDDHHmm = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");// 设置日期格式
 	private static final SimpleDateFormat DF_YYYYMMDDHHMM_NUMBER = new SimpleDateFormat("yyyyMMddHHmm");// 设置日期格式
-	
+	private static final SimpleDateFormat DF_YYYYMMDD_NUMBER = new SimpleDateFormat("yyyyMMdd");// 设置日期格式
 	public static String getToday() {
 		return DF_YYYYMMDD.format(new Date());
 	}
@@ -106,7 +106,21 @@ public class DateUtils {
 			return new Date();
 		}
 	}
+	public static String getDateForYYYYMMDDByDate(Date day) {
+		try {
+			return DF_YYYYMMDD_NUMBER.format(day);
+		}catch (Exception e) {
+		}
+		return "";
+	}
 	
+	public static String getDateForYYYYMMDDHHMMByDate(Date day) {
+		try {
+			return DF_YYYYMMDDHHMM_NUMBER.format(day);
+		}catch (Exception e) {
+		}
+		return "";
+	}
 	
 	public static Long getDefDays(Date beginTime, Date endTime,List<HolidayDo> list) {
 		Calendar day1 = Calendar.getInstance();

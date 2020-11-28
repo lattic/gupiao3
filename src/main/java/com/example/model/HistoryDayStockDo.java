@@ -13,6 +13,8 @@ public class HistoryDayStockDo implements Serializable {
 	
 	private String historyDay;
 	
+	private Long volume;
+	
 	private BigDecimal open; 
 	
 	private BigDecimal close;
@@ -39,6 +41,15 @@ public class HistoryDayStockDo implements Serializable {
 	private BigDecimal boxAvg;
 	
 	private String remark;
+
+
+	public Long getVolume() {
+		return volume;
+	}
+
+	public void setVolume(Long volume) {
+		this.volume = volume;
+	}
 
 	public Long getId() {
 		return id;

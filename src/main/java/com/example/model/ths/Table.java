@@ -9,9 +9,15 @@ public class Table {
 	private List<BigDecimal> avgPrice;
 	private List<BigDecimal> low;
 	private List<BigDecimal> high;
+	private List<Long> volume;
 	
 	
-	
+	public List<Long> getVolume() {
+		return volume;
+	}
+	public void setVolume(List<Long> volume) {
+		this.volume = volume;
+	}
 	public List<BigDecimal> getOpen() {
 		return open;
 	}

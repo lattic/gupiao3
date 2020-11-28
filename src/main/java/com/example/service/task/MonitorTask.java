@@ -1,12 +1,9 @@
 package com.example.service.task;
 
-import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -17,15 +14,11 @@ import javax.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.example.ai.MockDeal;
-import com.example.demo.GuPiao;
-import com.example.model.GuPiaoDo;
 import com.example.model.MockLog;
 import com.example.model.StockDo;
 import com.example.model.SubscriptionDo;
@@ -62,7 +55,6 @@ public class MonitorTask  {
 	private void followTask() {
 		
 		if(!DateUtils.traceTime(guPiaoService.getHolidayList())) {
-			System.out.println("还没开盘");
 			return ;
 		}
 		

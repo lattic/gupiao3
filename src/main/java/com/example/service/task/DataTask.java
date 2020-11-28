@@ -54,13 +54,6 @@ public class DataTask  implements InitializingBean {
 											   + init(),new Object[] {});
 		logger.info(robotbuy);
         DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_TEST_SECRET, robotbuy, null, false);
-        pool.execute(new Runnable() {
-			
-			@Override
-			public void run() {
-				 updateHistory();
-			}
-		});
        
 	}
 	
@@ -110,20 +103,32 @@ public class DataTask  implements InitializingBean {
 		});
 	}
 	
+	/**
+	 * 补60分钟线上
+	 */
 	@Scheduled(cron = "0 0 9 * * *")
+	private void  updateHistoryTask() {
+		 pool.execute(new Runnable() {
+			@Override
+			public void run() {
+				updateHistory();
+			}
+		 });
+	}
+	
 	private void  updateHistory() {
 		//获取所有股票的历史60分钟数据
 		logger.info("开始复盘昨天的数据");
-		List<StockDo> stockList = guPiaoService.getAllStock();
-		stockList.forEach(stock->{
-			String key=RedisKeyUtil.getRecheckStock(stock.getNumber());
-			if(!redisUtil.hasKey(key)) {
-				logger.info("更新数据--->"+stock.getNumber()+" "+redisUtil.get(RedisKeyUtil.getStockName(stock.getNumber()))+" "+DateUtils.getToday());
-				guPiaoService.updateHistoryStock(stock.getNumber());
-				guPiaoService.timeInterval(stock.getNumber());
-				redisUtil.set(key, true);
-			}
-        });
+			List<StockDo> stockList = guPiaoService.getAllStock();
+			stockList.forEach(stock->{
+				String key=RedisKeyUtil.getRecheckStock(stock.getNumber());
+				if(!redisUtil.hasKey(key)) {
+					logger.info("更新数据--->"+stock.getNumber()+" "+redisUtil.get(RedisKeyUtil.getStockName(stock.getNumber()))+" "+DateUtils.getToday());
+					guPiaoService.updateHistoryStock(stock.getNumber());
+					guPiaoService.timeInterval(stock.getNumber());
+					redisUtil.set(key, true);
+				}
+	        });
 	}
 	
 	

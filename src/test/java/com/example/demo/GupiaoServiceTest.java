@@ -1,12 +1,12 @@
 package com.example.demo;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
 
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +24,12 @@ import com.example.model.HistoryDayStockDo;
 import com.example.model.HistoryStockDo;
 import com.example.model.RobotAccountDo;
 import com.example.model.RobotSetDo;
-import com.example.model.StockDo;
 import com.example.model.TradingRecordDo;
 import com.example.model.ths.HistoryRsDate;
 import com.example.service.GuPiaoService;
 import com.example.service.task.DataTask;
 import com.example.service.task.MonitorTask;
+import com.example.service.task.RealTimeTask;
 import com.example.uitls.ReadApiUrl;
 import com.example.uitls.RedisUtil;
 
@@ -46,7 +46,7 @@ public class GupiaoServiceTest {
 	private RobotAccountMapper robotAccountMapper;
 	@Autowired
 	private TradingRecordMapper tradingRecordMapper;
-	private MonitorTask monitorTask;
+	
 	@Autowired
 	private HistoryStockMapper historyStockMapper;
 	@Autowired
@@ -58,16 +58,35 @@ public class GupiaoServiceTest {
 	private RedisUtil redisUtil;
 	@Autowired
 	private ReadApiUrl readApiUrl;
-	
+	@Autowired
 	private DataTask  dataTask;
-	
+	private MonitorTask monitorTask;
+	@Autowired
+	private RealTimeTask realTimeTask;
 	@Autowired
 	private HistoryDayStockMapper historyDayStockMapper;
 	
 	private String number="sh600305";
 	
 	@Test
+	public void task() {
+		try {
+			realTimeTask.task1();
+			realTimeTask.task2();
+			realTimeTask.task3();
+			realTimeTask.task4();
+			realTimeTask.task5();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	
+	//@Test
 	public void boduan() {
+		
+		
 		List<HistoryStockDo> list = guPiaoService.getLastHistoryStock(number,3);
 		for(HistoryStockDo stock:list) {
 			System.out.println(stock.getBoxMax()+"  "+stock.getBoxMin()+ " "+ stock.getRemark());
@@ -80,29 +99,24 @@ public class GupiaoServiceTest {
 	}
 	
 	//@Test
+	public void updateDayStock() {
+		updateDay(number.replace("sh", "")+".SH"); 
+	}
+	
+	//@Test
 	public void TestDay() {
-		List<StockDo> list = guPiaoService.getAllStock();
-		for(int i=4618;i<list.size();i++) {
-			StockDo stock=list.get(i);
-			String number = stock.getNumber();
-			System.out.println(number+"==>"+i+"/"+list.size());
-			if(number.contains("sz")) {
-				updateDay(number.replace("sz", "")+".SZ"); 
-			}
-			if(number.contains("sh")) {
-				updateDay(number.replace("sh", "")+".SH"); 
-			}
-		}
-		
+		guPiaoService.updateDayStockByThs();
 	}
 	
 	
 	public void updateDay(String number) {
+		final SimpleDateFormat DF_YYYY_MM_DD = new SimpleDateFormat("yyyy-MM-dd");// 设置日期格式
+		
 		System.out.println(System.getProperty("java.library.path"));
 		System.load("D:\\API\\bin\\x64\\iFinDJava_x64.dll");
 		//JDIBridge.THS_iFinDLogin("wmg027", "644850");
 		JDIBridge.THS_iFinDLogin("sjjk010", "273645");
-		String strResulthis = JDIBridge.THS_HistoryQuotes(number,"close,avgPrice,open,low,high","Interval:D,CPS:1,baseDate:1900-01-01,Currency:YSHB,fill:Previous","2020-01-01","2020-11-22");
+		String strResulthis = JDIBridge.THS_HistoryQuotes(number,"close,avgPrice,open,low,high,volume","Interval:D,CPS:1,baseDate:1900-01-01,Currency:YSHB,fill:Previous","2020-01-01",DF_YYYY_MM_DD.format(new Date()));
 		System.out.println("THS_iFinDhis ==> " + strResulthis);
 		HistoryRsDate rs=JSON.parseObject(strResulthis,HistoryRsDate.class);
 		if(rs.getTables().get(0).getTable().getClose() == null) {
@@ -114,6 +128,8 @@ public class GupiaoServiceTest {
 		List<BigDecimal> openList = rs.getTables().get(0).getTable().getOpen();
 		List<BigDecimal> lowList = rs.getTables().get(0).getTable().getLow();
 		List<BigDecimal> highList = rs.getTables().get(0).getTable().getHigh();
+		List<Long> volumeList = rs.getTables().get(0).getTable().getVolume();
+		
 		List<String> times=rs.getTables().get(0).getTime();
 		int total=times.size();
 		for(int i=0;i<total;i++) {
@@ -123,7 +139,7 @@ public class GupiaoServiceTest {
 			BigDecimal close=closeList.get(i).setScale(2,BigDecimal.ROUND_HALF_UP);
 			BigDecimal low=lowList.get(i).setScale(2,BigDecimal.ROUND_HALF_UP);
 			BigDecimal high=highList.get(i).setScale(2,BigDecimal.ROUND_HALF_UP);
-			
+			Long volume = volumeList.get(i);
 			HistoryDayStockDo obj =new HistoryDayStockDo();
 			if(number.contains(".SZ")) {
 				obj.setNumber("sz"+number.replace(".SZ", "")); 
@@ -137,6 +153,7 @@ public class GupiaoServiceTest {
 			obj.setHigh(high);
 			obj.setLow(low);
 			obj.setHistoryDay(time);
+			obj.setVolume(volume);
 			if(historyDayStockMapper.getByTime(obj) == null) {
 				System.out.println(obj.getNumber());
 				historyDayStockMapper.insert(obj);

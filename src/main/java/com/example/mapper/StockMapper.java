@@ -11,7 +11,7 @@ public interface StockMapper  {
 	
 	int insert(StockDo obj);
 
-	int delete(Long id);
-
+	int delete(StockDo obj);
+	
 	StockDo getNumber(String string);
 }

@@ -59,8 +59,8 @@ public class RealTimeDo implements Serializable {
 	private Double low;
 	private Double jbuy1;
 	private Double jsell1;
-	private BigDecimal chengjiaogupiao;
-	private BigDecimal chengjiaojine;
+	private Double chengjiaogupiao;
+	private Double chengjiaojine;
 	private Double buy1number;
 	private Double buy1;
 	private Double buy2number;
@@ -186,22 +186,22 @@ public class RealTimeDo implements Serializable {
 	}
 
 
-	public BigDecimal getChengjiaogupiao() {
+	public Double getChengjiaogupiao() {
 		return chengjiaogupiao;
 	}
 
 
-	public void setChengjiaogupiao(BigDecimal chengjiaogupiao) {
+	public void setChengjiaogupiao(Double chengjiaogupiao) {
 		this.chengjiaogupiao = chengjiaogupiao;
 	}
 
 
-	public BigDecimal  getChengjiaojine() {
+	public Double  getChengjiaojine() {
 		return chengjiaojine;
 	}
 
 
-	public void setChengjiaojine(BigDecimal  chengjiaojine) {
+	public void setChengjiaojine(Double  chengjiaojine) {
 		this.chengjiaojine = chengjiaojine;
 	}
 

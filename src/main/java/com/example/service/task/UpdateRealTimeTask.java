@@ -42,6 +42,8 @@ public class UpdateRealTimeTask  implements Runnable {
 					}
 					list.add(model);
 					redisUtil.set(key2, list,86000);
+					String key3 =RedisKeyUtil.getRealTimeGupiao(model.getNumber());
+					redisUtil.set(key3, date,30);
 				}
 			} catch (Exception e) {
 				logger.warn(e.getMessage(),e);

@@ -108,6 +108,7 @@ public class ReadApiUrl {
 	public GuPiao readRealTimeUrl(String number) {
 		String url = "http://hq.sinajs.cn/list=" + number;
 		String code = HttpClientUtil.doGet(url);
+		logger.info("http请求:"+url+" return:"+code);
 		for(int i=1;i<=5;i++){
 			if (code != null) {
 				return hanldeData(number, code);

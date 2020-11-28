@@ -49,7 +49,7 @@ public class RedisKeyUtil {
 	}
 	
 	public static String getRealTimeByRealTimeDo(RealTimeDo model) {
-		return "realTime_RealTimeDo"+model.getNumber()+"_"+model.getDate().replace("-", "")+"_"+model.getTime().replace(":", "");
+		return "realTime_RealTimeDo_"+model.getNumber()+"_"+model.getDate().replace("-", "")+"_"+model.getTime().replace(":", "");
 	}
 	
 	public static String getRealTimeListByRealTimeDo(RealTimeDo model) {

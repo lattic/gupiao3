@@ -59,7 +59,7 @@ public class RealTimeTask implements InitializingBean {
 	private static List<StockDo> list5= new ArrayList<StockDo>();
 	
 	
-	@Scheduled(cron = "0/30 * 9-15 * * MON-FRI")
+	@Scheduled(cron = "0/30 * * * * *")
 	public void  task1() throws Exception {
 		for(StockDo stock:list1) {
 			try {
@@ -69,7 +69,7 @@ public class RealTimeTask implements InitializingBean {
 			}
 		}
 	}
-	@Scheduled(cron = "0/30 * 9-15 * * MON-FRI")
+	@Scheduled(cron = "0/30 * * * * *")
 	public void  task2() throws Exception {
 		for(StockDo stock:list2) {
 			try {
@@ -79,7 +79,7 @@ public class RealTimeTask implements InitializingBean {
 			}
 		}
 	}
-	@Scheduled(cron = "0/30 * 9-15 * * MON-FRI")
+	@Scheduled(cron = "0/30 * * * * *")
 	public void  task3() throws Exception {
 		for(StockDo stock:list3) {
 			try {
@@ -89,7 +89,7 @@ public class RealTimeTask implements InitializingBean {
 			}
 		}
 	}
-	@Scheduled(cron = "0/30 * 9-15 * * MON-FRI")
+	@Scheduled(cron = "0/30 * * * * *")
 	public void  task4() throws Exception {
 		for(StockDo stock:list4) {
 			try {
@@ -99,7 +99,7 @@ public class RealTimeTask implements InitializingBean {
 			}
 		}
 	}
-	@Scheduled(cron = "0/30 * 9-15 * * MON-FRI")
+	@Scheduled(cron = "0/30 * * * * *")
 	public void  task5() throws Exception {
 		for(StockDo stock:list5) {
 			try {
@@ -121,11 +121,6 @@ public class RealTimeTask implements InitializingBean {
 		list3=list.subList(2*k, 3*k);
 		list4=list.subList(3*k, 4*k);
 		list5=list.subList(4*k, list.size());
-		task1();
-		task2();
-		task3();
-		task4();
-		task5();
 		} catch (Exception e) {
 			logger.warn("init Exception:"+e.getMessage(),e);
 		}

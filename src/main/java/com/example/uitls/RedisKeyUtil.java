@@ -48,10 +48,6 @@ public class RedisKeyUtil {
 		return "realtime_status_"+dateformat_min.format(new Date())+"_"+number;
 	}
 	
-	public static String getRealTimeGupiao(String number) {
-		return "realTime_gupiao"+dateformat.format(new Date())+"_"+number;
-	}
-	
 	public static String getRealTimeByRealTimeDo(RealTimeDo model) {
 		return "realTime_RealTimeDo"+model.getNumber()+"_"+model.getDate().replace("-", "")+"_"+model.getTime().replace(":", "");
 	}

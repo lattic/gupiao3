@@ -36,13 +36,14 @@ public class UpdateRealTimeTask  implements Runnable {
 					}
 					redisUtil.set(key, model,60);
 					String key2 =RedisKeyUtil.getRealTimeListByRealTimeDo(model);
+					@SuppressWarnings("unchecked")
 					List<RealTimeDo> list=(List<RealTimeDo>) redisUtil.get(key2);
 					if(list == null) {
 						list=new ArrayList<RealTimeDo>();
 					}
 					list.add(model);
 					redisUtil.set(key2, list,86000);
-					String key3 =RedisKeyUtil.getRealTimeGupiao(model.getNumber());
+					String key3 =RedisKeyUtil.getRealTime(number);
 					redisUtil.set(key3, date,30);
 				}
 			} catch (Exception e) {

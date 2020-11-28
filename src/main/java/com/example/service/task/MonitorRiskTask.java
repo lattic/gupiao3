@@ -100,7 +100,7 @@ public class MonitorRiskTask {
 		DecimalFormat    df   = new DecimalFormat("######0.00");  
 		Date now=new Date();
     	SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    	String gpkey =RedisKeyUtil.getRealTimeGupiao(number);
+    	String gpkey =RedisKeyUtil.getRealTime(number);
     	GuPiao date= (GuPiao) redisUtil.get(gpkey);
     	if(date == null) {
     		pool.execute(new UpdateRealTimeTask(guPiaoService,number,apiUrl,redisUtil));

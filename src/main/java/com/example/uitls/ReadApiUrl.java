@@ -163,7 +163,7 @@ public class ReadApiUrl {
 		}
 		GuPiao gp=readRealTimeUrl(number);
 		if(gp !=null) {
-			redisUtil.set(key, gp, 60L);
+			redisUtil.set(key, gp, 5L);
 		}
 		return gp;
 	}

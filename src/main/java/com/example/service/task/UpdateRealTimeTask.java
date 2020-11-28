@@ -24,7 +24,7 @@ public class UpdateRealTimeTask  implements Runnable {
 	@Override
 	public void run() {
 			try {
-				GuPiao date=apiUrl.readUrl(number,true);
+				GuPiao date=apiUrl.readUrl(number,false);
 				if(date !=null) {
 					logger.info("写入缓存:"+number);
 					RealTimeDo model=new RealTimeDo();

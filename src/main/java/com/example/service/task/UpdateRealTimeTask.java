@@ -25,8 +25,8 @@ public class UpdateRealTimeTask  implements Runnable {
 	public void run() {
 			try {
 				GuPiao date=apiUrl.readUrl(number,false);
+				
 				if(date !=null) {
-					
 					RealTimeDo model=new RealTimeDo();
 					BeanUtils.copyProperties(date, model);
 					String key = RedisKeyUtil.getRealTimeByRealTimeDo(model);

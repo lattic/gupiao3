@@ -112,6 +112,18 @@ public class ReadApiUrl {
 	public GuPiao readRealTimeUrl(String number) {
 		String url = "http://hq.sinajs.cn/list=" + number;
 		String code = HttpClientUtil.doGet(url);
+		for(int i=1;i<=5;i++){
+			if (code != null) {
+				return hanldeData(number, code);
+			}
+			try {
+				Thread.sleep(1000L);
+				logger.warn("第"+i+"次，重试请求："+url);
+				code= HttpClientUtil.doGet(url);
+			} catch (InterruptedException e) {
+				logger.warn("http异常："+e.getMessage());
+			}
+		}
 		logger.warn("http请求："+url);
 		if (code == null) {
 			logger.warn("http请求数据为空："+url);
@@ -150,7 +162,9 @@ public class ReadApiUrl {
 			return (GuPiao)redisUtil.get(key);
 		}
 		GuPiao gp=readRealTimeUrl(number);
-		redisUtil.set(key, gp, 60L);
+		if(gp !=null) {
+			redisUtil.set(key, gp, 60L);
+		}
 		return gp;
 	}
 	

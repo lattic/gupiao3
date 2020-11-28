@@ -47,7 +47,7 @@ public class MonitorTask  {
 	private RedisUtil redisUtil;
 	
 	
-	@Scheduled(cron = "0 30 9 * * *")
+	@Scheduled(cron = "0 30 9 * * MON-FRI")
 	private void followTask1() {
 		followTask();
 	}
@@ -81,7 +81,7 @@ public class MonitorTask  {
 	
 	
 	//初始化map
-	@Scheduled(cron = "0 35 9 * * *")
+	@Scheduled(cron = "0 35 9 * * MON-FRI")
 	public void AiBuyIn() {
 		List<SubscriptionDo> subscriptionList=guPiaoService.listMemberAll();
 		int max=0;

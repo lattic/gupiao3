@@ -77,7 +77,7 @@ public class DataTask  implements InitializingBean {
 	/**
 	 * 所有到的股票池
 	 */
-	@Scheduled(cron = "0 10 15 * * *")
+	@Scheduled(cron = "0 10 15 * * MON-FRI")
 	private void updateAllGuPiao() {
 		logger.info("开始更新股票池总数");
 		pool.execute(new Runnable() {
@@ -120,7 +120,7 @@ public class DataTask  implements InitializingBean {
 	/**
 	 * 所有到的股票池
 	 */
-	@Scheduled(cron = "0 10 15 * * *")
+	@Scheduled(cron = "0 10 15 * * MON-FRI")
 	public void updateAllDayGuPiao() {
 		List<StockDo> stockList = guPiaoService.getAllStock();
 		final SimpleDateFormat dateformat = new SimpleDateFormat("yyyyMMdd");
@@ -157,7 +157,7 @@ public class DataTask  implements InitializingBean {
 	/**
 	 * 补60分钟线上
 	 */
-	@Scheduled(cron = "0 0 9 * * *")
+	@Scheduled(cron = "0 0 9 * * MON-FRI")
 	private void  updateHistoryTask() {
 		 pool.execute(new Runnable() {
 			@Override
@@ -184,7 +184,7 @@ public class DataTask  implements InitializingBean {
 	
 	
 	
-	@Scheduled(cron = "0 35 9 * * *")
+	@Scheduled(cron = "0 35 9 * * MON-FRI")
 	private void showBoduan() {
 		List<SubscriptionDo> list=guPiaoService.listMemberAll();
 		for(SubscriptionDo realTime:list) {

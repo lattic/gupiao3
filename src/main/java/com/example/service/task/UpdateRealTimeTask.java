@@ -15,7 +15,7 @@ import com.example.uitls.RedisKeyUtil;
 import com.example.uitls.RedisUtil;
 
 public class UpdateRealTimeTask  implements Runnable {
-	private static Logger logger = LoggerFactory.getLogger("real_time_monitor");
+	private static Logger logger = LoggerFactory.getLogger("real_time");
 	private String number;
 	private GuPiaoService guPiaoService;
 	private ReadApiUrl apiUrl;

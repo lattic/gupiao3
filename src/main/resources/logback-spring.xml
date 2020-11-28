@@ -43,7 +43,7 @@
 			<totalSizeCap>20GB</totalSizeCap>
 		</rollingPolicy>
 	</appender>
-	<appender name="READ_API"
+	<appender name="API_LOG"
 		class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<file>${LOG_PATH}/api.log</file>
 		<encoder>
@@ -122,7 +122,7 @@
 	</logger>
 	
 	<logger name="api_log" level="INFO" additivity="false">
-		<appender-ref ref="READ_API" />
+		<appender-ref ref="API_LOG" />
 	</logger>
 
 	<logger name="mock_log" level="INFO" additivity="false">

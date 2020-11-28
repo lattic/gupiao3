@@ -95,8 +95,7 @@ public class DingTalkRobotHTTPUtil {
 			        	 run(accessToken, content, notifyList, isAtAll);
 			        }
 		        } catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+		        	logger.error(e.getMessage(),e);
 				}
 		    };
 

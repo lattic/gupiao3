@@ -4,11 +4,8 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -25,11 +22,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
-import com.example.ai.MockDeal;
 import com.example.demo.GuPiao;
 import com.example.model.GuPiaoDo;
 import com.example.model.HistoryPriceDo;
-import com.example.model.HistoryStockDo;
 import com.example.model.SubscriptionDo;
 import com.example.service.GuPiaoService;
 import com.example.uitls.DateUtils;
@@ -40,7 +35,7 @@ import com.example.uitls.RedisUtil;
 
 @Service
 public class MonitorRiskTask {
-	private static Logger logger = LoggerFactory.getLogger(MonitorRiskTask.class);
+	private static Logger logger = LoggerFactory.getLogger("task_log");
 	ThreadPoolExecutor  pool = new ThreadPoolExecutor(20, 100, 1,TimeUnit.SECONDS,
 			new LinkedBlockingDeque<Runnable>(1000), 
 			Executors.defaultThreadFactory(), 

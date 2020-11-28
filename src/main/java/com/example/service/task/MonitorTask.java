@@ -30,7 +30,7 @@ import com.example.uitls.RedisUtil;
 
 @Service
 public class MonitorTask  {
-	private static Logger logger = LoggerFactory.getLogger("mock_log");
+	private static Logger logger = LoggerFactory.getLogger("task_log");
 	ThreadPoolExecutor  pool = new ThreadPoolExecutor(20, 100, 1,TimeUnit.SECONDS,
 			new LinkedBlockingDeque<Runnable>(1000), 
 			Executors.defaultThreadFactory(), 

@@ -52,11 +52,11 @@ public class RealTimeTask implements InitializingBean {
 			Executors.defaultThreadFactory(), 
 			new ThreadPoolExecutor.CallerRunsPolicy());
 	
-	private List<StockDo> list1= new ArrayList<StockDo>();
-	private List<StockDo> list2= new ArrayList<StockDo>();
-	private List<StockDo> list3= new ArrayList<StockDo>();
-	private List<StockDo> list4= new ArrayList<StockDo>();
-	private List<StockDo> list5= new ArrayList<StockDo>();
+	private static List<StockDo> list1= new ArrayList<StockDo>();
+	private static List<StockDo> list2= new ArrayList<StockDo>();
+	private static List<StockDo> list3= new ArrayList<StockDo>();
+	private static List<StockDo> list4= new ArrayList<StockDo>();
+	private static List<StockDo> list5= new ArrayList<StockDo>();
 	
 	
 	@Scheduled(cron = "0/30 * 9-15 * * MON-FRI")

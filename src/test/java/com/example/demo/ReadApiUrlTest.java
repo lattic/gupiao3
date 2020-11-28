@@ -10,6 +10,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.example.service.GuPiaoService;
 import com.example.service.task.DataTask;
+import com.example.service.task.RealTimeTask;
 import com.example.service.task.UpdateRealTimeTask;
 import com.example.uitls.ReadApiUrl;
 import com.example.uitls.RedisUtil;
@@ -24,6 +25,9 @@ public class ReadApiUrlTest {
 	private RedisUtil redisUtil;
 	@Autowired
 	private DataTask  dataTask;
+	@Autowired
+	private RealTimeTask realTimeTask;
+	
 	
 	private String number="sh688366";
 	
@@ -39,6 +43,11 @@ public class ReadApiUrlTest {
 	@Test
 	public void task() {
 		try {
+			realTimeTask.task1();
+			realTimeTask.task2();
+			realTimeTask.task3();
+			realTimeTask.task4();
+			realTimeTask.task5();
 			dataTask.updateAllDayGuPiao();
 		} catch (Exception e) {
 			e.printStackTrace();

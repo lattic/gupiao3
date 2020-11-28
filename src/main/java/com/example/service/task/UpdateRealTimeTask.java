@@ -26,12 +26,13 @@ public class UpdateRealTimeTask  implements Runnable {
 			try {
 				GuPiao date=apiUrl.readUrl(number,false);
 				if(date !=null) {
-					logger.info("写入缓存:"+number);
+					
 					RealTimeDo model=new RealTimeDo();
 					BeanUtils.copyProperties(date, model);
 					String key = RedisKeyUtil.getRealTimeByRealTimeDo(model);
 					if(redisUtil.hasKey(key)) {
 						logger.info("已经存在:"+key);
+						logger.info("已有缓存:"+key);
 						return ;
 					}
 					redisUtil.set(key, model,60);
@@ -45,6 +46,7 @@ public class UpdateRealTimeTask  implements Runnable {
 					redisUtil.set(key2, map,86000);
 					String key3 =RedisKeyUtil.getRealTime(number);
 					redisUtil.set(key3, date,30);
+					logger.info("写入缓存:"+number);
 				}
 			} catch (Exception e) {
 				logger.warn(e.getMessage(),e);

@@ -60,8 +60,7 @@ public class GupiaoServiceTest {
 	private ReadApiUrl readApiUrl;
 	
 	private MonitorTask monitorTask;
-	@Autowired
-	private RealTimeTask realTimeTask;
+	
 	@Autowired
 	private HistoryDayStockMapper historyDayStockMapper;
 	

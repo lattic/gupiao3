@@ -117,7 +117,7 @@ public class ReadApiUrl {
 				return hanldeData(number, code);
 			}
 			try {
-				Thread.sleep(1000L);
+				Thread.sleep(5000L);
 				logger.warn("第"+i+"次，重试请求："+url);
 				code= HttpClientUtil.doGet(url);
 			} catch (InterruptedException e) {

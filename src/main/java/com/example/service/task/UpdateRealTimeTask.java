@@ -1,7 +1,7 @@
 package com.example.service.task;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,12 +37,12 @@ public class UpdateRealTimeTask  implements Runnable {
 					redisUtil.set(key, model,60);
 					String key2 =RedisKeyUtil.getRealTimeListByRealTimeDo(model);
 					@SuppressWarnings("unchecked")
-					List<RealTimeDo> list=(List<RealTimeDo>) redisUtil.get(key2);
-					if(list == null) {
-						list=new ArrayList<RealTimeDo>();
+					Map<String,RealTimeDo> map=(Map<String,RealTimeDo>) redisUtil.get(key2);
+					if(map == null) {
+						map=new HashMap<String,RealTimeDo>();
 					}
-					list.add(model);
-					redisUtil.set(key2, list,86000);
+					map.put(model.getDate()+model.getTime(), model);
+					redisUtil.set(key2, map,86000);
 					String key3 =RedisKeyUtil.getRealTime(number);
 					redisUtil.set(key3, date,30);
 				}

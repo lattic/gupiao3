@@ -3,8 +3,11 @@ package com.example.service.task;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -127,9 +130,11 @@ public class DataTask  implements InitializingBean {
 		stockList.forEach(stock->{
 			RealTimeDo model=new RealTimeDo();
 			model.setNumber(stock.getNumber());
-			model.setDate(dateformat.format(new Date()));
+			model.setDate("20201127");
 			String key =RedisKeyUtil.getRealTimeListByRealTimeDo(model);
-			List<RealTimeDo> list=(List<RealTimeDo>) redisUtil.get(key);
+			Map<String,RealTimeDo> map=(Map<String,RealTimeDo>) redisUtil.get(key);
+			Collection<RealTimeDo> valueCollection = map.values();
+			List<RealTimeDo>list=new ArrayList<RealTimeDo>(valueCollection);
 			if(list != null && list.size()>0) {
 				double avg=0;
 				for(RealTimeDo rt:list) {

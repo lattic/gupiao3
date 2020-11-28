@@ -3,16 +3,13 @@ package com.example.demo;
 import javax.annotation.Resource;
 
 import org.junit.Test;
-import org.junit.runner.Description;
 import org.junit.runner.RunWith;
-import org.junit.runner.Runner;
-import org.junit.runner.notification.RunNotifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.example.ai.MockDeal;
 import com.example.service.GuPiaoService;
+import com.example.service.task.DataTask;
 import com.example.service.task.UpdateRealTimeTask;
 import com.example.uitls.ReadApiUrl;
 import com.example.uitls.RedisUtil;
@@ -25,7 +22,8 @@ public class ReadApiUrlTest {
 	private GuPiaoService guPiaoService;
 	@Resource
 	private RedisUtil redisUtil;
-	
+	@Autowired
+	private DataTask  dataTask;
 	
 	private String number="sh688366";
 	
@@ -33,8 +31,17 @@ public class ReadApiUrlTest {
 	public void readRealTimeUrl() {
 		readApiUrl.readRealTimeUrl(number);
 	}
-	@Test
+
 	public void updateRealTime() {
 		new UpdateRealTimeTask(guPiaoService,number,readApiUrl,redisUtil).run();
+	}
+	
+	@Test
+	public void task() {
+		try {
+			dataTask.updateAllDayGuPiao();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

@@ -58,8 +58,7 @@ public class GupiaoServiceTest {
 	private RedisUtil redisUtil;
 	@Autowired
 	private ReadApiUrl readApiUrl;
-	@Autowired
-	private DataTask  dataTask;
+	
 	private MonitorTask monitorTask;
 	@Autowired
 	private RealTimeTask realTimeTask;
@@ -70,21 +69,6 @@ public class GupiaoServiceTest {
 	
 	
 	
-	
-	//@Test
-	public void task() {
-		try {
-			realTimeTask.task1();
-			realTimeTask.task2();
-			realTimeTask.task3();
-			realTimeTask.task4();
-			realTimeTask.task5();
-			dataTask.updateAllDayGuPiao();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
 	
 	
 	//@Test

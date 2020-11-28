@@ -121,6 +121,11 @@ public class RealTimeTask implements InitializingBean {
 		list3=list.subList(2*k, 3*k);
 		list4=list.subList(3*k, 4*k);
 		list5=list.subList(4*k, list.size());
+		task1();
+		task2();
+		task3();
+		task4();
+		task5();
 		} catch (Exception e) {
 			logger.warn("init Exception:"+e.getMessage(),e);
 		}

@@ -23,7 +23,7 @@
 			class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
 			<fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
 			<maxHistory>7</maxHistory>
-			<maxFileSize>50MB</maxFileSize>
+			<maxFileSize>1GB</maxFileSize>
 			<totalSizeCap>20GB</totalSizeCap>
 		</rollingPolicy>
 	</appender>
@@ -39,7 +39,7 @@
 			<fileNamePattern>${LOG_PATH}/realTime.%d{yyyy-MM-dd}.%i.log
 			</fileNamePattern>
 			<maxHistory>7</maxHistory>
-			<maxFileSize>50MB</maxFileSize>
+			<maxFileSize>1GB</maxFileSize>
 			<totalSizeCap>20GB</totalSizeCap>
 		</rollingPolicy>
 	</appender>
@@ -54,7 +54,7 @@
 			<fileNamePattern>${LOG_PATH}/api.%d{yyyy-MM-dd}.%i.log
 			</fileNamePattern>
 			<maxHistory>7</maxHistory>
-			<maxFileSize>50MB</maxFileSize>
+			<maxFileSize>1GB</maxFileSize>
 			<totalSizeCap>20GB</totalSizeCap>
 		</rollingPolicy>
 	</appender>
@@ -70,7 +70,7 @@
 			<fileNamePattern>${LOG_PATH}/dingtalk.%d{yyyy-MM-dd}.%i.log
 			</fileNamePattern>
 			<maxHistory>7</maxHistory>
-			<maxFileSize>50MB</maxFileSize>
+			<maxFileSize>1GB</maxFileSize>
 			<totalSizeCap>20GB</totalSizeCap>
 		</rollingPolicy>
 	</appender>
@@ -86,7 +86,7 @@
 			<fileNamePattern>${LOG_PATH}/mock.%d{yyyy-MM-dd}.%i.log
 			</fileNamePattern>
 			<maxHistory>7</maxHistory>
-			<maxFileSize>50MB</maxFileSize>
+			<maxFileSize>1GB</maxFileSize>
 			<totalSizeCap>20GB</totalSizeCap>
 		</rollingPolicy>
 	</appender>
@@ -102,7 +102,7 @@
 			<fileNamePattern>${LOG_PATH}/task.%d{yyyy-MM-dd}.%i.log
 			</fileNamePattern>
 			<maxHistory>7</maxHistory>
-			<maxFileSize>50MB</maxFileSize>
+			<maxFileSize>1GB</maxFileSize>
 			<totalSizeCap>20GB</totalSizeCap>
 		</rollingPolicy>
 	</appender>

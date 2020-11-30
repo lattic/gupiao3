@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.model.StockDo;
 import com.example.service.GuPiaoService;
+import com.example.uitls.DateUtils;
 import com.example.uitls.ReadApiUrl;
 import com.example.uitls.RedisUtil;
 
@@ -59,8 +60,11 @@ public class RealTimeTask implements InitializingBean {
 	private static List<StockDo> list5= new ArrayList<StockDo>();
 	
 	
-	@Scheduled(cron = "0/30 * * * * *")
+	@Scheduled(cron = "0/30 * 9-15 * * MON-FRI")
 	public void  task1() throws Exception {
+		if(!DateUtils.traceTime(guPiaoService.getHolidayList())) {
+			return ;
+		}
 		for(StockDo stock:list1) {
 			try {
 				pool1.execute(new UpdateRealTimeTask(guPiaoService,stock.getNumber(),apiUrl,redisUtil));
@@ -69,8 +73,11 @@ public class RealTimeTask implements InitializingBean {
 			}
 		}
 	}
-	@Scheduled(cron = "0/30 * * * * *")
+	@Scheduled(cron = "0/30 * 9-15 * * MON-FRI")
 	public void  task2() throws Exception {
+		if(!DateUtils.traceTime(guPiaoService.getHolidayList())) {
+			return ;
+		}
 		for(StockDo stock:list2) {
 			try {
 				pool2.execute(new UpdateRealTimeTask(guPiaoService,stock.getNumber(),apiUrl,redisUtil));
@@ -79,8 +86,11 @@ public class RealTimeTask implements InitializingBean {
 			}
 		}
 	}
-	@Scheduled(cron = "0/30 * * * * *")
+	@Scheduled(cron = "0/30 * 9-15 * * MON-FRI")
 	public void  task3() throws Exception {
+		if(!DateUtils.traceTime(guPiaoService.getHolidayList())) {
+			return ;
+		}
 		for(StockDo stock:list3) {
 			try {
 				pool3.execute(new UpdateRealTimeTask(guPiaoService,stock.getNumber(),apiUrl,redisUtil));
@@ -89,8 +99,11 @@ public class RealTimeTask implements InitializingBean {
 			}
 		}
 	}
-	@Scheduled(cron = "0/30 * * * * *")
+	@Scheduled(cron = "0/30 * 9-15 * * MON-FRI")
 	public void  task4() throws Exception {
+		if(!DateUtils.traceTime(guPiaoService.getHolidayList())) {
+			return ;
+		}
 		for(StockDo stock:list4) {
 			try {
 				pool4.execute(new UpdateRealTimeTask(guPiaoService,stock.getNumber(),apiUrl,redisUtil));
@@ -99,8 +112,11 @@ public class RealTimeTask implements InitializingBean {
 			}
 		}
 	}
-	@Scheduled(cron = "0/30 * * * * *")
+	@Scheduled(cron = "0/30 * 9-15 * * MON-FRI")
 	public void  task5() throws Exception {
+		if(!DateUtils.traceTime(guPiaoService.getHolidayList())) {
+			return ;
+		}
 		for(StockDo stock:list5) {
 			try {
 				pool5.execute(new UpdateRealTimeTask(guPiaoService,stock.getNumber(),apiUrl,redisUtil));
@@ -114,13 +130,13 @@ public class RealTimeTask implements InitializingBean {
 	public void afterPropertiesSet() throws Exception {
 		
 		try {
-		List<StockDo> list=guPiaoService.getAllStock();
-		int k=list.size()/5;
-		list1=list.subList(0, k);
-		list2=list.subList(1*k, 2*k);
-		list3=list.subList(2*k, 3*k);
-		list4=list.subList(3*k, 4*k);
-		list5=list.subList(4*k, list.size());
+			List<StockDo> list=guPiaoService.getAllStock();
+			int k=list.size()/5;
+			list1=list.subList(0, k);
+			list2=list.subList(1*k, 2*k);
+			list3=list.subList(2*k, 3*k);
+			list4=list.subList(3*k, 4*k);
+			list5=list.subList(4*k, list.size());
 		} catch (Exception e) {
 			logger.warn("init Exception:"+e.getMessage(),e);
 		}

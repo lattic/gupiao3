@@ -31,7 +31,7 @@ public class ReadApiUrl {
 	public List<HistoryPriceDo> readHistoryApiUrl(String number,int type) {
 		String url = "http://api.finance.ifeng.com/akmin?scode=" + number+"&type="+type;
 		String code = HttpClientUtil.doGet(url);
-		logger.info("http请求:"+url+" return:"+code);
+		logger.debug("http请求:"+url+" return:"+code);
 		if (code == null) {
 			logger.warn("http请求数据为空:"+url);
 			return null;
@@ -108,7 +108,7 @@ public class ReadApiUrl {
 	public GuPiao readRealTimeUrl(String number) {
 		String url = "http://hq.sinajs.cn/list=" + number;
 		String code = HttpClientUtil.doGet(url);
-		logger.info("http请求:"+url+" return:"+code);
+		logger.debug("http请求:"+url+" return:"+code);
 		for(int i=1;i<=5;i++){
 			if (code != null) {
 				return hanldeData(number, code);

@@ -53,7 +53,6 @@ public class MonitorTask  {
 	}
 	
 	private void followTask() {
-		
 		if(!DateUtils.traceTime(guPiaoService.getHolidayList())) {
 			return ;
 		}

@@ -5,9 +5,6 @@ import java.math.BigDecimal;
 
 public class RobotAccountDo implements Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 8195305329250487915L;
 
 	private Long id;
@@ -16,6 +13,9 @@ public class RobotAccountDo implements Serializable {
 	
 	private Long robotId;
 
+	public RobotAccountDo() {
+	}
+	
 	public Long getId() {
 		return id;
 	}

@@ -5,10 +5,15 @@ import java.util.Date;
 
 public class HolidayDo implements Serializable {
 
+	private static final long serialVersionUID = -3632084925836642048L;
+
 	private Long id;
 	
 	private Date holiday;
 
+	public HolidayDo() {
+	}
+	
 	public Long getId() {
 		return id;
 	}

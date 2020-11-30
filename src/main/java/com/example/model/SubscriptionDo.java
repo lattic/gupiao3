@@ -4,9 +4,6 @@ import java.io.Serializable;
 import java.util.Date;
 
 public class SubscriptionDo implements Serializable {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -2022773262678015013L;
 	
 	private Long id;
@@ -23,6 +20,9 @@ public class SubscriptionDo implements Serializable {
 	
 	private Integer status;
 
+	public SubscriptionDo() {
+	}
+	
 	public Long getId() {
 		return id;
 	}

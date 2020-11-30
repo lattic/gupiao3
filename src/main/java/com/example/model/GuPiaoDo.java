@@ -10,7 +10,9 @@ import java.math.BigDecimal;
  */
 public class GuPiaoDo implements Serializable {
 	
-	
+	private static final long serialVersionUID = -576953173464483273L;
+
+
 	@Override
 	public String toString() {
 		return "GuPiao [number=" + number + ", name=" + name + ", 今天开盘价=" + kaipanjia + ", 昨日收盘价="
@@ -23,7 +25,8 @@ public class GuPiaoDo implements Serializable {
 				+ sell3number + ", 卖三价格=" + sell3 + ", 卖四股数=" + sell4number + ", 卖四价格=" + sell4
 				+ ", 卖五股数=" + sell5number + ", 卖五价格=" + sell5 + ", 日期=" + date + ", 时间=" + time + "]";
 	}
-
+	public GuPiaoDo() {
+	}
 	private Long id;
 	private String number;
 	private String name;

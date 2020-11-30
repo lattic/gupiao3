@@ -11,6 +11,8 @@ import java.math.BigDecimal;
 public class RealTimeDo implements Serializable {
 	
 	
+	private static final long serialVersionUID = 3693765378412541935L;
+
 	@Override
 	public String toString() {
 		return "RealTime ["
@@ -84,7 +86,8 @@ public class RealTimeDo implements Serializable {
 	private String date;
 	private String time;
 	
-	
+	public RealTimeDo() {
+	}
 	
 	public Long getId() {
 		return id;

@@ -1,8 +1,10 @@
 package com.example.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class MockLog {
+public class MockLog implements Serializable {
+	private static final long serialVersionUID = 6523392249528549952L;
 	private Date beginTime;
 	private Date endTime;
 	private String number;
@@ -18,7 +20,8 @@ public class MockLog {
 	private Boolean isBuyin=false;
 	private Date lastBuyin;
 	
-	
+	public MockLog() {
+	}
 
 	public Date getLastBuyin() {
 		return lastBuyin;

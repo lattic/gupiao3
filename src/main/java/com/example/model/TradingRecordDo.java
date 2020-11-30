@@ -6,9 +6,6 @@ import java.util.Date;
 
 public class TradingRecordDo implements Serializable  {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 6244267443156745046L;
 
 	private Long id;
@@ -31,6 +28,9 @@ public class TradingRecordDo implements Serializable  {
 	
 	private String remark;
 
+	public TradingRecordDo() {
+	}
+	
 	public Long getId() {
 		return id;
 	}

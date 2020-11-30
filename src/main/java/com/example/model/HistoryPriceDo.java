@@ -1,9 +1,14 @@
 package com.example.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class HistoryPriceDo {
+public class HistoryPriceDo implements Serializable  {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8916176475196201972L;
 	private Date dateime;
 	private String number;
 	private String name;
@@ -25,7 +30,8 @@ public class HistoryPriceDo {
 	private int powerValue;
 	private BigDecimal yaliwei;
 	private BigDecimal zhichengwei;
-	
+	public HistoryPriceDo() {
+	}
 	public String getName() {
 		return name;
 	}

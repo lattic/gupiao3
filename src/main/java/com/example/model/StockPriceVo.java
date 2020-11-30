@@ -1,9 +1,12 @@
 package com.example.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class StockPriceVo {
+public class StockPriceVo implements Serializable {
 	
+	private static final long serialVersionUID = -5771022073336573609L;
+
 	private String number;
 	
 	private String name;
@@ -38,6 +41,9 @@ public class StockPriceVo {
 	
 	private String remark;
 
+	public StockPriceVo() {
+	}
+	
 	public Long getVolume() {
 		return volume;
 	}

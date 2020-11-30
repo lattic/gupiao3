@@ -42,7 +42,8 @@ public class HistoryDayStockDo implements Serializable {
 	
 	private String remark;
 
-
+	public HistoryDayStockDo() {
+	}
 	public Long getVolume() {
 		return volume;
 	}

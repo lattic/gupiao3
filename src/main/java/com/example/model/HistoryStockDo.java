@@ -6,9 +6,6 @@ import java.util.Date;
 
 public class HistoryStockDo implements Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 8195305329250487915L;
 
 	private Long id;
@@ -41,6 +38,9 @@ public class HistoryStockDo implements Serializable {
 	private BigDecimal boxAvg;
 	
 	private String remark;
+	
+	public HistoryStockDo() {
+	}
 	
 	public String getRemark() {
 		return remark;

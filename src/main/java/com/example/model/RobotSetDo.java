@@ -6,9 +6,6 @@ import java.util.Date;
 
 public class RobotSetDo implements Serializable  {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 4330902221504993783L;
 
 	private Long id;
@@ -29,6 +26,9 @@ public class RobotSetDo implements Serializable  {
 	
 	private BigDecimal stopLossesPrice;
 
+	public RobotSetDo() {
+	}
+	
 	public String getName() {
 		return name;
 	}

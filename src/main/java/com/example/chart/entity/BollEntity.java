@@ -29,8 +29,33 @@ public class BollEntity implements ChartEntity {
         this.midList = new ArrayList<>();
         this.lowerList = new ArrayList<>();
     }
+    
 
-    @Override
+    public List<Entry> getUpList() {
+		return upList;
+	}
+
+	public void setUpList(List<Entry> upList) {
+		this.upList = upList;
+	}
+
+	public List<Entry> getMidList() {
+		return midList;
+	}
+
+	public void setMidList(List<Entry> midList) {
+		this.midList = midList;
+	}
+
+	public List<Entry> getLowerList() {
+		return lowerList;
+	}
+
+	public void setLowerList(List<Entry> lowerList) {
+		this.lowerList = lowerList;
+	}
+
+	@Override
     public void clearValues() {
         if (upList != null) {
             upList.clear();

@@ -187,25 +187,150 @@ public class TrendStrategyServiceImpl implements TrendStrategyService {
 	}
 
 	@Override
-	public MAEntity getStrategyByMa(List<StockPriceVo> list, RobotAccountDo account, RobotSetDo config) {
+	public List<TradingRecordDo> getStrategyByMa(List<StockPriceVo> list, RobotAccountDo account, RobotSetDo config) {
+		List<TradingRecordDo> rslist=new ArrayList<TradingRecordDo>();
+		MAEntity ma = buildMaEntry(list);
+	    
+	    for(int i=0;i<list.size();i++) {
+	    	StockPriceVo price=list.get(i);
+	    	Entry maValue=ma.ma.get(i);
+	    	double buyPoint=maValue.getY()*0.97;
+	    	double sellPoint=maValue.getY()*1.05;
+	    	double stopLossPoint=maValue.getY()*0.95;
+	    	
+	    	if(price.getOpen().doubleValue() <= buyPoint && price.getOpen().doubleValue()>=stopLossPoint) {
+	    		double sotck=account.getTotal().intValue() * 0.2/ (price.getOpen().intValue()*100);
+	    		int num=(int)sotck*100;
+	    		TradingRecordDo buyRecord=new TradingRecordDo(
+	    				DateUtils.getDateForYYYYMMDDHHMM_NUMBER(price.getHistoryAll()),
+	    				price.getNumber(),
+	    				price.getName(),
+	    				config.getDtId(),
+	    				price.getOpen(),
+	    				num,
+	    				TradingRecordDo.options_buy,
+	    				"低于MA均线买入"
+	    				);
+	    		rslist.add(buyRecord);
+	    	}
+	    	if(price.getOpen().doubleValue() <= stopLossPoint) {
+	    		double sotck=account.getTotal().intValue() * 0.2/ (price.getOpen().intValue()*100);
+	    		int num=(int)sotck*100;
+	    		TradingRecordDo buyRecord=new TradingRecordDo(
+	    				DateUtils.getDateForYYYYMMDDHHMM_NUMBER(price.getHistoryAll()),
+	    				price.getNumber(),
+	    				price.getName(),
+	    				config.getDtId(),
+	    				price.getOpen(),
+	    				num,
+	    				TradingRecordDo.options_sell,
+	    				"跌破止损卖出"
+	    				);
+	    		rslist.add(buyRecord);
+	    	}
+	    	if(price.getOpen().doubleValue() >= sellPoint) {
+	    		double sotck=account.getTotal().intValue() * 0.2/ (price.getOpen().intValue()*100);
+	    		int num=(int)sotck*100;
+	    		TradingRecordDo buyRecord=new TradingRecordDo(
+	    				DateUtils.getDateForYYYYMMDDHHMM_NUMBER(price.getHistoryAll()),
+	    				price.getNumber(),
+	    				price.getName(),
+	    				config.getDtId(),
+	    				price.getOpen(),
+	    				num,
+	    				TradingRecordDo.options_sell,
+	    				"止盈卖出"
+	    				);
+	    		rslist.add(buyRecord);
+	    	}
+	    }
+		return rslist;
+	}
+
+	private MAEntity buildMaEntry(List<StockPriceVo> list) {
 		BarSeries series = transformBarSeriesByStockPrice(list);
 		ClosePriceIndicator closePrice = new ClosePriceIndicator(series);
 	    SMAIndicator avg = new SMAIndicator(closePrice, 20);
 	    List<Entry> maList =new  ArrayList<Entry>();
 	    for(int i=0;i<list.size();i++) {
-	    	Entry ma=new Entry();
-	    	ma.setX(list.get(i).getHistoryAll());
-	    	ma.setY(avg.getValue(i).doubleValue());
-	    	ma.setData(list.get(i));
-	    	maList.add(ma);
+	    	Entry entry=new Entry();
+	    	entry.setX(list.get(i).getHistoryAll());
+	    	entry.setY(avg.getValue(i).doubleValue());
+	    	entry.setData(list.get(i));
+	    	maList.add(entry);
 	    }
-		return new MAEntity(maList);
+	    return new MAEntity(maList);
 	}
 
 	@Override
-	public BollEntity getStrateByBoll(List<StockPriceVo> list, RobotAccountDo account, RobotSetDo config) {
+	public List<TradingRecordDo> getStrateByBoll(List<StockPriceVo> list, RobotAccountDo account, RobotSetDo config) {
+		List<TradingRecordDo> rslist=new ArrayList<TradingRecordDo>();
+		BollEntity boll= buildBollEntry(list);
+		for(int i=0;i<list.size();i++) {
+	    	StockPriceVo price=list.get(i);
+	    	Entry upValue=boll.getUpList().get(i);
+	    	Entry midValue=boll.getMidList().get(i);
+	    	Entry lowerValue=boll.getLowerList().get(i);
+	    	if(price.getOpen().doubleValue() <midValue.getY()) {
+	    		continue;
+	    	}
+	    	
+	    	double buyPoint=lowerValue.getY()*0.97;
+	    	double stopLossPoint=lowerValue.getY()*0.95;
+	    	double sellPoint=upValue.getY()*0.995;
+	    	
+	    	if(price.getOpen().doubleValue() <= buyPoint && price.getOpen().doubleValue()>=stopLossPoint) {
+	    		double sotck=account.getTotal().intValue() * 0.2/ (price.getOpen().intValue()*100);
+	    		int num=(int)sotck*100;
+	    		TradingRecordDo buyRecord=new TradingRecordDo(
+	    				DateUtils.getDateForYYYYMMDDHHMM_NUMBER(price.getHistoryAll()),
+	    				price.getNumber(),
+	    				price.getName(),
+	    				config.getDtId(),
+	    				price.getOpen(),
+	    				num,
+	    				TradingRecordDo.options_buy,
+	    				"低于boll下轨买入"
+	    				);
+	    		rslist.add(buyRecord);
+	    	}
+	    	if(price.getOpen().doubleValue() <= stopLossPoint) {
+	    		double sotck=account.getTotal().intValue() * 0.2/ (price.getOpen().intValue()*100);
+	    		int num=(int)sotck*100;
+	    		TradingRecordDo buyRecord=new TradingRecordDo(
+	    				DateUtils.getDateForYYYYMMDDHHMM_NUMBER(price.getHistoryAll()),
+	    				price.getNumber(),
+	    				price.getName(),
+	    				config.getDtId(),
+	    				price.getOpen(),
+	    				num,
+	    				TradingRecordDo.options_sell,
+	    				"跌破止损卖出"
+	    				);
+	    		rslist.add(buyRecord);
+	    	}
+	    	if(price.getOpen().doubleValue() >= sellPoint) {
+	    		double sotck=account.getTotal().intValue() * 0.2/ (price.getOpen().intValue()*100);
+	    		int num=(int)sotck*100;
+	    		TradingRecordDo buyRecord=new TradingRecordDo(
+	    				DateUtils.getDateForYYYYMMDDHHMM_NUMBER(price.getHistoryAll()),
+	    				price.getNumber(),
+	    				price.getName(),
+	    				config.getDtId(),
+	    				price.getOpen(),
+	    				num,
+	    				TradingRecordDo.options_sell,
+	    				"止盈卖出"
+	    				);
+	    		rslist.add(buyRecord);
+	    	}
+	    }
+		return rslist;
+	}
+
+	private BollEntity buildBollEntry(List<StockPriceVo> list) {
+		BollEntity boll;
 		BarSeries series = transformBarSeriesByStockPrice(list);
-		
         ClosePriceIndicator closePrice = new ClosePriceIndicator(series);
         SMAIndicator avg = new SMAIndicator(closePrice, 20);
         StandardDeviationIndicator sd20 = new StandardDeviationIndicator(closePrice, 20);
@@ -240,7 +365,7 @@ public class TrendStrategyServiceImpl implements TrendStrategyService {
         	lower.setData(list.get(i));
         	lowerList.add(lower);
         }
-		return new BollEntity(upList, midList, lowerList);
+        return new BollEntity(upList, midList, lowerList);
 	}
 
 	

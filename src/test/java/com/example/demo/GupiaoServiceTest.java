@@ -66,8 +66,18 @@ public class GupiaoServiceTest {
 	
 	private String number="sh600305";
 	
+	@Autowired
+	private DataTask dataTask;
 	
-	
+	@Test
+	public void dataTask() {
+		try {
+			dataTask.afterPropertiesSet();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	
 	
 	//@Test

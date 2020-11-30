@@ -5,6 +5,7 @@ import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -63,7 +64,7 @@ public class DataTask  implements InitializingBean {
 											   + init(),new Object[] {});
 		logger.info(robotbuy);
         DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_TEST_SECRET, robotbuy, null, false);
-       
+        updateAllDayGuPiao();
 	}
 	
 	// 从数据库获取股票池初始化map
@@ -126,35 +127,50 @@ public class DataTask  implements InitializingBean {
 	public void updateAllDayGuPiao() {
 		List<StockDo> stockList = guPiaoService.getAllStock();
 		final SimpleDateFormat dateformat = new SimpleDateFormat("yyyyMMdd");
-		stockList.forEach(stock->{
+		String dateStr=dateformat.format(new Date());
+		for(StockDo stock:stockList) {
 			RealTimeDo model=new RealTimeDo();
 			model.setNumber(stock.getNumber());
-			model.setDate("20201127");
+			model.setDate(dateStr);
 			String key =RedisKeyUtil.getRealTimeListByRealTimeDo(model);
 			Map<String,RealTimeDo> map=(Map<String,RealTimeDo>) redisUtil.get(key);
+			if(map == null) {
+				continue;
+			}
 			Collection<RealTimeDo> valueCollection = map.values();
 			List<RealTimeDo>list=new ArrayList<RealTimeDo>(valueCollection);
 			if(list != null && list.size()>0) {
 				double avg=0;
+				double high=0;
+				double low=100000;
 				for(RealTimeDo rt:list) {
 					avg+=rt.getDangqianjiage();
+					if(rt.getTop()>=high) {
+						high=rt.getTop();
+					}
+					if(rt.getLow()<=low) {
+						low=rt.getLow();
+					}
 				}
 				avg=avg/list.size();
+				
+				
 				RealTimeDo last=list.get(list.size()-1);
 				HistoryDayStockDo obj =new HistoryDayStockDo();
+				obj.setHistoryDay(dateStr);
+				obj.setNumber(stock.getNumber());
 				obj.setOpen(new BigDecimal(last.getKaipanjia()));
 				obj.setClose(new BigDecimal(last.getDangqianjiage()));
 				obj.setAvg(new BigDecimal(avg));
-				obj.setHigh(new BigDecimal(last.getTop()));
-				obj.setLow(new BigDecimal(last.getLow()));
-				obj.setHistoryDay(last.getDate());
+				obj.setHigh(new BigDecimal(high));
+				obj.setLow(new BigDecimal(low));
 				obj.setVolume(last.getChengjiaogupiao().longValue());
 				if(historyDayStockMapper.getByTime(obj) == null) {
 					System.out.println(obj.getNumber());
 					historyDayStockMapper.insert(obj);
 				}
 			}
-        });
+        }
 	}
 	
 	

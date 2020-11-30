@@ -8,6 +8,9 @@ public class TradingRecordDo implements Serializable  {
 
 	private static final long serialVersionUID = 6244267443156745046L;
 
+	public static final Integer options_buy=1;
+	public static final Integer options_sell=2;
+	
 	private Long id;
 	
 	private Date createDate;
@@ -23,10 +26,28 @@ public class TradingRecordDo implements Serializable  {
 	private BigDecimal price;
 	
 	private Integer num;
-	
+	/**
+	 * 0=不操作
+	 * 1=买入
+	 * 2=卖出
+	 */
 	private Integer options;
 	
 	private String remark;
+
+	
+	public TradingRecordDo(Date createDate, String number, String name, String dtId, BigDecimal price, Integer num,
+			Integer options, String remark) {
+		super();
+		this.createDate = createDate;
+		this.number = number;
+		this.name = name;
+		this.dtId = dtId;
+		this.price = price;
+		this.num = num;
+		this.options = options;
+		this.remark = remark;
+	}
 
 	public TradingRecordDo() {
 	}

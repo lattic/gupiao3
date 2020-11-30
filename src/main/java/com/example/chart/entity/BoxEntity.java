@@ -14,9 +14,7 @@ public class BoxEntity implements ChartEntity {
 
     public List<Entry> pdiList;
     public List<Entry> mdiList;
-    //adx
     public List<Entry> adxList;
-    //adxr
     public List<Entry> adxrList;
     public String indexDes = "";
 

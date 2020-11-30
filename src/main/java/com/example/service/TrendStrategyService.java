@@ -95,7 +95,7 @@ public interface TrendStrategyService {
 	 * @param config  参数
 	 * @return
 	 */
-	MAEntity getStrategyByMa(List<StockPriceVo> list,RobotAccountDo account,RobotSetDo config);
+	List<TradingRecordDo> getStrategyByMa(List<StockPriceVo> list,RobotAccountDo account,RobotSetDo config);
 	
 	
 	/**
@@ -105,5 +105,5 @@ public interface TrendStrategyService {
 	 * @param config
 	 * @return
 	 */
-	BollEntity getStrateByBoll(List<StockPriceVo> list,RobotAccountDo account,RobotSetDo config);
+	List<TradingRecordDo> getStrateByBoll(List<StockPriceVo> list,RobotAccountDo account,RobotSetDo config);
 }

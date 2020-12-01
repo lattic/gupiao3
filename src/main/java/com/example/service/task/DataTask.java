@@ -60,17 +60,18 @@ public class DataTask  implements InitializingBean {
 	private ReadApiUrl apiUrl;
 	@Autowired
 	private HistoryDayStockMapper historyDayStockMapper;
-	
 	@Autowired
 	private TrendStrategyService trendStrategyService;
-	
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		String robotbuy = MessageFormat.format("【初始化股票池】 \n 初始化股票池数量："  + init(),new Object[] {});
         DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_TEST_SECRET, robotbuy, null, false);
 	}
 	
-	// 从数据库获取股票池初始化map
+	/**
+	 * 缓存股票名称
+	 * @return
+	 */
 	private int init() {
 		List<StockDo> stockList = guPiaoService.getAllStock();
 		stockList.forEach(stock->{
@@ -81,7 +82,7 @@ public class DataTask  implements InitializingBean {
 	
 	
 	/**
-	 * 所有到的股票池
+	 * 搜索每天新发行的股票
 	 */
 	@Scheduled(cron = "0 10 15 * * MON-FRI")
 	private void updateAllGuPiao() {
@@ -124,7 +125,7 @@ public class DataTask  implements InitializingBean {
 	}
 	
 	/**
-	 * 所有到的股票池
+	 * 更新日线数据
 	 */
 	@Scheduled(cron = "0 10 15 * * MON-FRI")
 	public void updateAllDayGuPiao() {
@@ -189,7 +190,9 @@ public class DataTask  implements InitializingBean {
 	
 	
 	
-	
+	/**
+	 * 关注个股，显示操作
+	 */
 	@Scheduled(cron = "0 35 9 * * MON-FRI")
 	private void showBoduan() {
 		List<SubscriptionDo> list=guPiaoService.listMemberAll();

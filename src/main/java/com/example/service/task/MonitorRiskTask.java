@@ -45,7 +45,6 @@ public class MonitorRiskTask {
 	private GuPiaoService guPiaoService;
 	@Autowired
 	private ReadApiUrl apiUrl;
-	
 	@Resource
 	private RedisUtil redisUtil;
 	
@@ -55,7 +54,6 @@ public class MonitorRiskTask {
 		if(!DateUtils.traceTime(guPiaoService.getHolidayList())) {
 			return ;
 		}
-
 		List<SubscriptionDo> list=guPiaoService.listMemberAll();
 		for(SubscriptionDo realTime:list) {
 			if(!StringUtils.equals(realTime.getNumber(), "0")) {

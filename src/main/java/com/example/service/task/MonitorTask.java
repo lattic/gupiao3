@@ -36,11 +36,8 @@ public class MonitorTask  {
 			Executors.defaultThreadFactory(), 
 			new ThreadPoolExecutor.CallerRunsPolicy());
 	
-	static boolean updateAll=true;
-	static boolean updateReal=true;
 	@Autowired
 	private GuPiaoService guPiaoService;
-	
 	@Autowired
 	private MockDeal mockDeal;
 	@Resource
@@ -71,13 +68,6 @@ public class MonitorTask  {
 			}
 		});
 	}
-	
-	
-	
-		
-	
-	
-	
 	
 	//初始化map
 	@Scheduled(cron = "0 35 9 * * MON-FRI")

@@ -1,6 +1,4 @@
 package com.example.demo;
-import static org.assertj.core.api.Assertions.withinPercentage;
-
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -18,6 +16,7 @@ import com.example.model.StockPriceVo;
 import com.example.model.TradingRecordDo;
 import com.example.service.GuPiaoService;
 import com.example.service.TrendStrategyService;
+import com.example.service.task.DataTask;
 import com.example.uitls.ReadApiUrl;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -35,10 +34,15 @@ public class StrategyTest {
 	@Autowired
 	private GuPiaoService guPiaoService;
 	
+	@Autowired
+	private DataTask dataTask;
+	
+	
+	private static String appSecret = "bb888ac7199ba68c327c8a0e44fbf0ee6b65b5b0f490beb39a209a295e132a4f";
 	private String number="sz002030";
 	private static final SimpleDateFormat DF_YYYY_MM_DD = new SimpleDateFormat("yyyy-MM-dd");// 设置日期格式
 	
-	@Test
+	//@Test
 	public void Test() {
 		
 		List<StockPriceVo> spList=trendStrategyService.transformByDayLine(historyDayStockMapper.getNumber(number));
@@ -52,6 +56,21 @@ public class StrategyTest {
 			total=total.setScale(2, BigDecimal.ROUND_UP);
 			System.out.println(DF_YYYY_MM_DD.format(rt.getCreateDate())+" "+rt.getNumber()+" 当天均价："+rt.getPrice()+" "+rt.getRemark());
 		}
-		
+	}
+	
+	
+	@Test
+	public void excuteRunListenTest() {
+		guPiaoService.updateHistoryStock("sh600305");
+		guPiaoService.timeInterval("sh600305");
+		dataTask.excuteRunListen("sh600305",appSecret,"20201115");
+		while(true) {
+			try {
+				Thread.sleep(10L);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 }

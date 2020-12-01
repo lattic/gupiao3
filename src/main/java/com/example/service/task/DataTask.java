@@ -30,10 +30,14 @@ import com.example.model.GuPiaoDo;
 import com.example.model.HistoryDayStockDo;
 import com.example.model.HistoryStockDo;
 import com.example.model.RealTimeDo;
+import com.example.model.RobotAccountDo;
+import com.example.model.RobotSetDo;
 import com.example.model.StockDo;
+import com.example.model.StockPriceVo;
 import com.example.model.SubscriptionDo;
+import com.example.model.TradingRecordDo;
 import com.example.service.GuPiaoService;
-import com.example.uitls.DateUtils;
+import com.example.service.TrendStrategyService;
 import com.example.uitls.DingTalkRobotHTTPUtil;
 import com.example.uitls.ReadApiUrl;
 import com.example.uitls.RedisKeyUtil;
@@ -56,6 +60,9 @@ public class DataTask  implements InitializingBean {
 	private ReadApiUrl apiUrl;
 	@Autowired
 	private HistoryDayStockMapper historyDayStockMapper;
+	
+	@Autowired
+	private TrendStrategyService trendStrategyService;
 	
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -192,7 +199,7 @@ public class DataTask  implements InitializingBean {
 			}
 		}
 	}
-	private void excuteRunListen(final String number,final String appSecret,final String beginTime) {
+	public void excuteRunListen(final String number,final String appSecret,final String beginTime) {
 		pool.execute(new Runnable() {
 			@Override
 			public void run() {
@@ -202,13 +209,21 @@ public class DataTask  implements InitializingBean {
 					if(isNotifyByMock == null || isNotifyByMock) {
 						isNotifyByMock=true;
 					}
-					List<HistoryStockDo> list= guPiaoService.getLastHistoryStock(number,3);
+					List<HistoryStockDo> list= guPiaoService.getLastHistoryStock(number,2);
 					String msg="GS========超短线策略波段分析(3-5天)=========GS"
 							+ "\n 股票编号："+number
 							+ "\n 股票名称："+(String)redisUtil.get(RedisKeyUtil.getStockName(number))
 							+ "\n";
 					for(HistoryStockDo stock:list) {
 						msg=msg+stock.getRemark();
+					}
+					List<StockPriceVo> spList=trendStrategyService.transformByDayLine(historyDayStockMapper.getNumber(number));
+					RobotAccountDo account=new RobotAccountDo();
+					RobotSetDo config=new RobotSetDo();
+					account.setTotal(new BigDecimal(100000));
+					List<TradingRecordDo> rtList=trendStrategyService.getStrateByBoll(spList, account, config);
+					if(rtList!=null && rtList.size() >0) {
+						msg=msg+rtList.get(rtList.size()-1).getRemark();
 					}
 					logger.info(msg);
 					

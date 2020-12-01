@@ -377,7 +377,7 @@ public class TrendStrategyServiceImpl implements TrendStrategyService {
 	    	Entry lowerValue=boll.getLowerList().get(i);
 	    	boolean isSell=false;
 	    	boolean isBuy=false;
-	    	double buyPoint=midValue.getY()*0.975;
+	    	double buyPoint=midValue.getY()*0.97;
 	    	double stopLossPoint=midValue.getY()*0.95;
 	    	double sellPoint=upValue.getY();
 	    	if(price.getOpen().doubleValue()==0) {
@@ -408,9 +408,10 @@ public class TrendStrategyServiceImpl implements TrendStrategyService {
 	    				price.getOpen(),
 	    				numList,
 	    				TradingRecordDo.options_sell,
-	    				"操作建议：分批止盈 买入点："+new BigDecimal(buyPoint).setScale(2,BigDecimal.ROUND_DOWN)+"-"+new BigDecimal(midValue.getY()).setScale(2,BigDecimal.ROUND_DOWN)
-	    				+" 止损点："+new BigDecimal(stopLossPoint).setScale(2,BigDecimal.ROUND_DOWN)
-	    				+" 止盈点："+new BigDecimal(sellPoint).setScale(2,BigDecimal.ROUND_DOWN)+"-"+new BigDecimal(upValue.getY()*1.02).setScale(2,BigDecimal.ROUND_DOWN)
+	    				"\n操作建议：分批止盈"
+	    				+"\n买入点："+new BigDecimal(buyPoint).setScale(2,BigDecimal.ROUND_DOWN)+"-"+new BigDecimal(midValue.getY()*0.99).setScale(2,BigDecimal.ROUND_DOWN)
+	    				+"\n止损点："+new BigDecimal(stopLossPoint).setScale(2,BigDecimal.ROUND_DOWN)
+	    				+"\n止盈点："+new BigDecimal(sellPoint).setScale(2,BigDecimal.ROUND_DOWN)+"-"+new BigDecimal(upValue.getY()*1.02).setScale(2,BigDecimal.ROUND_DOWN)
 	    				);
 	    		rslist.add(buyRecord);
 	    		continue;
@@ -427,9 +428,10 @@ public class TrendStrategyServiceImpl implements TrendStrategyService {
 	    				price.getOpen(),
 	    				numList,
 	    				TradingRecordDo.options_sell,
-	    				"操作建议：分批止损 买入点："+new BigDecimal(buyPoint).setScale(2,BigDecimal.ROUND_DOWN)+"-"+new BigDecimal(midValue.getY()).setScale(2,BigDecimal.ROUND_DOWN)
-	    				+" 止损点："+new BigDecimal(stopLossPoint).setScale(2,BigDecimal.ROUND_DOWN)
-	    				+" 止盈点："+new BigDecimal(sellPoint).setScale(2,BigDecimal.ROUND_DOWN)+"-"+new BigDecimal(upValue.getY()*1.02).setScale(2,BigDecimal.ROUND_DOWN)
+	    				"\n操作建议：分批止损"
+	    				+"\n买入点："+new BigDecimal(buyPoint).setScale(2,BigDecimal.ROUND_DOWN)+"-"+new BigDecimal(midValue.getY()*0.99).setScale(2,BigDecimal.ROUND_DOWN)
+	    				+"\n止损点："+new BigDecimal(stopLossPoint).setScale(2,BigDecimal.ROUND_DOWN)
+	    				+"\n止盈点："+new BigDecimal(sellPoint).setScale(2,BigDecimal.ROUND_DOWN)+"-"+new BigDecimal(upValue.getY()*1.02).setScale(2,BigDecimal.ROUND_DOWN)
 	    				);
 	    		rslist.add(buyRecord);
 	    		continue;
@@ -464,16 +466,17 @@ public class TrendStrategyServiceImpl implements TrendStrategyService {
 	    				new BigDecimal(avg),
 	    				num,
 	    				TradingRecordDo.options_buy,
-	    				"操作建议：分批买入 买入点："+new BigDecimal(buyPoint).setScale(2,BigDecimal.ROUND_DOWN)+"-"+new BigDecimal(midValue.getY()).setScale(2,BigDecimal.ROUND_DOWN)
-	    				+" 止损点："+new BigDecimal(stopLossPoint).setScale(2,BigDecimal.ROUND_DOWN)
-	    				+" 止盈点："+new BigDecimal(sellPoint).setScale(2,BigDecimal.ROUND_DOWN)+"-"+new BigDecimal(upValue.getY()*1.02).setScale(2,BigDecimal.ROUND_DOWN)
+	    				"\n操作建议：分批买入"
+	    				+"\n买入点："+new BigDecimal(buyPoint).setScale(2,BigDecimal.ROUND_DOWN)+"-"+new BigDecimal(midValue.getY()*0.99).setScale(2,BigDecimal.ROUND_DOWN)
+	    				+"\n止损点："+new BigDecimal(stopLossPoint).setScale(2,BigDecimal.ROUND_DOWN)
+	    				+"\n止盈点："+new BigDecimal(sellPoint).setScale(2,BigDecimal.ROUND_DOWN)+"-"+new BigDecimal(upValue.getY()*1.02).setScale(2,BigDecimal.ROUND_DOWN)
 	    				);
 	    		
 	    		rslist.add(buyRecord);
 	    	}else {
-	    		String remark="操作建议：空仓观望";
+	    		String remark="\n操作建议：空仓观望";
 	    		if(isSell) {
-	    			remark="操作建议：持股待涨";
+	    			remark="\n操作建议：持股待涨";
 				}
 	    		TradingRecordDo buyRecord=new TradingRecordDo(
 	    				DateUtils.getDateForYYYYMMDDHHMM_NUMBER(price.getHistoryAll()),
@@ -483,9 +486,9 @@ public class TrendStrategyServiceImpl implements TrendStrategyService {
 	    				new BigDecimal(avg),
 	    				0,
 	    				TradingRecordDo.options_nothink,
-	    				remark+" 买入点："+new BigDecimal(buyPoint).setScale(2,BigDecimal.ROUND_DOWN)+"-"+new BigDecimal(midValue.getY()).setScale(2,BigDecimal.ROUND_DOWN)
-	    				+" 止损点："+new BigDecimal(stopLossPoint).setScale(2,BigDecimal.ROUND_DOWN)
-	    				+" 止盈点："+new BigDecimal(sellPoint).setScale(2,BigDecimal.ROUND_DOWN)+"-"+new BigDecimal(upValue.getY()*1.02).setScale(2,BigDecimal.ROUND_DOWN)
+	    				remark+"\n买入点："+new BigDecimal(buyPoint).setScale(2,BigDecimal.ROUND_DOWN)+"-"+new BigDecimal(midValue.getY()*0.99).setScale(2,BigDecimal.ROUND_DOWN)
+	    				+"\n止损点："+new BigDecimal(stopLossPoint).setScale(2,BigDecimal.ROUND_DOWN)
+	    				+"\n止盈点："+new BigDecimal(sellPoint).setScale(2,BigDecimal.ROUND_DOWN)+"-"+new BigDecimal(upValue.getY()*1.02).setScale(2,BigDecimal.ROUND_DOWN)
 	    				);
 	    		
 	    		rslist.add(buyRecord);

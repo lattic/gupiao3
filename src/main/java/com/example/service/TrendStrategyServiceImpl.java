@@ -370,62 +370,124 @@ public class TrendStrategyServiceImpl implements TrendStrategyService {
 	public List<TradingRecordDo> getStrateByBoll(List<StockPriceVo> list, RobotAccountDo account, RobotSetDo config) {
 		List<TradingRecordDo> rslist=new ArrayList<TradingRecordDo>();
 		BollEntity boll= buildBollEntry(list);
-		for(int i=0;i<list.size();i++) {
+		for(int i=20;i<list.size();i++) {
 	    	StockPriceVo price=list.get(i);
 	    	Entry upValue=boll.getUpList().get(i);
 	    	Entry midValue=boll.getMidList().get(i);
 	    	Entry lowerValue=boll.getLowerList().get(i);
-	    	if(price.getOpen().doubleValue() <midValue.getY()) {
+	    	boolean isSell=false;
+	    	boolean isBuy=false;
+	    	double buyPoint=midValue.getY()*0.975;
+	    	double stopLossPoint=midValue.getY()*0.95;
+	    	double sellPoint=upValue.getY();
+	    	if(price.getOpen().doubleValue()==0) {
+	    		price.setOpen(price.getClose());
+	    	}
+	    	
+	    	double avg=(price.getOpen().doubleValue()+price.getClose().doubleValue())/2;
+	    	int numList=0;
+	    	for(TradingRecordDo rc:rslist) {
+	    		if(rc.getOptions()==TradingRecordDo.options_buy) {
+	    			isSell=true;
+	    			numList+=rc.getNum();
+	    		}
+	    		if(rc.getOptions()==TradingRecordDo.options_sell) {
+	    			isSell=false;
+	    			numList-=rc.getNum();
+	    		}
+	    	}
+	    	if(isSell && avg >= sellPoint) {
+	    		double total=account.getTotal().doubleValue()+numList*avg;
+	    		account.setTotal(new BigDecimal(total));
+	    		
+	    		TradingRecordDo buyRecord=new TradingRecordDo(
+	    				DateUtils.getDateForYYYYMMDDHHMM_NUMBER(price.getHistoryAll()),
+	    				price.getNumber(),
+	    				price.getName(),
+	    				config.getDtId(),
+	    				price.getOpen(),
+	    				numList,
+	    				TradingRecordDo.options_sell,
+	    				"操作建议：分批止盈   买入点："+new BigDecimal(buyPoint).setScale(2,BigDecimal.ROUND_DOWN)+"-"+new BigDecimal(midValue.getY()).setScale(2,BigDecimal.ROUND_DOWN)
+	    				+" 止损点："+new BigDecimal(stopLossPoint).setScale(2,BigDecimal.ROUND_DOWN)
+	    				+" 止盈点："+new BigDecimal(sellPoint).setScale(2,BigDecimal.ROUND_DOWN)+"-"+new BigDecimal(upValue.getY()*1.02).setScale(2,BigDecimal.ROUND_DOWN)
+	    				);
+	    		rslist.add(buyRecord);
+	    		continue;
+	    	}
+	    	if(isSell && avg <= stopLossPoint) {
+	    		double total=account.getTotal().doubleValue()+numList*avg;
+	    		account.setTotal(new BigDecimal(total));
+	    		
+	    		TradingRecordDo buyRecord=new TradingRecordDo(
+	    				DateUtils.getDateForYYYYMMDDHHMM_NUMBER(price.getHistoryAll()),
+	    				price.getNumber(),
+	    				price.getName(),
+	    				config.getDtId(),
+	    				price.getOpen(),
+	    				numList,
+	    				TradingRecordDo.options_sell,
+	    				"操作建议：分批止损   买入点："+new BigDecimal(buyPoint).setScale(2,BigDecimal.ROUND_DOWN)+"-"+new BigDecimal(midValue.getY()).setScale(2,BigDecimal.ROUND_DOWN)
+	    				+" 止损点："+new BigDecimal(stopLossPoint).setScale(2,BigDecimal.ROUND_DOWN)
+	    				+" 止盈点："+new BigDecimal(sellPoint).setScale(2,BigDecimal.ROUND_DOWN)+"-"+new BigDecimal(upValue.getY()*1.02).setScale(2,BigDecimal.ROUND_DOWN)
+	    				);
+	    		rslist.add(buyRecord);
 	    		continue;
 	    	}
 	    	
-	    	double buyPoint=lowerValue.getY()*0.97;
-	    	double stopLossPoint=lowerValue.getY()*0.95;
-	    	double sellPoint=upValue.getY()*0.995;
 	    	
-	    	if(price.getOpen().doubleValue() <= buyPoint && price.getOpen().doubleValue()>=stopLossPoint) {
-	    		double sotck=account.getTotal().intValue() * 0.2/ (price.getOpen().intValue()*100);
-	    		int num=(int)sotck*100;
+	    	
+	    	//趋势向上
+//	    	if(boll.getMidList().get(i-8).getY() < boll.getMidList().get(i).getY()*1.03) {
+//	    		isBuy=true;
+//	    	} else {
+//	    		continue;
+//	    	}
+	    	//开盘与收盘价格需要覆盖中轨低1% 价格要覆盖
+	    	if(price.getLow().doubleValue() <= buyPoint &&  price.getLow().doubleValue() >= stopLossPoint) {
+	    		isBuy=true;
+	    	}  
+	    	
+	    	if(isBuy) {
+				double sotck = account.getTotal().intValue() * 0.25 / (avg * 100);
+				int num = (int) (sotck - 1) * 100;
+	    		if(num <=0) {
+	    			continue;
+	    		}
+	    		double total=account.getTotal().doubleValue()-num*avg;
+	    		account.setTotal(new BigDecimal(total));
 	    		TradingRecordDo buyRecord=new TradingRecordDo(
 	    				DateUtils.getDateForYYYYMMDDHHMM_NUMBER(price.getHistoryAll()),
 	    				price.getNumber(),
 	    				price.getName(),
 	    				config.getDtId(),
-	    				price.getOpen(),
+	    				new BigDecimal(avg),
 	    				num,
 	    				TradingRecordDo.options_buy,
-	    				"低于boll下轨买入"
+	    				"操作建议：分批买入 买入点："+new BigDecimal(buyPoint).setScale(2,BigDecimal.ROUND_DOWN)+"-"+new BigDecimal(midValue.getY()).setScale(2,BigDecimal.ROUND_DOWN)
+	    				+" 止损点："+new BigDecimal(stopLossPoint).setScale(2,BigDecimal.ROUND_DOWN)
+	    				+" 止盈点："+new BigDecimal(sellPoint).setScale(2,BigDecimal.ROUND_DOWN)+"-"+new BigDecimal(upValue.getY()*1.02).setScale(2,BigDecimal.ROUND_DOWN)
 	    				);
+	    		
 	    		rslist.add(buyRecord);
-	    	}
-	    	if(price.getOpen().doubleValue() <= stopLossPoint) {
-	    		double sotck=account.getTotal().intValue() * 0.2/ (price.getOpen().intValue()*100);
-	    		int num=(int)sotck*100;
+	    	}else {
+	    		String remark="操作建议：空仓观望";
+	    		if(isSell) {
+	    			remark="操作建议：持股待涨";
+				}
 	    		TradingRecordDo buyRecord=new TradingRecordDo(
 	    				DateUtils.getDateForYYYYMMDDHHMM_NUMBER(price.getHistoryAll()),
 	    				price.getNumber(),
 	    				price.getName(),
 	    				config.getDtId(),
-	    				price.getOpen(),
-	    				num,
-	    				TradingRecordDo.options_sell,
-	    				"跌破止损卖出"
+	    				new BigDecimal(avg),
+	    				0,
+	    				TradingRecordDo.options_nothink,
+	    				remark+" 买入点："+new BigDecimal(buyPoint).setScale(2,BigDecimal.ROUND_DOWN)+"-"+new BigDecimal(midValue.getY()).setScale(2,BigDecimal.ROUND_DOWN)
+	    				+" 止损点："+new BigDecimal(stopLossPoint).setScale(2,BigDecimal.ROUND_DOWN)
+	    				+" 止盈点："+new BigDecimal(sellPoint).setScale(2,BigDecimal.ROUND_DOWN)+"-"+new BigDecimal(upValue.getY()*1.02).setScale(2,BigDecimal.ROUND_DOWN)
 	    				);
-	    		rslist.add(buyRecord);
-	    	}
-	    	if(price.getOpen().doubleValue() >= sellPoint) {
-	    		double sotck=account.getTotal().intValue() * 0.2/ (price.getOpen().intValue()*100);
-	    		int num=(int)sotck*100;
-	    		TradingRecordDo buyRecord=new TradingRecordDo(
-	    				DateUtils.getDateForYYYYMMDDHHMM_NUMBER(price.getHistoryAll()),
-	    				price.getNumber(),
-	    				price.getName(),
-	    				config.getDtId(),
-	    				price.getOpen(),
-	    				num,
-	    				TradingRecordDo.options_sell,
-	    				"止盈卖出"
-	    				);
+	    		
 	    		rslist.add(buyRecord);
 	    	}
 	    }

@@ -7,7 +7,7 @@ import java.util.Date;
 public class TradingRecordDo implements Serializable  {
 
 	private static final long serialVersionUID = 6244267443156745046L;
-
+	public static final Integer options_nothink=0;
 	public static final Integer options_buy=1;
 	public static final Integer options_sell=2;
 	
@@ -47,6 +47,9 @@ public class TradingRecordDo implements Serializable  {
 		this.num = num;
 		this.options = options;
 		this.remark = remark;
+		this.total=price.multiply(new BigDecimal(num));
+		this.price=this.price.setScale(2, BigDecimal.ROUND_UP);
+		this.total=this.total.setScale(2, BigDecimal.ROUND_UP);
 	}
 
 	public TradingRecordDo() {

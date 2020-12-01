@@ -61,6 +61,21 @@ public class RealTimeTask implements InitializingBean {
 	private static List<StockDo> list4= new ArrayList<StockDo>();
 	private static List<StockDo> list5= new ArrayList<StockDo>();
 	
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		try {
+			List<StockDo> list=guPiaoService.getAllStock();
+			int k=list.size()/5;
+			list1=list.subList(0, k);
+			list2=list.subList(1*k, 2*k);
+			list3=list.subList(2*k, 3*k);
+			list4=list.subList(3*k, 4*k);
+			list5=list.subList(4*k, list.size());
+			today=DateUtils.getToday();
+		} catch (Exception e) {
+			logger.warn("init Exception:"+e.getMessage(),e);
+		}
+	}
 	
 	@Scheduled(cron = "0/30 * 9-15 * * MON-FRI")
 	public void  task1() throws Exception {
@@ -190,20 +205,5 @@ public class RealTimeTask implements InitializingBean {
 	}
 	
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		
-		try {
-			List<StockDo> list=guPiaoService.getAllStock();
-			int k=list.size()/5;
-			list1=list.subList(0, k);
-			list2=list.subList(1*k, 2*k);
-			list3=list.subList(2*k, 3*k);
-			list4=list.subList(3*k, 4*k);
-			list5=list.subList(4*k, list.size());
-			today=DateUtils.getToday();
-		} catch (Exception e) {
-			logger.warn("init Exception:"+e.getMessage(),e);
-		}
-	}
+	
 }

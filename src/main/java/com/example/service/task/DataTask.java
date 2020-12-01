@@ -59,12 +59,8 @@ public class DataTask  implements InitializingBean {
 	
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		String robotbuy = MessageFormat.format("【初始化股票池】"
-											   + "\n 初始化股票池数量："
-											   + init(),new Object[] {});
-		logger.info(robotbuy);
+		String robotbuy = MessageFormat.format("【初始化股票池】 \n 初始化股票池数量："  + init(),new Object[] {});
         DingTalkRobotHTTPUtil.sendMsg(DingTalkRobotHTTPUtil.APP_TEST_SECRET, robotbuy, null, false);
-        updateAllDayGuPiao();
 	}
 	
 	// 从数据库获取股票池初始化map
@@ -137,8 +133,18 @@ public class DataTask  implements InitializingBean {
 			if(map == null) {
 				continue;
 			}
+			
+			List<RealTimeDo>list=new ArrayList<RealTimeDo>();
 			Collection<RealTimeDo> valueCollection = map.values();
-			List<RealTimeDo>list=new ArrayList<RealTimeDo>(valueCollection);
+			List<RealTimeDo>templist=new ArrayList<RealTimeDo>(valueCollection);
+			for(RealTimeDo rt:templist) {
+				if(rt.getTop()<=0.1||rt.getLow()<=0.1||rt.getKaipanjia()<=0.1||rt.getZuorishoupanjia()<=0.1||rt.getChengjiaogupiao()<=0.1) {
+					System.out.println("异常数据："+rt.getName()+" "+rt.getNumber()+" 最高价:"+rt.getTop()+" 最低价："+rt.getLow()+" 开盘价："+rt.getKaipanjia()+" 收盘价："+rt.getZuorishoupanjia()+" 成交量："+rt.getChengjiaogupiao());
+					continue;
+				}
+				list.add(rt);
+			}
+			
 			if(list != null && list.size()>0) {
 				double avg=0;
 				double high=0;
@@ -153,8 +159,6 @@ public class DataTask  implements InitializingBean {
 					}
 				}
 				avg=avg/list.size();
-				
-				
 				RealTimeDo last=list.get(list.size()-1);
 				HistoryDayStockDo obj =new HistoryDayStockDo();
 				obj.setHistoryDay(dateStr);

@@ -33,7 +33,7 @@ public class DateUtils {
 		Date endTime2 = null;
 		try {
 			now = df.parse(df.format(new Date()));
-			beginTime1 = df.parse("09:15");
+			beginTime1 = df.parse("09:25");
 			endTime1 = df.parse("11:31");
 			
 			beginTime2 = df.parse("13:00");

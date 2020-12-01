@@ -15,9 +15,9 @@ public class RedisKeyUtil {
 	}
 	
 	//复盘数据
-		public static String getRecheckStock(String number) {
-			return "recheck_stock_"+dateformat.format(new Date())+"_"+number;
-		}
+	public static String getRecheckStock(String number) {
+		return "recheck_stock_"+dateformat.format(new Date())+"_"+number;
+	}
 	
 	//实时通知降噪
 	public static String getRealTimeNotify(String number) {

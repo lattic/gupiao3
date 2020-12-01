@@ -408,7 +408,7 @@ public class TrendStrategyServiceImpl implements TrendStrategyService {
 	    				price.getOpen(),
 	    				numList,
 	    				TradingRecordDo.options_sell,
-	    				"操作建议：分批止盈   买入点："+new BigDecimal(buyPoint).setScale(2,BigDecimal.ROUND_DOWN)+"-"+new BigDecimal(midValue.getY()).setScale(2,BigDecimal.ROUND_DOWN)
+	    				"操作建议：分批止盈 买入点："+new BigDecimal(buyPoint).setScale(2,BigDecimal.ROUND_DOWN)+"-"+new BigDecimal(midValue.getY()).setScale(2,BigDecimal.ROUND_DOWN)
 	    				+" 止损点："+new BigDecimal(stopLossPoint).setScale(2,BigDecimal.ROUND_DOWN)
 	    				+" 止盈点："+new BigDecimal(sellPoint).setScale(2,BigDecimal.ROUND_DOWN)+"-"+new BigDecimal(upValue.getY()*1.02).setScale(2,BigDecimal.ROUND_DOWN)
 	    				);
@@ -427,7 +427,7 @@ public class TrendStrategyServiceImpl implements TrendStrategyService {
 	    				price.getOpen(),
 	    				numList,
 	    				TradingRecordDo.options_sell,
-	    				"操作建议：分批止损   买入点："+new BigDecimal(buyPoint).setScale(2,BigDecimal.ROUND_DOWN)+"-"+new BigDecimal(midValue.getY()).setScale(2,BigDecimal.ROUND_DOWN)
+	    				"操作建议：分批止损 买入点："+new BigDecimal(buyPoint).setScale(2,BigDecimal.ROUND_DOWN)+"-"+new BigDecimal(midValue.getY()).setScale(2,BigDecimal.ROUND_DOWN)
 	    				+" 止损点："+new BigDecimal(stopLossPoint).setScale(2,BigDecimal.ROUND_DOWN)
 	    				+" 止盈点："+new BigDecimal(sellPoint).setScale(2,BigDecimal.ROUND_DOWN)+"-"+new BigDecimal(upValue.getY()*1.02).setScale(2,BigDecimal.ROUND_DOWN)
 	    				);

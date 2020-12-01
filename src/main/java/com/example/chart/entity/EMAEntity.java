@@ -1,74 +1,52 @@
 package com.example.chart.entity;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import com.example.chart.base.entity.Entry;
 
 /**
  * Created by Rex on 2018/11/14.
  */
 public class EMAEntity implements ChartEntity {
 
-    public List<EntryType> emaDataList;
+    private List<Entry> emaList1;
+    private List<Entry> emaList2;
 
-    public EMAEntity(List<EntryType> emaDataList) {
-        this.emaDataList = emaDataList;
-    }
+    public EMAEntity(List<Entry> emaList1, List<Entry> emaList2) {
+		super();
+		this.emaList1 = emaList1;
+		this.emaList2 = emaList2;
+	}
 
-    public EMAEntity() {
-        this.emaDataList = new ArrayList<>();
-//        this.ema30 = new ArrayList<>();
-    }
 
-    @Override
+	public List<Entry> getEmaList1() {
+		return emaList1;
+	}
+
+
+	public void setEmaList1(List<Entry> emaList1) {
+		this.emaList1 = emaList1;
+	}
+
+
+	public List<Entry> getEmaList2() {
+		return emaList2;
+	}
+
+
+	public void setEmaList2(List<Entry> emaList2) {
+		this.emaList2 = emaList2;
+	}
+
+
+	@Override
     public void clearValues() {
-        if (emaDataList != null) {
-            emaDataList.clear();
+        if (emaList1 != null) {
+        	emaList1.clear();
         }
-//        if (ema30 != null) {
-//            ema30.clear();
-//        }
+        if (emaList2 != null) {
+        	emaList2.clear();
+        }
     }
 
-
-    public static void CandleParseToEMA(List<ICandle> iCandles, int i, int period) {
-        ICandle tempModel = iCandles.get(i);
-        if (i == 0) {
-            tempModel.common = tempModel.Close;
-
-        } else if (tempModel.common == 0) {
-            ICandle lastModel = iCandles.get(i - 1);
-            if (lastModel.common != 0) {
-                //待修改
-                tempModel.common = (float) ((2.0 / (period + 1)) * (tempModel.Close - lastModel.common) + lastModel.common);
-            } else {
-                CandleParseToEMA(iCandles, i - 1, period);
-                tempModel.common = (float) ((2.0 / (period + 1)) * (tempModel.Close - lastModel.common) + lastModel.common);
-
-            }
-
-        }
-
-//        if (i == 0) {
-////            // 第一日的ema7为收盘价
-////            tempModel.common = tempModel.Close;
-////
-////        } else if (tempModel.ema7 == 0 || tempModel.ema30 == 0) {
-////
-////            ICandle lastModel = iCandles.get(i - 1);
-////
-////            if (lastModel.ema7 != 0 && lastModel.ema30 != 0) {
-////
-////                tempModel.ema7 = (float) ((2.0 / 13.0) * (tempModel.Close - lastModel.ema7) + lastModel.ema7);
-////
-////                tempModel.ema30 = (float) ((2.0 / 27.0) * (tempModel.Close - lastModel.ema30) + lastModel.ema30);
-////
-////            } else {
-////                CandleParseToEMA(iCandles, j, i - 1);
-////                tempModel.ema7 = (float) ((2.0 / 13.0) * (tempModel.Close - lastModel.ema7) + lastModel.ema7);
-////
-////                tempModel.ema30 = (float) ((2.0 / 27.0) * (tempModel.Close - lastModel.ema30) + lastModel.ema30);
-////            }
-////
-////        }
-    }
 }

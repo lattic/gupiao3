@@ -20,6 +20,7 @@ import com.example.model.StockDo;
 import com.example.service.GuPiaoService;
 import com.example.uitls.DateUtils;
 import com.example.uitls.ReadApiUrl;
+import com.example.uitls.RedisKeyUtil;
 import com.example.uitls.RedisUtil;
 
 @Service
@@ -125,6 +126,82 @@ public class RealTimeTask implements InitializingBean {
 			}
 		}
 	}
+	
+	@Scheduled(cron = "0 0 8,12 * * MON-FRI")
+	public void  updateHistoryTask1() {
+		//获取所有股票的历史60分钟数据
+		logger.info("开始复盘昨天的数据");
+		for(StockDo stock:list1) {
+			String key=RedisKeyUtil.getRecheckStock(stock.getNumber());
+			if(!redisUtil.hasKey(key)) {
+				logger.info("更新数据--->"+stock.getNumber()+" "+redisUtil.get(RedisKeyUtil.getStockName(stock.getNumber()))+" "+DateUtils.getToday());
+				guPiaoService.updateHistoryStock(stock.getNumber());
+				guPiaoService.timeInterval(stock.getNumber());
+				redisUtil.set(key, true);
+			}
+		}
+	}
+	
+	@Scheduled(cron = "5 0 8,12 * * MON-FRI")
+	public void  updateHistoryTask2() {
+		//获取所有股票的历史60分钟数据
+		logger.info("开始复盘昨天的数据");
+		for(StockDo stock:list2) {
+			String key=RedisKeyUtil.getRecheckStock(stock.getNumber());
+			if(!redisUtil.hasKey(key)) {
+				logger.info("更新数据--->"+stock.getNumber()+" "+redisUtil.get(RedisKeyUtil.getStockName(stock.getNumber()))+" "+DateUtils.getToday());
+				guPiaoService.updateHistoryStock(stock.getNumber());
+				guPiaoService.timeInterval(stock.getNumber());
+				redisUtil.set(key, true);
+			}
+		}
+	}
+	
+	@Scheduled(cron = "10 0 8,12 * * MON-FRI")
+	public void  updateHistoryTask3() {
+		//获取所有股票的历史60分钟数据
+		logger.info("开始复盘昨天的数据");
+		for(StockDo stock:list3) {
+			String key=RedisKeyUtil.getRecheckStock(stock.getNumber());
+			if(!redisUtil.hasKey(key)) {
+				logger.info("更新数据--->"+stock.getNumber()+" "+redisUtil.get(RedisKeyUtil.getStockName(stock.getNumber()))+" "+DateUtils.getToday());
+				guPiaoService.updateHistoryStock(stock.getNumber());
+				guPiaoService.timeInterval(stock.getNumber());
+				redisUtil.set(key, true);
+			}
+		}
+	}
+	
+	@Scheduled(cron = "15 0 8,12 * * MON-FRI")
+	public void  updateHistoryTask4() {
+		//获取所有股票的历史60分钟数据
+		logger.info("开始复盘昨天的数据");
+		for(StockDo stock:list4) {
+			String key=RedisKeyUtil.getRecheckStock(stock.getNumber());
+			if(!redisUtil.hasKey(key)) {
+				logger.info("更新数据--->"+stock.getNumber()+" "+redisUtil.get(RedisKeyUtil.getStockName(stock.getNumber()))+" "+DateUtils.getToday());
+				guPiaoService.updateHistoryStock(stock.getNumber());
+				guPiaoService.timeInterval(stock.getNumber());
+				redisUtil.set(key, true);
+			}
+		}
+	}
+	
+	@Scheduled(cron = "20 0 8,12 * * MON-FRI")
+	public void  updateHistoryTask5() {
+		//获取所有股票的历史60分钟数据
+		logger.info("开始复盘昨天的数据");
+		for(StockDo stock:list5) {
+			String key=RedisKeyUtil.getRecheckStock(stock.getNumber());
+			if(!redisUtil.hasKey(key)) {
+				logger.info("更新数据--->"+stock.getNumber()+" "+redisUtil.get(RedisKeyUtil.getStockName(stock.getNumber()))+" "+DateUtils.getToday());
+				guPiaoService.updateHistoryStock(stock.getNumber());
+				guPiaoService.timeInterval(stock.getNumber());
+				redisUtil.set(key, true);
+			}
+		}
+	}
+	
 
 	@Override
 	public void afterPropertiesSet() throws Exception {

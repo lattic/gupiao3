@@ -97,6 +97,15 @@ public interface TrendStrategyService {
 	 */
 	List<TradingRecordDo> getStrategyByMa(List<StockPriceVo> list,RobotAccountDo account,RobotSetDo config);
 	
+	/**
+	 * 指数移动平均线
+	 * @param list
+	 * @param account 资金
+	 * @param config  参数
+	 * @return
+	 */
+	List<TradingRecordDo> getStrategyByEMa(List<StockPriceVo> list,RobotAccountDo account,RobotSetDo config);
+	
 	
 	/**
 	 * 布林线

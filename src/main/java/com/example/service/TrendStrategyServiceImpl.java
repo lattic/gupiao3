@@ -25,6 +25,7 @@ import org.ta4j.core.indicators.statistics.StandardDeviationIndicator;
 import com.example.chart.base.entity.Candle;
 import com.example.chart.base.entity.Entry;
 import com.example.chart.entity.BollEntity;
+import com.example.chart.entity.EMAEntity;
 import com.example.chart.entity.MAEntity;
 import com.example.mapper.HistoryDayStockMapper;
 import com.example.mapper.HistoryStockMapper;
@@ -246,7 +247,110 @@ public class TrendStrategyServiceImpl implements TrendStrategyService {
 	    }
 		return rslist;
 	}
+	
+	@Override
+	public List<TradingRecordDo> getStrategyByEMa(List<StockPriceVo> list, RobotAccountDo account, RobotSetDo config) {
+		List<TradingRecordDo> rslist=new ArrayList<TradingRecordDo>();
+		EMAEntity ema = buildEmaEntry(list);
+	    
+		boolean isbuy=false;
+	    for(int i=0;i<list.size();i++) {
+	    	StockPriceVo price=list.get(i);
+	    	Entry maValue1=ema.getEmaList1().get(i);
+	    	Entry maValue2=ema.getEmaList2().get(i);
+	    	double buyPoint=maValue1.getY();
+	    	double sellPoint=buyPoint*1.1;
+	    	double stopLossPoint=maValue2.getY();
+	    	
+	    	if(price.getClose().doubleValue() <= stopLossPoint) {
+	    		double sotck=account.getTotal().intValue() * 0.2/ (price.getOpen().intValue()*100);
+	    		int num=(int)sotck*100;
+	    		TradingRecordDo buyRecord=new TradingRecordDo(
+	    				DateUtils.getDateForYYYYMMDDHHMM_NUMBER(price.getHistoryAll()),
+	    				price.getNumber(),
+	    				price.getName(),
+	    				config.getDtId(),
+	    				price.getOpen(),
+	    				num,
+	    				TradingRecordDo.options_sell,
+	    				"跌破止损卖出"
+	    				);
+	    		isbuy=true;
+	    		rslist.add(buyRecord);
+	    	}
+	    	
+	    	//股价收盘在MA1,MA2之下或 MA1不在MA2之上都是跳过
+	    	if(maValue1.getY() < maValue2.getY() || price.getClose().doubleValue()<maValue1.getY() || price.getClose().doubleValue()<maValue2.getY()) {
+	    		isbuy=false;
+	    		continue;
+	    	}
+	    	
+	    	//趋势判断 10天必须比现在低
+	    	if(i>10 && ema.getEmaList1().get(i-10).getY()>ema.getEmaList1().get(i).getY()) {
+	    		isbuy=true;
+	    	}
+	    	
+	    	//开盘价在MA1之下，收盘价在MA1之上
+	    	if(isbuy && price.getOpen().doubleValue() <= buyPoint && price.getClose().doubleValue() >= buyPoint) {
+	    		double sotck=account.getTotal().intValue() * 0.2/ (price.getOpen().intValue()*100);
+	    		int num=(int)sotck*100;
+	    		TradingRecordDo buyRecord=new TradingRecordDo(
+	    				DateUtils.getDateForYYYYMMDDHHMM_NUMBER(price.getHistoryAll()),
+	    				price.getNumber(),
+	    				price.getName(),
+	    				config.getDtId(),
+	    				price.getOpen(),
+	    				num,
+	    				TradingRecordDo.options_buy,
+	    				"突破EMA 87 均线买入"
+	    				);
+	    		rslist.add(buyRecord);
+	    	}
+	    	if(price.getClose().doubleValue() >= sellPoint) {
+	    		double sotck=account.getTotal().intValue() * 0.2/ (price.getOpen().intValue()*100);
+	    		int num=(int)sotck*100;
+	    		TradingRecordDo buyRecord=new TradingRecordDo(
+	    				DateUtils.getDateForYYYYMMDDHHMM_NUMBER(price.getHistoryAll()),
+	    				price.getNumber(),
+	    				price.getName(),
+	    				config.getDtId(),
+	    				price.getOpen(),
+	    				num,
+	    				TradingRecordDo.options_sell,
+	    				"止盈卖出"
+	    				);
+	    		isbuy=true;
+	    		rslist.add(buyRecord);
+	    	}
+	    }
+		return rslist;
+	}
 
+	private EMAEntity buildEmaEntry(List<StockPriceVo> list) {
+		BarSeries series = transformBarSeriesByStockPrice(list);
+		ClosePriceIndicator closePrice = new ClosePriceIndicator(series);
+	    SMAIndicator avg1 = new SMAIndicator(closePrice, 87);
+	    SMAIndicator avg2 = new SMAIndicator(closePrice, 144);
+	    List<Entry> maList1 =new  ArrayList<Entry>();
+	    List<Entry> maList2 =new  ArrayList<Entry>();
+	    for(int i=0;i<list.size();i++) {
+	    	Entry entry1=new Entry();
+	    	entry1.setX(list.get(i).getHistoryAll());
+	    	entry1.setY(avg1.getValue(i).doubleValue());
+	    	entry1.setData(list.get(i));
+	    	maList1.add(entry1);
+	    	
+	    	Entry entry2=new Entry();
+	    	entry2.setX(list.get(i).getHistoryAll());
+	    	entry2.setY(avg2.getValue(i).doubleValue());
+	    	entry2.setData(list.get(i));
+	    	maList2.add(entry2);
+	    }
+	   
+	    return new EMAEntity(maList1,maList2);
+	}
+	
+	
 	private MAEntity buildMaEntry(List<StockPriceVo> list) {
 		BarSeries series = transformBarSeriesByStockPrice(list);
 		ClosePriceIndicator closePrice = new ClosePriceIndicator(series);
@@ -367,6 +471,8 @@ public class TrendStrategyServiceImpl implements TrendStrategyService {
         }
         return new BollEntity(upList, midList, lowerList);
 	}
+
+	
 
 	
 

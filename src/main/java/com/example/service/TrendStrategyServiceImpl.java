@@ -437,16 +437,16 @@ public class TrendStrategyServiceImpl implements TrendStrategyService {
 	    		continue;
 	    	}
 	    	
-	    	
-	    	
 	    	//趋势向上
-	    	if(boll.getMidList().get(i-10).getY() < boll.getMidList().get(i).getY()*1.02) {
+	    	if(boll.getMidList().get(i-10).getY() < boll.getMidList().get(i).getY()*1.0065) {
 	    		isBuy=true;
 	    	} 
 	    	//开盘与收盘价格需要覆盖中轨低1% 价格要覆盖
 	    	if(isBuy && price.getLow().doubleValue() <= buyPoint &&  price.getLow().doubleValue() >= stopLossPoint) {
 	    		isBuy=true;
-	    	}  
+	    	}else {
+	    		isBuy=false;
+	    	}
 	    	
 	    	if(isBuy) {
 				double sotck = account.getTotal().intValue() * 0.25 / (avg * 100);

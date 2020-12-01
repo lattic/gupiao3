@@ -18,6 +18,7 @@ public class DateUtils {
 	private static final SimpleDateFormat DF_YYYYMMDDHHmm = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");// 设置日期格式
 	private static final SimpleDateFormat DF_YYYYMMDDHHMM_NUMBER = new SimpleDateFormat("yyyyMMddHHmm");// 设置日期格式
 	private static final SimpleDateFormat DF_YYYYMMDD_NUMBER = new SimpleDateFormat("yyyyMMdd");// 设置日期格式
+	
 	public static String getToday() {
 		return DF_YYYYMMDD.format(new Date());
 	}

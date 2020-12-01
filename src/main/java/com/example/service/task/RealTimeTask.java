@@ -32,6 +32,7 @@ public class RealTimeTask implements InitializingBean {
 	private ReadApiUrl apiUrl;
 	@Resource
 	private RedisUtil redisUtil;
+	private static String today=DateUtils.getToday();
 	
 	ThreadPoolExecutor  pool1 = new ThreadPoolExecutor(20, 300, 5,TimeUnit.SECONDS,
 			new LinkedBlockingDeque<Runnable>(2000), 
@@ -127,13 +128,13 @@ public class RealTimeTask implements InitializingBean {
 		}
 	}
 	
-	private void updateHistoryStock(StockDo stock,ThreadPoolExecutor  pool) {
+	private void updateHistoryStock(StockDo stock,String today,ThreadPoolExecutor  pool) {
 		pool.execute(new Runnable() {
 			@Override
 			public void run() {
 				String key=RedisKeyUtil.getRecheckStock(stock.getNumber());
 				if(!redisUtil.hasKey(key)) {
-					logger.info("更新数据--->"+stock.getNumber()+" "+redisUtil.get(RedisKeyUtil.getStockName(stock.getNumber()))+" "+DateUtils.getToday());
+					logger.info("更新数据--->"+stock.getNumber()+" "+redisUtil.get(RedisKeyUtil.getStockName(stock.getNumber()))+" "+today);
 					guPiaoService.updateHistoryStock(stock.getNumber());
 					guPiaoService.timeInterval(stock.getNumber());
 					redisUtil.set(key, true);
@@ -142,55 +143,50 @@ public class RealTimeTask implements InitializingBean {
 		});
 	}
 	
-	@Scheduled(cron = "0 30 8,12 * * MON-FRI")
+	@Scheduled(cron = "0 50 8,12 * * MON-FRI")
 	public void  updateHistoryTask1() {
+		today=DateUtils.getToday();
 		//获取所有股票的历史60分钟数据
-		logger.info("开始复盘昨天的数据-任务1");
 		for(StockDo stock:list1) {
-			updateHistoryStock(stock,pool1);
+			updateHistoryStock(stock,today,pool1);
 		}
-		logger.info("结束复盘昨天的数据-任务1");
 	}
 	
 	
-	@Scheduled(cron = "5 30 8,12 * * MON-FRI")
+	@Scheduled(cron = "5 50 8,12 * * MON-FRI")
 	public void  updateHistoryTask2() {
+		today=DateUtils.getToday();
 		//获取所有股票的历史60分钟数据
-		logger.info("开始复盘昨天的数据-任务2");
 		for(StockDo stock:list2) {
-			updateHistoryStock(stock,pool2);
+			updateHistoryStock(stock,today,pool2);
 		}
-		logger.info("结束复盘昨天的数据-任务2");
 	}
 	
-	@Scheduled(cron = "10 30 8,12 * * MON-FRI")
+	@Scheduled(cron = "10 50 8,12 * * MON-FRI")
 	public void  updateHistoryTask3() {
+		today=DateUtils.getToday();
 		//获取所有股票的历史60分钟数据
-		logger.info("开始复盘昨天的数据-任务3");
 		for(StockDo stock:list3) {
-			updateHistoryStock(stock,pool3);
+			updateHistoryStock(stock,today,pool3);
 		}
-		logger.info("结束复盘昨天的数据-任务3");
 	}
 	
-	@Scheduled(cron = "15 30 8,12 * * MON-FRI")
+	@Scheduled(cron = "15 50 8,12 * * MON-FRI")
 	public void  updateHistoryTask4() {
+		today=DateUtils.getToday();
 		//获取所有股票的历史60分钟数据
-		logger.info("开始复盘昨天的数据-任务4");
 		for(StockDo stock:list4) {
-			updateHistoryStock(stock,pool4);
+			updateHistoryStock(stock,today,pool4);
 		}
-		logger.info("结束复盘昨天的数据-任务4");
 	}
 	
-	@Scheduled(cron = "20 30 8,12 * * MON-FRI")
+	@Scheduled(cron = "20 50 8,12 * * MON-FRI")
 	public void  updateHistoryTask5() {
+		today=DateUtils.getToday();
 		//获取所有股票的历史60分钟数据
-		logger.info("开始复盘昨天的数据-任务5");
 		for(StockDo stock:list5) {
-			updateHistoryStock(stock,pool5);
+			updateHistoryStock(stock,today,pool5);
 		}
-		logger.info("结束复盘昨天的数据-任务5");
 	}
 	
 
@@ -205,6 +201,7 @@ public class RealTimeTask implements InitializingBean {
 			list3=list.subList(2*k, 3*k);
 			list4=list.subList(3*k, 4*k);
 			list5=list.subList(4*k, list.size());
+			today=DateUtils.getToday();
 		} catch (Exception e) {
 			logger.warn("init Exception:"+e.getMessage(),e);
 		}

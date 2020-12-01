@@ -127,79 +127,70 @@ public class RealTimeTask implements InitializingBean {
 		}
 	}
 	
-	@Scheduled(cron = "0 0 8,12 * * MON-FRI")
+	private void updateHistoryStock(StockDo stock,ThreadPoolExecutor  pool) {
+		pool.execute(new Runnable() {
+			@Override
+			public void run() {
+				String key=RedisKeyUtil.getRecheckStock(stock.getNumber());
+				if(!redisUtil.hasKey(key)) {
+					logger.info("更新数据--->"+stock.getNumber()+" "+redisUtil.get(RedisKeyUtil.getStockName(stock.getNumber()))+" "+DateUtils.getToday());
+					guPiaoService.updateHistoryStock(stock.getNumber());
+					guPiaoService.timeInterval(stock.getNumber());
+					redisUtil.set(key, true);
+				}
+			}
+		});
+	}
+	
+	@Scheduled(cron = "0 30 8,12 * * MON-FRI")
 	public void  updateHistoryTask1() {
 		//获取所有股票的历史60分钟数据
-		logger.info("开始复盘昨天的数据");
+		logger.info("开始复盘昨天的数据-任务1");
 		for(StockDo stock:list1) {
-			String key=RedisKeyUtil.getRecheckStock(stock.getNumber());
-			if(!redisUtil.hasKey(key)) {
-				logger.info("更新数据--->"+stock.getNumber()+" "+redisUtil.get(RedisKeyUtil.getStockName(stock.getNumber()))+" "+DateUtils.getToday());
-				guPiaoService.updateHistoryStock(stock.getNumber());
-				guPiaoService.timeInterval(stock.getNumber());
-				redisUtil.set(key, true);
-			}
+			updateHistoryStock(stock,pool1);
 		}
+		logger.info("结束复盘昨天的数据-任务1");
 	}
 	
-	@Scheduled(cron = "5 0 8,12 * * MON-FRI")
+	
+	@Scheduled(cron = "5 30 8,12 * * MON-FRI")
 	public void  updateHistoryTask2() {
 		//获取所有股票的历史60分钟数据
-		logger.info("开始复盘昨天的数据");
+		logger.info("开始复盘昨天的数据-任务2");
 		for(StockDo stock:list2) {
-			String key=RedisKeyUtil.getRecheckStock(stock.getNumber());
-			if(!redisUtil.hasKey(key)) {
-				logger.info("更新数据--->"+stock.getNumber()+" "+redisUtil.get(RedisKeyUtil.getStockName(stock.getNumber()))+" "+DateUtils.getToday());
-				guPiaoService.updateHistoryStock(stock.getNumber());
-				guPiaoService.timeInterval(stock.getNumber());
-				redisUtil.set(key, true);
-			}
+			updateHistoryStock(stock,pool2);
 		}
+		logger.info("结束复盘昨天的数据-任务2");
 	}
 	
-	@Scheduled(cron = "10 0 8,12 * * MON-FRI")
+	@Scheduled(cron = "10 30 8,12 * * MON-FRI")
 	public void  updateHistoryTask3() {
 		//获取所有股票的历史60分钟数据
-		logger.info("开始复盘昨天的数据");
+		logger.info("开始复盘昨天的数据-任务3");
 		for(StockDo stock:list3) {
-			String key=RedisKeyUtil.getRecheckStock(stock.getNumber());
-			if(!redisUtil.hasKey(key)) {
-				logger.info("更新数据--->"+stock.getNumber()+" "+redisUtil.get(RedisKeyUtil.getStockName(stock.getNumber()))+" "+DateUtils.getToday());
-				guPiaoService.updateHistoryStock(stock.getNumber());
-				guPiaoService.timeInterval(stock.getNumber());
-				redisUtil.set(key, true);
-			}
+			updateHistoryStock(stock,pool3);
 		}
+		logger.info("结束复盘昨天的数据-任务3");
 	}
 	
-	@Scheduled(cron = "15 0 8,12 * * MON-FRI")
+	@Scheduled(cron = "15 30 8,12 * * MON-FRI")
 	public void  updateHistoryTask4() {
 		//获取所有股票的历史60分钟数据
-		logger.info("开始复盘昨天的数据");
+		logger.info("开始复盘昨天的数据-任务4");
 		for(StockDo stock:list4) {
-			String key=RedisKeyUtil.getRecheckStock(stock.getNumber());
-			if(!redisUtil.hasKey(key)) {
-				logger.info("更新数据--->"+stock.getNumber()+" "+redisUtil.get(RedisKeyUtil.getStockName(stock.getNumber()))+" "+DateUtils.getToday());
-				guPiaoService.updateHistoryStock(stock.getNumber());
-				guPiaoService.timeInterval(stock.getNumber());
-				redisUtil.set(key, true);
-			}
+			updateHistoryStock(stock,pool4);
 		}
+		logger.info("结束复盘昨天的数据-任务4");
 	}
 	
-	@Scheduled(cron = "20 0 8,12 * * MON-FRI")
+	@Scheduled(cron = "20 30 8,12 * * MON-FRI")
 	public void  updateHistoryTask5() {
 		//获取所有股票的历史60分钟数据
-		logger.info("开始复盘昨天的数据");
+		logger.info("开始复盘昨天的数据-任务5");
 		for(StockDo stock:list5) {
-			String key=RedisKeyUtil.getRecheckStock(stock.getNumber());
-			if(!redisUtil.hasKey(key)) {
-				logger.info("更新数据--->"+stock.getNumber()+" "+redisUtil.get(RedisKeyUtil.getStockName(stock.getNumber()))+" "+DateUtils.getToday());
-				guPiaoService.updateHistoryStock(stock.getNumber());
-				guPiaoService.timeInterval(stock.getNumber());
-				redisUtil.set(key, true);
-			}
+			updateHistoryStock(stock,pool5);
 		}
+		logger.info("结束复盘昨天的数据-任务5");
 	}
 	
 

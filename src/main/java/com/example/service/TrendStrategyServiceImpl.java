@@ -440,13 +440,11 @@ public class TrendStrategyServiceImpl implements TrendStrategyService {
 	    	
 	    	
 	    	//趋势向上
-//	    	if(boll.getMidList().get(i-8).getY() < boll.getMidList().get(i).getY()*1.03) {
-//	    		isBuy=true;
-//	    	} else {
-//	    		continue;
-//	    	}
+	    	if(boll.getMidList().get(i-10).getY() < boll.getMidList().get(i).getY()*1.02) {
+	    		isBuy=true;
+	    	} 
 	    	//开盘与收盘价格需要覆盖中轨低1% 价格要覆盖
-	    	if(price.getLow().doubleValue() <= buyPoint &&  price.getLow().doubleValue() >= stopLossPoint) {
+	    	if(isBuy && price.getLow().doubleValue() <= buyPoint &&  price.getLow().doubleValue() >= stopLossPoint) {
 	    		isBuy=true;
 	    	}  
 	    	

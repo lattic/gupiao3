@@ -42,7 +42,7 @@ public class StrategyTest {
 	private String number="sz002030";
 	private static final SimpleDateFormat DF_YYYY_MM_DD = new SimpleDateFormat("yyyy-MM-dd");// 设置日期格式
 	
-	//@Test
+	@Test
 	public void Test() {
 		
 		List<StockPriceVo> spList=trendStrategyService.transformByDayLine(historyDayStockMapper.getNumber(number));
@@ -59,7 +59,7 @@ public class StrategyTest {
 	}
 	
 	
-	@Test
+	//@Test
 	public void excuteRunListenTest() {
 		guPiaoService.updateHistoryStock("sh600305");
 		guPiaoService.timeInterval("sh600305");

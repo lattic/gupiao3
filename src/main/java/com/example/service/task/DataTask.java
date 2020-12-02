@@ -146,6 +146,10 @@ public class DataTask  implements InitializingBean {
 			Collection<RealTimeDo> valueCollection = map.values();
 			List<RealTimeDo>templist=new ArrayList<RealTimeDo>(valueCollection);
 			for(RealTimeDo rt:templist) {
+				if(rt.getTop() == null||rt.getLow()== null||rt.getKaipanjia()== null||rt.getZuorishoupanjia()== null||rt.getChengjiaogupiao()== null) {
+					logger.warn("空值数据："+rt.getName()+" "+rt.getNumber()+" 最高价:"+rt.getTop()+" 最低价："+rt.getLow()+" 开盘价："+rt.getKaipanjia()+" 收盘价："+rt.getZuorishoupanjia()+" 成交量："+rt.getChengjiaogupiao());
+					continue;
+				}
 				if(rt.getTop()<=0.1||rt.getLow()<=0.1||rt.getKaipanjia()<=0.1||rt.getZuorishoupanjia()<=0.1||rt.getChengjiaogupiao()<=0.1) {
 					logger.warn("异常数据："+rt.getName()+" "+rt.getNumber()+" 最高价:"+rt.getTop()+" 最低价："+rt.getLow()+" 开盘价："+rt.getKaipanjia()+" 收盘价："+rt.getZuorishoupanjia()+" 成交量："+rt.getChengjiaogupiao());
 					continue;

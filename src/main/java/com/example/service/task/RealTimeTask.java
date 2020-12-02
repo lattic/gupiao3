@@ -76,6 +76,7 @@ public class RealTimeTask implements InitializingBean {
 			logger.warn("init Exception:"+e.getMessage(),e);
 		}
 	}
+	
 	@Scheduled(cron = "0 0 * * * *")
 	public void  todayTask() throws Exception {
 		today=DateUtils.getToday();
@@ -83,67 +84,84 @@ public class RealTimeTask implements InitializingBean {
 	
 	@Scheduled(cron = "0/30 * 9-15 * * MON-FRI")
 	public void  task1() throws Exception {
-		if(!DateUtils.traceTime(guPiaoService.getHolidayList())) {
-			return ;
-		}
-		for(StockDo stock:list1) {
-			try {
-				pool1.execute(new UpdateRealTimeTask(guPiaoService,stock.getNumber(),apiUrl,redisUtil));
-			}catch (Exception e) {
-				logger.warn("pool1 Exception:"+stock.getNumber()+":"+e.getMessage(),e);
-			}
-		}
+		updateCache(list1,pool1);
 	}
 	@Scheduled(cron = "0/30 * 9-15 * * MON-FRI")
 	public void  task2() throws Exception {
-		if(!DateUtils.traceTime(guPiaoService.getHolidayList())) {
-			return ;
-		}
-		for(StockDo stock:list2) {
-			try {
-				pool2.execute(new UpdateRealTimeTask(guPiaoService,stock.getNumber(),apiUrl,redisUtil));
-			}catch (Exception e) {
-				logger.warn("pool2 Exception:"+stock.getNumber()+":"+e.getMessage(),e);
-			}
-		}
+		updateCache(list2,pool2);
 	}
 	@Scheduled(cron = "0/30 * 9-15 * * MON-FRI")
 	public void  task3() throws Exception {
-		if(!DateUtils.traceTime(guPiaoService.getHolidayList())) {
-			return ;
-		}
-		for(StockDo stock:list3) {
-			try {
-				pool3.execute(new UpdateRealTimeTask(guPiaoService,stock.getNumber(),apiUrl,redisUtil));
-			}catch (Exception e) {
-				logger.warn("pool3 Exception:"+stock.getNumber()+":"+e.getMessage(),e);
-			}
-		}
+		updateCache(list3,pool3);
 	}
 	@Scheduled(cron = "0/30 * 9-15 * * MON-FRI")
 	public void  task4() throws Exception {
-		if(!DateUtils.traceTime(guPiaoService.getHolidayList())) {
-			return ;
-		}
-		for(StockDo stock:list4) {
-			try {
-				pool4.execute(new UpdateRealTimeTask(guPiaoService,stock.getNumber(),apiUrl,redisUtil));
-			}catch (Exception e) {
-				logger.warn("pool4 Exception:"+stock.getNumber()+":"+e.getMessage(),e);
-			}
-		}
+		updateCache(list4,pool4);
 	}
 	@Scheduled(cron = "0/30 * 9-15 * * MON-FRI")
 	public void  task5() throws Exception {
+		updateCache(list5,pool5);
+	}
+	
+	//实时更新价格到cache
+	private void updateCache(List<StockDo> stockList,ThreadPoolExecutor  pool) {
 		if(!DateUtils.traceTime(guPiaoService.getHolidayList())) {
 			return ;
 		}
-		for(StockDo stock:list5) {
+		for(StockDo stock:stockList) {
 			try {
-				pool5.execute(new UpdateRealTimeTask(guPiaoService,stock.getNumber(),apiUrl,redisUtil));
+				pool.execute(new UpdateRealTimeTask(guPiaoService,stock.getNumber(),apiUrl,redisUtil));
 			}catch (Exception e) {
 				logger.warn("pool5 Exception:"+stock.getNumber()+":"+e.getMessage(),e);
 			}
+		}
+	}
+	
+	
+	
+	@Scheduled(cron = "0 50 8,15,22 * * MON-FRI")
+	public void  updateHistoryTask1() {
+		today=DateUtils.getToday();
+		//获取所有股票的历史60分钟数据
+		for(StockDo stock:list1) {
+			updateHistoryStock(stock,today,pool1);
+		}
+	}
+	
+	
+	@Scheduled(cron = "5 50 8,15,22 * * MON-FRI")
+	public void  updateHistoryTask2() {
+		today=DateUtils.getToday();
+		//获取所有股票的历史60分钟数据
+		for(StockDo stock:list2) {
+			updateHistoryStock(stock,today,pool2);
+		}
+	}
+	
+	@Scheduled(cron = "10 50 8,15,22 * * MON-FRI")
+	public void  updateHistoryTask3() {
+		today=DateUtils.getToday();
+		//获取所有股票的历史60分钟数据
+		for(StockDo stock:list3) {
+			updateHistoryStock(stock,today,pool3);
+		}
+	}
+	
+	@Scheduled(cron = "15 50 8,15,22 * * MON-FRI")
+	public void  updateHistoryTask4() {
+		today=DateUtils.getToday();
+		//获取所有股票的历史60分钟数据
+		for(StockDo stock:list4) {
+			updateHistoryStock(stock,today,pool4);
+		}
+	}
+	
+	@Scheduled(cron = "20 50 8,15,22 * * MON-FRI")
+	public void  updateHistoryTask5() {
+		today=DateUtils.getToday();
+		//获取所有股票的历史60分钟数据
+		for(StockDo stock:list5) {
+			updateHistoryStock(stock,today,pool5);
 		}
 	}
 	
@@ -161,53 +179,6 @@ public class RealTimeTask implements InitializingBean {
 			}
 		});
 	}
-	
-	@Scheduled(cron = "0 50 8,12 * * MON-FRI")
-	public void  updateHistoryTask1() {
-		today=DateUtils.getToday();
-		//获取所有股票的历史60分钟数据
-		for(StockDo stock:list1) {
-			updateHistoryStock(stock,today,pool1);
-		}
-	}
-	
-	
-	@Scheduled(cron = "5 50 8,12 * * MON-FRI")
-	public void  updateHistoryTask2() {
-		today=DateUtils.getToday();
-		//获取所有股票的历史60分钟数据
-		for(StockDo stock:list2) {
-			updateHistoryStock(stock,today,pool2);
-		}
-	}
-	
-	@Scheduled(cron = "10 50 8,12 * * MON-FRI")
-	public void  updateHistoryTask3() {
-		today=DateUtils.getToday();
-		//获取所有股票的历史60分钟数据
-		for(StockDo stock:list3) {
-			updateHistoryStock(stock,today,pool3);
-		}
-	}
-	
-	@Scheduled(cron = "15 50 8,12 * * MON-FRI")
-	public void  updateHistoryTask4() {
-		today=DateUtils.getToday();
-		//获取所有股票的历史60分钟数据
-		for(StockDo stock:list4) {
-			updateHistoryStock(stock,today,pool4);
-		}
-	}
-	
-	@Scheduled(cron = "20 50 8,12 * * MON-FRI")
-	public void  updateHistoryTask5() {
-		today=DateUtils.getToday();
-		//获取所有股票的历史60分钟数据
-		for(StockDo stock:list5) {
-			updateHistoryStock(stock,today,pool5);
-		}
-	}
-	
 
 	
 }

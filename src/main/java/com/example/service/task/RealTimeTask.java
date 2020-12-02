@@ -120,35 +120,35 @@ public class RealTimeTask implements InitializingBean {
 	
 	
 	@Scheduled(cron = "0 40 8,15,23 * * MON-FRI")
-	public void updateHistoryTask1() {
-		// 获取所有股票的历史60分钟数据
-		updateHistoryStock(list1, today, pool1);
-		updateHistoryStock(list2, today, pool2);
-		updateHistoryStock(list3, today, pool3);
-		updateHistoryStock(list4, today, pool4);
-		updateHistoryStock(list5, today, pool5);
+	public void  updateHistoryTask1() {
+		//获取所有股票的历史60分钟数据
+			updateHistoryStock(list1,today,pool1);
+			updateHistoryStock(list2,today,pool2);
+			updateHistoryStock(list3,today,pool3);
+			updateHistoryStock(list4,today,pool4);
+			updateHistoryStock(list5,today,pool5);
 	}
 	
-	private void updateHistoryStock(final List<StockDo> stockList,final String today,final ThreadPoolExecutor  pool) {
-		for(StockDo stock:stockList) {
-			try {
-				pool.execute(new Runnable() {
-					@Override
-					public void run() {
-						String key=RedisKeyUtil.getRecheckStock(stock.getNumber());
-						if(!redisUtil.hasKey(key)) {
-							logger.info("更新数据(补60分钟线)--->"+stock.getNumber()+" "+redisUtil.get(RedisKeyUtil.getStockName(stock.getNumber()))+" "+today);
+	private void updateHistoryStock(final List<StockDo> stockList, final String today, final ThreadPoolExecutor pool) {
+		try {
+			pool.execute(new Runnable() {
+				@Override
+				public void run() {
+					for (StockDo stock : stockList) {
+						String key = RedisKeyUtil.getRecheckStock(stock.getNumber());
+						if (!redisUtil.hasKey(key)) {
+							logger.info("更新数据(补60分钟线)--->" + stock.getNumber() + " "
+									+ redisUtil.get(RedisKeyUtil.getStockName(stock.getNumber())) + " " + today);
 							guPiaoService.updateHistoryStock(stock.getNumber());
 							guPiaoService.timeInterval(stock.getNumber());
-							redisUtil.set(key, true,3500);
+							redisUtil.set(key, true, 3500);
 						}
 					}
-				});
-			}catch (Exception e) {
-				logger.error(e.getMessage(),e);
-			}
+				}
+			});
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
 	}
-
 	
 }

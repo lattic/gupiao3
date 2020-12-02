@@ -231,6 +231,8 @@ public class DataTask  implements InitializingBean {
 
 			private String updateMsg(final String number, String msg) {
 				try {
+					guPiaoService.updateHistoryStock(number);
+					guPiaoService.timeInterval(number);
 					List<StockPriceVo> spList=trendStrategyService.transformByDayLine(historyDayStockMapper.getNumber(number));
 					RobotAccountDo account=new RobotAccountDo();
 					RobotSetDo config=new RobotSetDo();

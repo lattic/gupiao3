@@ -119,9 +119,8 @@ public class RealTimeTask implements InitializingBean {
 	
 	
 	
-	@Scheduled(cron = "0 50 8,15,22 * * MON-FRI")
+	@Scheduled(cron = "0 5 8,15,23 * * MON-FRI")
 	public void  updateHistoryTask1() {
-		today=DateUtils.getToday();
 		//获取所有股票的历史60分钟数据
 		for(StockDo stock:list1) {
 			updateHistoryStock(stock,today,pool1);
@@ -129,36 +128,32 @@ public class RealTimeTask implements InitializingBean {
 	}
 	
 	
-	@Scheduled(cron = "5 50 8,15,22 * * MON-FRI")
+	@Scheduled(cron = "5 5 8,15,23 * * MON-FRI")
 	public void  updateHistoryTask2() {
-		today=DateUtils.getToday();
 		//获取所有股票的历史60分钟数据
 		for(StockDo stock:list2) {
 			updateHistoryStock(stock,today,pool2);
 		}
 	}
 	
-	@Scheduled(cron = "10 50 8,15,22 * * MON-FRI")
+	@Scheduled(cron = "10 5 8,15,23 * * MON-FRI")
 	public void  updateHistoryTask3() {
-		today=DateUtils.getToday();
 		//获取所有股票的历史60分钟数据
 		for(StockDo stock:list3) {
 			updateHistoryStock(stock,today,pool3);
 		}
 	}
 	
-	@Scheduled(cron = "15 50 8,15,22 * * MON-FRI")
+	@Scheduled(cron = "15 5 8,15,23 * * MON-FRI")
 	public void  updateHistoryTask4() {
-		today=DateUtils.getToday();
 		//获取所有股票的历史60分钟数据
 		for(StockDo stock:list4) {
 			updateHistoryStock(stock,today,pool4);
 		}
 	}
 	
-	@Scheduled(cron = "20 50 8,15,22 * * MON-FRI")
+	@Scheduled(cron = "20 5 8,15,23 * * MON-FRI")
 	public void  updateHistoryTask5() {
-		today=DateUtils.getToday();
 		//获取所有股票的历史60分钟数据
 		for(StockDo stock:list5) {
 			updateHistoryStock(stock,today,pool5);

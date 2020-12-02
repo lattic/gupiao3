@@ -157,6 +157,7 @@ public class GuPiaoServiceImpl implements GuPiaoService, InitializingBean {
 			try {
 				if (historyStockMapper.getByTime(tr) == null) {
 					historyStockMapper.insert(tr);
+					logger.info("补60分钟数据到数据库成功："+number+" 数据日期："+tr.getHistoryAll());
 				}
 			} catch (Exception e) {
 				logger.warn(e.getMessage(),e);
@@ -270,6 +271,7 @@ public class GuPiaoServiceImpl implements GuPiaoService, InitializingBean {
 	
 	@Override
 	public void timeInterval(String number) {
+		logger.info("开始计算波段："+number);
 		String returnStr="GS======测试波段区间分隔=========\n";
 		returnStr=returnStr+"股票编码："+number+" \n";
 		returnStr=returnStr+"股票名称："+(String)redisUtil.get(RedisKeyUtil.getStockName(number))+" \n";

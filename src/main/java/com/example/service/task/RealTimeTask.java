@@ -54,7 +54,7 @@ public class RealTimeTask implements InitializingBean {
 			new LinkedBlockingDeque<Runnable>(2000), 
 			Executors.defaultThreadFactory(), 
 			new ThreadPoolExecutor.CallerRunsPolicy());
-	
+	private static List<StockDo> list= new ArrayList<StockDo>();
 	private static List<StockDo> list1= new ArrayList<StockDo>();
 	private static List<StockDo> list2= new ArrayList<StockDo>();
 	private static List<StockDo> list3= new ArrayList<StockDo>();
@@ -64,7 +64,7 @@ public class RealTimeTask implements InitializingBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		try {
-			List<StockDo> list=guPiaoService.getAllStock();
+			list=guPiaoService.getAllStock();
 			int k=list.size()/5;
 			list1=list.subList(0, k);
 			list2=list.subList(1*k, 2*k);
@@ -122,11 +122,22 @@ public class RealTimeTask implements InitializingBean {
 	@Scheduled(cron = "0 40 8,15,23 * * MON-FRI")
 	public void  updateHistoryTask1() {
 		//获取所有股票的历史60分钟数据
-			updateHistoryStock(list1,today,pool1);
-			updateHistoryStock(list2,today,pool2);
-			updateHistoryStock(list3,today,pool3);
-			updateHistoryStock(list4,today,pool4);
-			updateHistoryStock(list5,today,pool5);
+		updateHistoryStock(list1,today,pool1);
+		updateHistoryStock(list2,today,pool2);
+		updateHistoryStock(list3,today,pool3);
+		updateHistoryStock(list4,today,pool4);
+		updateHistoryStock(list5,today,pool5);
+		for (StockDo stock : list) {
+			guPiaoService.timeInterval(stock.getNumber());
+		}
+	}
+	
+	@Scheduled(cron = "0 40 8,15,23 * * MON-FRI")
+	public void  updateHistoryTask2() {
+		//获取所有股票的历史60分钟数据
+		for (StockDo stock : list) {
+			guPiaoService.timeInterval(stock.getNumber());
+		}
 	}
 	
 	private void updateHistoryStock(final List<StockDo> stockList, final String today, final ThreadPoolExecutor pool) {
@@ -140,7 +151,6 @@ public class RealTimeTask implements InitializingBean {
 							logger.info("更新数据(补60分钟线)--->" + stock.getNumber() + " "
 									+ redisUtil.get(RedisKeyUtil.getStockName(stock.getNumber())) + " " + today);
 							guPiaoService.updateHistoryStock(stock.getNumber());
-							guPiaoService.timeInterval(stock.getNumber());
 							redisUtil.set(key, true, 3500);
 						}
 					}

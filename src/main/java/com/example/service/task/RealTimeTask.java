@@ -153,7 +153,7 @@ public class RealTimeTask implements InitializingBean {
 			public void run() {
 				String key=RedisKeyUtil.getRecheckStock(stock.getNumber());
 				if(!redisUtil.hasKey(key)) {
-					logger.info("更新数据--->"+stock.getNumber()+" "+redisUtil.get(RedisKeyUtil.getStockName(stock.getNumber()))+" "+today);
+					logger.info("更新数据(补60分钟线)--->"+stock.getNumber()+" "+redisUtil.get(RedisKeyUtil.getStockName(stock.getNumber()))+" "+today);
 					guPiaoService.updateHistoryStock(stock.getNumber());
 					guPiaoService.timeInterval(stock.getNumber());
 					redisUtil.set(key, true);

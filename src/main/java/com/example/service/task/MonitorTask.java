@@ -82,7 +82,7 @@ public class MonitorTask  {
 	}
 	
 	//初始化map
-	@Scheduled(cron = "0 5 11 * * MON-FRI")
+	@Scheduled(cron = "0 25 11 * * MON-FRI")
 	public void AiBuyIn() {
 		List<SubscriptionDo> subscriptionList=guPiaoService.listMemberAll();
 		int max=0;

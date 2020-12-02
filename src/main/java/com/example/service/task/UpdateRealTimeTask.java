@@ -28,6 +28,7 @@ public class UpdateRealTimeTask  implements Runnable {
 				GuPiao date=apiUrl.readUrl(number,false);
 				if(date !=null) {
 					RealTimeDo model=new RealTimeDo();
+					BeanUtils.copyProperties(date, model);
 					if(model.getTop()==null ||model.getLow()==null||model.getKaipanjia()==null||model.getZuorishoupanjia()==null||model.getChengjiaogupiao()==null) {
 						logger.error("空值数据："+model.getName()+" "+model.getNumber()+" "+JSON.toJSONString(model));
 						return ;
@@ -36,7 +37,6 @@ public class UpdateRealTimeTask  implements Runnable {
 						logger.error("异常数据："+model.getName()+" "+model.getNumber()+" 最高价:"+model.getTop()+" 最低价："+model.getLow()+" 开盘价："+model.getKaipanjia()+" 收盘价："+model.getZuorishoupanjia()+" 成交量："+model.getChengjiaogupiao());
 						return ;
 					}
-					BeanUtils.copyProperties(date, model);
 					String key = RedisKeyUtil.getRealTimeByRealTimeDo(model);
 					if(redisUtil.hasKey(key)) {
 						logger.info("读取缓存:"+number+" "+model.getName()+" 时间:"+model.getDate()+" "+model.getTime()+" 当前价格:"+model.getDangqianjiage());

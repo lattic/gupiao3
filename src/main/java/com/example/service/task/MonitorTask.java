@@ -1,5 +1,6 @@
 package com.example.service.task;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -19,10 +20,16 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.example.ai.MockDeal;
+import com.example.mapper.HistoryDayStockMapper;
 import com.example.model.MockLog;
+import com.example.model.RobotAccountDo;
+import com.example.model.RobotSetDo;
 import com.example.model.StockDo;
+import com.example.model.StockPriceVo;
 import com.example.model.SubscriptionDo;
+import com.example.model.TradingRecordDo;
 import com.example.service.GuPiaoService;
+import com.example.service.TrendStrategyService;
 import com.example.uitls.DateUtils;
 import com.example.uitls.DingTalkRobotHTTPUtil;
 import com.example.uitls.RedisKeyUtil;
@@ -42,6 +49,11 @@ public class MonitorTask  {
 	private MockDeal mockDeal;
 	@Resource
 	private RedisUtil redisUtil;
+	@Autowired
+	private TrendStrategyService trendStrategyService;
+	@Autowired
+	private HistoryDayStockMapper historyDayStockMapper;
+	
 	
 	
 	@Scheduled(cron = "0 30 9 * * MON-FRI")
@@ -136,6 +148,7 @@ public class MonitorTask  {
 						
 						if(StringUtils.equals(realTime.getNumber(), "0") && isNotifyByMock) {
 							isNotifyByMock=false;
+							log.setLogs(updateMsg(realTime.getNumber(),log.getLogs()));
 							DingTalkRobotHTTPUtil.sendMsg(realTime.getDingtalkId(), log.getLogs(), null, false);
 						}
 						redisUtil.set(key,isNotifyByMock,86400L);
@@ -160,7 +173,23 @@ public class MonitorTask  {
 		
 	}
 	
-	
+	private String updateMsg(final String number, String msg) {
+		try {
+			guPiaoService.updateHistoryStock(number);
+			guPiaoService.timeInterval(number);
+			List<StockPriceVo> spList=trendStrategyService.transformByDayLine(historyDayStockMapper.getNumber(number));
+			RobotAccountDo account=new RobotAccountDo();
+			RobotSetDo config=new RobotSetDo();
+			account.setTotal(new BigDecimal(100000));
+			List<TradingRecordDo> rtList=trendStrategyService.getStrateByBoll(spList, account, config);
+			if(rtList!=null && rtList.size() >1) {
+				msg=msg+rtList.get(rtList.size()-1).getRemark();
+			}
+		} catch (Exception e) {
+			logger.error("updateMsg:"+"number:"+number+"-->"+e.getMessage(),e);
+		}
+		return msg;
+	}
 	
 	
 	

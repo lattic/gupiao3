@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 
+import com.alibaba.fastjson.JSON;
 import com.example.demo.GuPiao;
 import com.example.model.RealTimeDo;
 import com.example.service.GuPiaoService;
@@ -28,11 +29,11 @@ public class UpdateRealTimeTask  implements Runnable {
 				if(date !=null) {
 					RealTimeDo model=new RealTimeDo();
 					if(model.getTop()==null ||model.getLow()==null||model.getKaipanjia()==null||model.getZuorishoupanjia()==null||model.getChengjiaogupiao()==null) {
-						logger.warn("空值数据："+model.getName()+" "+model.getNumber());
+						logger.error("空值数据："+model.getName()+" "+model.getNumber()+" "+JSON.toJSONString(model));
 						return ;
 					}
 					if(model.getTop()<=0.1||model.getLow()<=0.1||model.getKaipanjia()<=0.1||model.getZuorishoupanjia()<=0.1||model.getChengjiaogupiao()<=0.1) {
-						logger.warn("异常数据："+model.getName()+" "+model.getNumber()+" 最高价:"+model.getTop()+" 最低价："+model.getLow()+" 开盘价："+model.getKaipanjia()+" 收盘价："+model.getZuorishoupanjia()+" 成交量："+model.getChengjiaogupiao());
+						logger.error("异常数据："+model.getName()+" "+model.getNumber()+" 最高价:"+model.getTop()+" 最低价："+model.getLow()+" 开盘价："+model.getKaipanjia()+" 收盘价："+model.getZuorishoupanjia()+" 成交量："+model.getChengjiaogupiao());
 						return ;
 					}
 					BeanUtils.copyProperties(date, model);
@@ -49,7 +50,7 @@ public class UpdateRealTimeTask  implements Runnable {
 						map=new HashMap<String,RealTimeDo>();
 					}
 					map.put(model.getDate()+model.getTime(), model);
-					redisUtil.set(key2, map,86000);
+					redisUtil.set(key2, map,43200);
 					String key3 =RedisKeyUtil.getRealTime(number);
 					redisUtil.set(key3, date,30);
 					logger.info("写入缓存成功:"+number+" "+model.getName()+" 时间:"+model.getDate()+" "+model.getTime()+" 当前价格:"+model.getDangqianjiage());

@@ -119,7 +119,7 @@ public class RealTimeTask implements InitializingBean {
 	
 	
 	
-	@Scheduled(cron = "0 40 8,15,23 * * MON-FRI")
+	@Scheduled(cron = "0 0 1 * * *")
 	public void  updateHistoryTask1() {
 		//获取所有股票的历史60分钟数据
 		updateHistoryStock(list1,today,pool1);
@@ -127,12 +127,9 @@ public class RealTimeTask implements InitializingBean {
 		updateHistoryStock(list3,today,pool3);
 		updateHistoryStock(list4,today,pool4);
 		updateHistoryStock(list5,today,pool5);
-		for (StockDo stock : list) {
-			guPiaoService.timeInterval(stock.getNumber());
-		}
 	}
 	
-	@Scheduled(cron = "0 40 8,15,23 * * MON-FRI")
+	@Scheduled(cron = "0 0 3 * * *")
 	public void  updateHistoryTask2() {
 		//获取所有股票的历史60分钟数据
 		for (StockDo stock : list) {
@@ -141,11 +138,11 @@ public class RealTimeTask implements InitializingBean {
 	}
 	
 	private void updateHistoryStock(final List<StockDo> stockList, final String today, final ThreadPoolExecutor pool) {
-		try {
-			pool.execute(new Runnable() {
-				@Override
-				public void run() {
-					for (StockDo stock : stockList) {
+		for (StockDo stock : stockList) {
+			try {
+				pool.execute(new Runnable() {
+					@Override
+					public void run() {
 						String key = RedisKeyUtil.getRecheckStock(stock.getNumber());
 						if (!redisUtil.hasKey(key)) {
 							logger.info("更新数据(补60分钟线)--->" + stock.getNumber() + " "
@@ -154,11 +151,10 @@ public class RealTimeTask implements InitializingBean {
 							redisUtil.set(key, true, 3500);
 						}
 					}
-				}
-			});
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+				});
+			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
+			}
 		}
 	}
-	
 }

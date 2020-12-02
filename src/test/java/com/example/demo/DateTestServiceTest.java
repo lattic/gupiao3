@@ -52,7 +52,7 @@ public class DateTestServiceTest {
 	@Autowired
 	private GuPiaoService guPiaoService;
 	@Autowired
-	private MockDeal mockDeal;
+	private RealTimeTask realTimeTask;
 
 	@Resource
 	private RedisUtil redisUtil;
@@ -70,12 +70,14 @@ public class DateTestServiceTest {
 	private DataTask dataTask;
 
 	
-	@Test
+	//@Test
 	public void TestDay() {
 		guPiaoService.updateDayStockByThs();
 	}
 	
-	
-
+	@Test
+	public void Test60Day() {
+		realTimeTask.updateHistoryTask1();
+	}
 
 }

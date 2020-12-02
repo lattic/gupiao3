@@ -138,9 +138,10 @@ public class GuPiaoServiceImpl implements GuPiaoService, InitializingBean {
 	public void updateHistoryStock(String number) {
 		List<HistoryPriceDo> list = readApiUrl.readHistoryApiUrl(number, 60);
 		if (list == null || list.isEmpty()) {
-			logger.warn("没有获取到数据");
+			logger.warn("没有获取到数据"+number);
 			return;
 		}
+		logger.warn("获取到数据"+number);
 		final SimpleDateFormat df1 = new SimpleDateFormat("yyyyMMdd");// 设置日期格式
 		final SimpleDateFormat df2 = new SimpleDateFormat("yyyyMMddHHmm");// 设置日期格式
 		for (HistoryPriceDo price : list) {

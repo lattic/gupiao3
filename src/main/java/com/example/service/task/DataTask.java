@@ -193,7 +193,7 @@ public class DataTask  implements InitializingBean {
 	/**
 	 * 关注个股，显示操作
 	 */
-	@Scheduled(cron = "0 35 9 * * MON-FRI")
+	@Scheduled(cron = "0 35 10 * * MON-FRI")
 	private void showBoduan() {
 		List<SubscriptionDo> list=guPiaoService.listMemberAll();
 		for(SubscriptionDo realTime:list) {
@@ -220,14 +220,14 @@ public class DataTask  implements InitializingBean {
 					for(HistoryStockDo stock:list) {
 						msg=msg+stock.getRemark();
 					}
-					List<StockPriceVo> spList=trendStrategyService.transformByDayLine(historyDayStockMapper.getNumber(number));
-					RobotAccountDo account=new RobotAccountDo();
-					RobotSetDo config=new RobotSetDo();
-					account.setTotal(new BigDecimal(100000));
-					List<TradingRecordDo> rtList=trendStrategyService.getStrateByBoll(spList, account, config);
-					if(rtList!=null && rtList.size() >0) {
-						msg=msg+rtList.get(rtList.size()-1).getRemark();
-					}
+//					List<StockPriceVo> spList=trendStrategyService.transformByDayLine(historyDayStockMapper.getNumber(number));
+//					RobotAccountDo account=new RobotAccountDo();
+//					RobotSetDo config=new RobotSetDo();
+//					account.setTotal(new BigDecimal(100000));
+//					List<TradingRecordDo> rtList=trendStrategyService.getStrateByBoll(spList, account, config);
+//					if(rtList!=null && rtList.size() >1) {
+//						msg=msg+rtList.get(rtList.size()-1).getRemark();
+//					}
 					logger.info(msg);
 					
 					if(isNotifyByMock) {

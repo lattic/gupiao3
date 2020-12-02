@@ -148,7 +148,7 @@ public class MonitorTask  {
 						
 						if(StringUtils.equals(realTime.getNumber(), "0") && isNotifyByMock) {
 							isNotifyByMock=false;
-							log.setLogs(updateMsg(realTime.getNumber(),log.getLogs()));
+							log.setLogs(updateMsg(log.getNumber(),log.getLogs()));
 							DingTalkRobotHTTPUtil.sendMsg(realTime.getDingtalkId(), log.getLogs(), null, false);
 						}
 						redisUtil.set(key,isNotifyByMock,86400L);

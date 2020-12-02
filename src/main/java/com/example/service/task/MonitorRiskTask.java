@@ -54,9 +54,11 @@ public class MonitorRiskTask {
 		if(!DateUtils.traceTime(guPiaoService.getHolidayList())) {
 			return ;
 		}
+		
 		List<SubscriptionDo> list=guPiaoService.listMemberAll();
 		for(SubscriptionDo realTime:list) {
 			if(!StringUtils.equals(realTime.getNumber(), "0")) {
+				logger.info("实时监控-->"+realTime.getNumber());
 				excuteRunListen(realTime.getNumber(),realTime.getDingtalkId(),realTime.getBegintime());
 			}
 		}
@@ -107,7 +109,7 @@ public class MonitorRiskTask {
 		//获取走势
 		HistoryPriceDo riskPrice=guPiaoService.getLastZhichengwei(number);
 		if(riskPrice == null || riskPrice.getZhichengwei() == null) {
-			System.out.println("找不到最近一次指标："+number);
+			logger.info("找不到最近一次指标："+number);
 			return;
 		}
 		Boolean status= getRealTimeStatus(number);

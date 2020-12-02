@@ -131,9 +131,25 @@ public class RealTimeTask implements InitializingBean {
 	
 	@Scheduled(cron = "0 0 3 * * *")
 	public void  updateHistoryTask2() {
-		//获取所有股票的历史60分钟数据
-		for (StockDo stock : list) {
-			guPiaoService.timeInterval(stock.getNumber());
+		updateIntervalHistoryStock(list1,pool1);
+		updateIntervalHistoryStock(list2,pool2);
+		updateIntervalHistoryStock(list3,pool3);
+		updateIntervalHistoryStock(list4,pool4);
+		updateIntervalHistoryStock(list5,pool5);
+	}
+	
+	private void updateIntervalHistoryStock(final List<StockDo> stockList, final ThreadPoolExecutor pool) {
+		for (StockDo stock : stockList) {
+			try {
+				pool.execute(new Runnable() {
+					@Override
+					public void run() {
+						guPiaoService.timeInterval(stock.getNumber());
+					}
+				});
+			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
+			}
 		}
 	}
 	

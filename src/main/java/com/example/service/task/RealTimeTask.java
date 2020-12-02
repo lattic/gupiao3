@@ -76,6 +76,10 @@ public class RealTimeTask implements InitializingBean {
 			logger.warn("init Exception:"+e.getMessage(),e);
 		}
 	}
+	@Scheduled(cron = "0 0 * * * *")
+	public void  todayTask() throws Exception {
+		today=DateUtils.getToday();
+	}
 	
 	@Scheduled(cron = "0/30 * 9-15 * * MON-FRI")
 	public void  task1() throws Exception {

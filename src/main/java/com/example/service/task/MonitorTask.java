@@ -70,7 +70,7 @@ public class MonitorTask  {
 	}
 	
 	//初始化map
-	@Scheduled(cron = "0 35 9 * * MON-FRI")
+	@Scheduled(cron = "0 5 11 * * MON-FRI")
 	public void AiBuyIn() {
 		List<SubscriptionDo> subscriptionList=guPiaoService.listMemberAll();
 		int max=0;
@@ -122,7 +122,7 @@ public class MonitorTask  {
 			
 			//近5天出现买入点,推荐
 			Calendar before = Calendar.getInstance();  
-			before.add(Calendar.DATE, -3);
+			before.add(Calendar.DATE, -5);
 			if(log.getIsBuyin() && log.getLastBuyin()!= null && log.getLastBuyin().after(before.getTime()) ) {
 				if(log.getWinRate().doubleValue()>=3 && log.getWinRate().doubleValue()<=40) {
 					log.setLogs(log.getLogs().replace("测试AI操盘", "AI个股推荐"));

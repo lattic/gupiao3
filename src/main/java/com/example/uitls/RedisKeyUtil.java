@@ -30,10 +30,10 @@ public class RedisKeyUtil {
 	}
 	
 	//个股波段分析
-		public static String getStockSellNotify(String number,String appId) {
-			return "stock_sell_"+dateformat.format(new Date())+"_"+number+"_"+appId;
-		}
-	
+	public static String getStockSellNotify(String number,String appId) {
+		return "stock_sell_"+dateformat.format(new Date())+"_"+number+"_"+appId;
+	}
+
 	//上一个趋势指标
 	public static String getLastHistoryPrice(String number,String today) {
 		return "last_history_price_"+today+"_"+number;

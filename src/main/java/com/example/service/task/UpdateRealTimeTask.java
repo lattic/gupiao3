@@ -27,6 +27,10 @@ public class UpdateRealTimeTask  implements Runnable {
 				GuPiao date=apiUrl.readUrl(number,false);
 				if(date !=null) {
 					RealTimeDo model=new RealTimeDo();
+					if(model.getTop()==null ||model.getLow()==null||model.getKaipanjia()==null||model.getZuorishoupanjia()==null||model.getChengjiaogupiao()==null) {
+						logger.warn("空值数据："+model.getName()+" "+model.getNumber());
+						return ;
+					}
 					if(model.getTop()<=0.1||model.getLow()<=0.1||model.getKaipanjia()<=0.1||model.getZuorishoupanjia()<=0.1||model.getChengjiaogupiao()<=0.1) {
 						logger.warn("异常数据："+model.getName()+" "+model.getNumber()+" 最高价:"+model.getTop()+" 最低价："+model.getLow()+" 开盘价："+model.getKaipanjia()+" 收盘价："+model.getZuorishoupanjia()+" 成交量："+model.getChengjiaogupiao());
 						return ;

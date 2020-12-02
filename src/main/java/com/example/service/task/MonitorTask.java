@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.ai.MockDeal;
 import com.example.mapper.HistoryDayStockMapper;
+import com.example.model.HistoryDayStockDo;
 import com.example.model.MockLog;
 import com.example.model.RobotAccountDo;
 import com.example.model.RobotSetDo;
@@ -38,11 +40,13 @@ import com.example.uitls.RedisUtil;
 @Service
 public class MonitorTask  {
 	private static Logger logger = LoggerFactory.getLogger("task_log");
+	private static Logger ai_logger = LoggerFactory.getLogger("task_log");
 	ThreadPoolExecutor  pool = new ThreadPoolExecutor(20, 100, 1,TimeUnit.SECONDS,
 			new LinkedBlockingDeque<Runnable>(1000), 
 			Executors.defaultThreadFactory(), 
 			new ThreadPoolExecutor.CallerRunsPolicy());
-	
+	private static final SimpleDateFormat DF_YYYY_MM_DD = new SimpleDateFormat("yyyy-MM-dd");// 设置日期格式
+	private static final SimpleDateFormat DF_YYYY_MM_DD_number = new SimpleDateFormat("yyyyMMdd");// 设置日期格式
 	@Autowired
 	private GuPiaoService guPiaoService;
 	@Autowired
@@ -137,7 +141,7 @@ public class MonitorTask  {
 			before.add(Calendar.DATE, -5);
 			if(log.getIsBuyin() && log.getLastBuyin()!= null && log.getLastBuyin().after(before.getTime()) ) {
 				if(log.getWinRate().doubleValue()>=3 && log.getWinRate().doubleValue()<=40) {
-					log.setLogs(log.getLogs().replace("测试AI操盘", "AI个股推荐"));
+					log.setLogs(log.getLogs().replace("测试AI操盘", "AI个股推荐(箱体策略)"));
 					for(SubscriptionDo realTime:subscriptionList) {
 						String key=RedisKeyUtil.getStockSellNotify(realTime.getNumber(), realTime.getDingtalkId());
 						Boolean isNotifyByMock=(Boolean)redisUtil.get(key);
@@ -172,6 +176,66 @@ public class MonitorTask  {
 		}
 		
 	}
+	
+	@Scheduled(cron = "0 30 10 * * MON-FRI")
+	public void EmaGupiao() {
+		Calendar now = Calendar.getInstance();  
+		now.add(Calendar.DATE, -1);
+		String today=DF_YYYY_MM_DD_number.format(now.getTime());
+		List<SubscriptionDo> subscriptionList=new ArrayList<SubscriptionDo>();
+		for(SubscriptionDo realTime:guPiaoService.listMemberAll()) {
+			if(StringUtils.equals(realTime.getNumber(), "0")){
+				subscriptionList.add(realTime);
+			}
+		}
+		String logContext="GS===========EMA策略选股=============";
+		for(StockDo stock : guPiaoService.getAllStock()){
+			HistoryDayStockDo obj=new HistoryDayStockDo();
+			obj.setNumber(stock.getNumber()); 
+			obj.setHistoryDay(today);
+			obj=historyDayStockMapper.getByTime(obj);
+			if(obj == null||obj.getClose()==null) {
+				continue;
+			}
+			if(obj.getClose().intValue() >35 || obj.getClose().intValue() <12 ) {
+				continue;
+			}
+			
+			Calendar before = Calendar.getInstance();  
+			before.add(Calendar.DATE, -3);
+			List<StockPriceVo> spList=trendStrategyService.transformByDayLine(historyDayStockMapper.getNumber(stock.getNumber()));
+			RobotAccountDo account=new RobotAccountDo();
+			RobotSetDo config=new RobotSetDo();
+			account.setTotal(new BigDecimal(100000));
+			List<TradingRecordDo> rtList=trendStrategyService.getStrategyByEMA(spList, account, config);
+			for(TradingRecordDo rt:rtList) {
+				System.out.println(logContext);
+				if(rt.getCreateDate().after(before.getTime())) {
+					logContext=logContext
+							+"\n时间:"+DF_YYYY_MM_DD.format(rt.getCreateDate())
+							+"\n股票编号:"+rt.getNumber()
+							+"\n股票名称:"+rt.getName()
+							+"\n当天均价："+rt.getPrice()
+							+"\n"+rt.getRemark()+"\n";
+				}
+			}
+		}
+		ai_logger.info(logContext);
+		for(SubscriptionDo realTime:subscriptionList) {
+			String key=RedisKeyUtil.getEmaStockSellNotify(realTime.getNumber(), realTime.getDingtalkId());
+			Boolean isNotifyByMock=(Boolean)redisUtil.get(key);
+			//通知开关
+			if(isNotifyByMock == null || isNotifyByMock) {
+				isNotifyByMock=true;
+			}
+			if(isNotifyByMock) {
+				isNotifyByMock=false;
+				DingTalkRobotHTTPUtil.sendMsg(realTime.getDingtalkId(), logContext, null, false);
+			}
+			redisUtil.set(key,isNotifyByMock,86400L);
+		}
+	}
+	
 	
 	private String updateMsg(final String number, String msg) {
 		try {

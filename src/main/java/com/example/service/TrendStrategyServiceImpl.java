@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.BaseBarSeries;
+import org.ta4j.core.indicators.EMAIndicator;
 import org.ta4j.core.indicators.SMAIndicator;
 import org.ta4j.core.indicators.bollinger.BollingerBandsLowerIndicator;
 import org.ta4j.core.indicators.bollinger.BollingerBandsMiddleIndicator;
@@ -22,6 +24,7 @@ import org.ta4j.core.indicators.bollinger.BollingerBandsUpperIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 import org.ta4j.core.indicators.statistics.StandardDeviationIndicator;
 
+import com.alibaba.fastjson.JSON;
 import com.example.chart.base.entity.Candle;
 import com.example.chart.base.entity.Entry;
 import com.example.chart.entity.BollEntity;
@@ -65,23 +68,27 @@ public class TrendStrategyServiceImpl implements TrendStrategyService {
 
 	@Override
 	public BarSeries transformBarSeriesByStockPrice(List<StockPriceVo> list) {
-		if(list == null || list.isEmpty()) {
+		if (list == null || list.isEmpty()) {
 			return null;
 		}
 		BarSeries series = new BaseBarSeries(list.get(0).getNumber());
-		for(StockPriceVo stock:list) {
-			    Timestamp timestamp=new Timestamp(DateUtils.getDateForYYYYMMDDHHMM_NUMBER(stock.getHistoryAll()).getTime());
-	            ZonedDateTime date = ZonedDateTime.ofInstant(timestamp.toInstant(), ZoneOffset.UTC);
-	            double open = stock.getOpen().doubleValue();
-	            double high = stock.getHigh().doubleValue();
-	            double low = stock.getLow().doubleValue();
-	            double close = stock.getClose().doubleValue();
-	            double volume = stock.getVolume();
-	            series.addBar(date, open, high, low, close, volume);
-	        }
+		for (StockPriceVo stock : list) {
+			try {
+				Timestamp timestamp = new Timestamp(DateUtils.getDateForYYYYMMDDHHMM_NUMBER(stock.getHistoryAll()).getTime());
+				ZonedDateTime date = ZonedDateTime.ofInstant(timestamp.toInstant(), ZoneOffset.UTC);
+				double open = stock.getOpen().doubleValue();
+				double high = stock.getHigh().doubleValue();
+				double low = stock.getLow().doubleValue();
+				double close = stock.getClose().doubleValue();
+				double volume = stock.getVolume();
+				series.addBar(date, open, high, low, close, volume);
+			} catch (Exception e) {
+				logger.error(JSON.toJSONString(stock)+":"+e.getMessage(),e);
+			}
+		}
 		return series;
 	}
-	
+
 	@Override
 	public List<Candle> transformStockPrice(List<StockPriceVo> list) {
 		List<Candle> rsList = new ArrayList<Candle>();
@@ -103,6 +110,9 @@ public class TrendStrategyServiceImpl implements TrendStrategyService {
 	public List<StockPriceVo> transformByDayLine(List<HistoryDayStockDo> list) {
 		List<StockPriceVo> rsList = new ArrayList<StockPriceVo>();
 		for (HistoryDayStockDo dayStock : list) {
+			if(dayStock.getVolume()==null || dayStock.getVolume()<=0) {
+				continue;
+			}
 			StockPriceVo stock = new StockPriceVo();
 			stock.setClose(dayStock.getClose());
 			stock.setOpen(dayStock.getOpen());
@@ -188,7 +198,7 @@ public class TrendStrategyServiceImpl implements TrendStrategyService {
 	}
 
 	@Override
-	public List<TradingRecordDo> getStrategyByMa(List<StockPriceVo> list, RobotAccountDo account, RobotSetDo config) {
+	public List<TradingRecordDo> getStrategyByMA(List<StockPriceVo> list, RobotAccountDo account, RobotSetDo config) {
 		List<TradingRecordDo> rslist=new ArrayList<TradingRecordDo>();
 		MAEntity ma = buildMaEntry(list);
 	    
@@ -249,49 +259,31 @@ public class TrendStrategyServiceImpl implements TrendStrategyService {
 	}
 	
 	@Override
-	public List<TradingRecordDo> getStrategyByEMa(List<StockPriceVo> list, RobotAccountDo account, RobotSetDo config) {
+	public List<TradingRecordDo> getStrategyByEMA(List<StockPriceVo> list, RobotAccountDo account, RobotSetDo config) {
 		List<TradingRecordDo> rslist=new ArrayList<TradingRecordDo>();
 		EMAEntity ema = buildEmaEntry(list);
-	    
+	    if(ema==null) {
+	    	return rslist;
+	    }
 		boolean isbuy=false;
 	    for(int i=0;i<list.size();i++) {
 	    	StockPriceVo price=list.get(i);
+	    	//89
 	    	Entry maValue1=ema.getEmaList1().get(i);
+	    	//144
 	    	Entry maValue2=ema.getEmaList2().get(i);
 	    	double buyPoint=maValue1.getY();
 	    	double sellPoint=buyPoint*1.1;
 	    	double stopLossPoint=maValue2.getY();
 	    	
-	    	if(price.getClose().doubleValue() <= stopLossPoint) {
-	    		double sotck=account.getTotal().intValue() * 0.2/ (price.getOpen().intValue()*100);
-	    		int num=(int)sotck*100;
-	    		TradingRecordDo buyRecord=new TradingRecordDo(
-	    				DateUtils.getDateForYYYYMMDDHHMM_NUMBER(price.getHistoryAll()),
-	    				price.getNumber(),
-	    				price.getName(),
-	    				config.getDtId(),
-	    				price.getOpen(),
-	    				num,
-	    				TradingRecordDo.options_sell,
-	    				"跌破止损卖出"
-	    				);
-	    		isbuy=true;
-	    		rslist.add(buyRecord);
-	    	}
 	    	
-	    	//股价收盘在MA1,MA2之下或 MA1不在MA2之上都是跳过
-	    	if(maValue1.getY() < maValue2.getY() || price.getClose().doubleValue()<maValue1.getY() || price.getClose().doubleValue()<maValue2.getY()) {
-	    		isbuy=false;
+	    	//趋势判断 10天必须比现在低
+	    	if(maValue1.getY() > maValue2.getY()) {
 	    		continue;
 	    	}
 	    	
-	    	//趋势判断 10天必须比现在低
-	    	if(i>10 && ema.getEmaList1().get(i-10).getY()>ema.getEmaList1().get(i).getY()) {
-	    		isbuy=true;
-	    	}
-	    	
 	    	//开盘价在MA1之下，收盘价在MA1之上
-	    	if(isbuy && price.getOpen().doubleValue() <= buyPoint && price.getClose().doubleValue() >= buyPoint) {
+	    	if(i>144&&price.getOpen().doubleValue() <= maValue1.getY() && price.getOpen().doubleValue() <= maValue2.getY() && price.getClose().doubleValue()>=maValue1.getY() && price.getClose().doubleValue() >= maValue2.getY() ) {
 	    		double sotck=account.getTotal().intValue() * 0.2/ (price.getOpen().intValue()*100);
 	    		int num=(int)sotck*100;
 	    		TradingRecordDo buyRecord=new TradingRecordDo(
@@ -302,35 +294,44 @@ public class TrendStrategyServiceImpl implements TrendStrategyService {
 	    				price.getOpen(),
 	    				num,
 	    				TradingRecordDo.options_buy,
-	    				"突破EMA 87 均线买入"
+	    				"买入信号"+getLastPrice(list,i,10)
 	    				);
-	    		rslist.add(buyRecord);
-	    	}
-	    	if(price.getClose().doubleValue() >= sellPoint) {
-	    		double sotck=account.getTotal().intValue() * 0.2/ (price.getOpen().intValue()*100);
-	    		int num=(int)sotck*100;
-	    		TradingRecordDo buyRecord=new TradingRecordDo(
-	    				DateUtils.getDateForYYYYMMDDHHMM_NUMBER(price.getHistoryAll()),
-	    				price.getNumber(),
-	    				price.getName(),
-	    				config.getDtId(),
-	    				price.getOpen(),
-	    				num,
-	    				TradingRecordDo.options_sell,
-	    				"止盈卖出"
-	    				);
-	    		isbuy=true;
 	    		rslist.add(buyRecord);
 	    	}
 	    }
 		return rslist;
 	}
 
+	private String  getLastPrice(List<StockPriceVo> list, int i, int j) {
+		int jump=list.size()-1;
+		if(list.size()>=i+j) {
+			jump=i+j-1;
+		}
+		String rs=" 策略失败";
+		BigDecimal top=list.get(jump).getClose();
+		for(int l=i+1;l<=jump;l++) {
+			if(top.doubleValue()<list.get(l).getClose().doubleValue()) {
+				top=list.get(l).getClose();
+			}
+		}
+		if( top.doubleValue() > list.get(i).getClose().doubleValue()) {
+			rs=" 策略成功";
+		}
+		
+		if( top.doubleValue() == list.get(i).getClose().doubleValue()) {
+			rs=" 持股观察";
+		}
+		return  "现价："+list.get(i).getClose()+" "+"未来最高的收盘价："+top+" "+ rs;
+	}
+
 	private EMAEntity buildEmaEntry(List<StockPriceVo> list) {
+		if(list.isEmpty()||list.size()<144) {
+			return null;
+		}
 		BarSeries series = transformBarSeriesByStockPrice(list);
 		ClosePriceIndicator closePrice = new ClosePriceIndicator(series);
-	    SMAIndicator avg1 = new SMAIndicator(closePrice, 87);
-	    SMAIndicator avg2 = new SMAIndicator(closePrice, 144);
+		EMAIndicator avg1 = new EMAIndicator(closePrice, 89);
+		EMAIndicator avg2 = new EMAIndicator(closePrice, 144);
 	    List<Entry> maList1 =new  ArrayList<Entry>();
 	    List<Entry> maList2 =new  ArrayList<Entry>();
 	    for(int i=0;i<list.size();i++) {
@@ -488,7 +489,6 @@ public class TrendStrategyServiceImpl implements TrendStrategyService {
 	    				+"\n止损点："+new BigDecimal(stopLossPoint).setScale(2,BigDecimal.ROUND_DOWN)
 	    				+"\n止盈点："+new BigDecimal(sellPoint).setScale(2,BigDecimal.ROUND_DOWN)+"-"+new BigDecimal(upValue.getY()*1.02).setScale(2,BigDecimal.ROUND_DOWN)
 	    				);
-	    		
 	    		rslist.add(buyRecord);
 	    	}
 	    }

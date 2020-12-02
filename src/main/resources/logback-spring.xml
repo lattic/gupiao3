@@ -106,6 +106,21 @@
 			<totalSizeCap>20GB</totalSizeCap>
 		</rollingPolicy>
 	</appender>
+	<appender name="AI_LOG"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_PATH}/ai.log</file>
+		<encoder>
+			<pattern>${FILE_LOG_PATTERN}</pattern>
+		</encoder>
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_PATH}/ai.%d{yyyy-MM-dd}.%i.log
+			</fileNamePattern>
+			<maxHistory>7</maxHistory>
+			<maxFileSize>1GB</maxFileSize>
+			<totalSizeCap>20GB</totalSizeCap>
+		</rollingPolicy>
+	</appender>
 
 	<appender name="CONSOLE"
 		class="ch.qos.logback.core.ConsoleAppender">
@@ -115,7 +130,9 @@
 		</encoder>
 	</appender>
 
-
+	<logger name="ai_log" level="INFO" additivity="false">
+		<appender-ref ref="AI_LOG" />
+	</logger>
 
 	<logger name="task_log" level="INFO" additivity="false">
 		<appender-ref ref="TASK_LOG" />

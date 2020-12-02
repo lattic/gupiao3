@@ -58,7 +58,7 @@ public class GupiaoServiceTest {
 	private RedisUtil redisUtil;
 	@Autowired
 	private ReadApiUrl readApiUrl;
-	
+	@Autowired
 	private MonitorTask monitorTask;
 	
 	@Autowired
@@ -70,6 +70,13 @@ public class GupiaoServiceTest {
 	private DataTask dataTask;
 	
 	@Test
+	public void AiBuyIn() {
+		monitorTask.EmaGupiao();
+	}
+
+	
+	
+	//@Test
 	public void dataTask() {
 		try {
 			dataTask.afterPropertiesSet();
@@ -160,17 +167,6 @@ public class GupiaoServiceTest {
 		JDIBridge.THS_iFinDLogout();
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	//@Test
 	public void readUrl() {
 		readApiUrl.readHistoryApiUrl(number, 60);
@@ -194,11 +190,7 @@ public class GupiaoServiceTest {
 		mockDeal.mockDeal("sz399006", "2020-07-15", appSecret, true);
 	}
 
-	// @Test
-	public void AiBuyIn() {
-		monitorTask.AiBuyIn();
-	}
-
+	
 	// @Test
 	public void updateHistory() {
 		guPiaoService.updateHistoryStock("sh601702");

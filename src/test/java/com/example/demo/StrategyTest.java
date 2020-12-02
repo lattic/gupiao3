@@ -1,6 +1,7 @@
 package com.example.demo;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
@@ -12,6 +13,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.example.mapper.HistoryDayStockMapper;
 import com.example.model.RobotAccountDo;
 import com.example.model.RobotSetDo;
+import com.example.model.StockDo;
 import com.example.model.StockPriceVo;
 import com.example.model.TradingRecordDo;
 import com.example.service.GuPiaoService;
@@ -43,10 +45,31 @@ public class StrategyTest {
 	private static final SimpleDateFormat DF_YYYY_MM_DD = new SimpleDateFormat("yyyy-MM-dd");// 设置日期格式
 	
 	@Test
-	public void Test() {
+	public void TestStrategyByEMa() {
+		List<StockDo> list1= new ArrayList<StockDo>();
+		List<StockDo> list=guPiaoService.getAllStock();
+		int k=list.size()/5;
+		list1=list.subList(0, k);
+		for(StockDo sk:list1) {
+			List<StockPriceVo> spList=trendStrategyService.transformByDayLine(historyDayStockMapper.getNumber(sk.getNumber()));
+			RobotAccountDo account=new RobotAccountDo();
+			RobotSetDo config=new RobotSetDo();
+			account.setTotal(new BigDecimal(100000));
+			List<TradingRecordDo> rtList=trendStrategyService.getStrategyByEMA(spList, account, config);
+			for(TradingRecordDo rt:rtList) {
+				BigDecimal total =rt.getTotal().add(account.getTotal());
+				total=total.setScale(2, BigDecimal.ROUND_UP);
+				System.out.println(DF_YYYY_MM_DD.format(rt.getCreateDate())+" "+rt.getNumber()+" 当天均价："+rt.getPrice()+" "+rt.getRemark());
+			}
+		}
+		
+	}
+	
+	
+	//@Test
+	public void TestStrateByBoll() {
 		
 		List<StockPriceVo> spList=trendStrategyService.transformByDayLine(historyDayStockMapper.getNumber(number));
-		//List<Candle> originData=trendStrategyService.transformStockPrice(spList);
 		RobotAccountDo account=new RobotAccountDo();
 		RobotSetDo config=new RobotSetDo();
 		account.setTotal(new BigDecimal(100000));

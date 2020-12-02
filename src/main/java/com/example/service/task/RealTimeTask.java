@@ -119,47 +119,27 @@ public class RealTimeTask implements InitializingBean {
 	
 	
 	
-	@Scheduled(cron = "0 15 8,15,23 * * MON-FRI")
+	@Scheduled(cron = "0 40 8,15,23 * * MON-FRI")
 	public void  updateHistoryTask1() {
 		//获取所有股票的历史60分钟数据
 		for(StockDo stock:list1) {
 			updateHistoryStock(stock,today,pool1);
 		}
-	}
-	
-	@Scheduled(cron = "5 15 8,15,23 * * MON-FRI")
-	public void  updateHistoryTask2() {
-		//获取所有股票的历史60分钟数据
 		for(StockDo stock:list2) {
 			updateHistoryStock(stock,today,pool2);
 		}
-	}
-	
-	@Scheduled(cron = "10 15 8,15,23 * * MON-FRI")
-	public void  updateHistoryTask3() {
-		//获取所有股票的历史60分钟数据
 		for(StockDo stock:list3) {
 			updateHistoryStock(stock,today,pool3);
 		}
-	}
-	
-	@Scheduled(cron = "15 15 8,15,23 * * MON-FRI")
-	public void  updateHistoryTask4() {
-		//获取所有股票的历史60分钟数据
 		for(StockDo stock:list4) {
 			updateHistoryStock(stock,today,pool4);
 		}
-	}
-	
-	@Scheduled(cron = "20 15 8,15,23 * * MON-FRI")
-	public void  updateHistoryTask5() {
-		//获取所有股票的历史60分钟数据
 		for(StockDo stock:list5) {
 			updateHistoryStock(stock,today,pool5);
 		}
 	}
 	
-	private void updateHistoryStock(StockDo stock,String today,ThreadPoolExecutor  pool) {
+	private void updateHistoryStock(final StockDo stock,final String today,final ThreadPoolExecutor  pool) {
 		pool.execute(new Runnable() {
 			@Override
 			public void run() {
@@ -168,7 +148,7 @@ public class RealTimeTask implements InitializingBean {
 					logger.info("更新数据(补60分钟线)--->"+stock.getNumber()+" "+redisUtil.get(RedisKeyUtil.getStockName(stock.getNumber()))+" "+today);
 					guPiaoService.updateHistoryStock(stock.getNumber());
 					guPiaoService.timeInterval(stock.getNumber());
-					redisUtil.set(key, true);
+					redisUtil.set(key, true,3500);
 				}
 			}
 		});
